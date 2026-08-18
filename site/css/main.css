@@ -1498,7 +1498,8 @@ section#art {
   transform: rotate(-4deg) translateX(calc(-14 * var(--u)));
 }
 @media (max-width: 820px) {
-  .headspace { --u: calc((100vw - 26px) / 342); }
+  /* la tête déborde volontairement un peu de l'écran */
+  .headspace { --u: calc((100vw + 16px) / 342); }
 }
 .headspace img { image-rendering: pixelated; }
 
@@ -2103,9 +2104,10 @@ section#art {
   /* fan-arts : 2 par ligne */
   .art-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
-  /* modal produit : photo bien plus grande */
-  .product-modal #modal-visual { flex-basis: 320px; }
-  .product-modal #modal-visual .product-visual { max-height: 330px; }
+  /* modal produit : plus large et photo nettement plus grande */
+  .product-modal { width: 96vw; }
+  .product-modal #modal-visual { flex-basis: 400px; }
+  .product-modal #modal-visual .product-visual { max-height: 430px; }
 
   /* --- merch : produits côte à côte, tout tient dans un écran --- */
   .bento-board { grid-template-columns: 10fr 9fr; min-height: 210px; }
