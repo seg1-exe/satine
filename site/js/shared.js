@@ -139,12 +139,37 @@
     var i = -1;
 
     var box = document.getElementById('clippy');
+    var typer = null;
+    var blip = null;
 
+    function stopTyping() {
+      if (typer) { clearInterval(typer); typer = null; }
+      if (blip) blip.pause();
+    }
+
+    /* écriture façon Undertale : lettre par lettre + son de frappe */
     function say() {
       i = (i + 1) % CLIPPY_MSGS.length;
-      text.textContent = CLIPPY_MSGS[i];
+      var msg = '* ' + CLIPPY_MSGS[i];
       bubble.hidden = false;
+      stopTyping();
+
+      if (!blip) {
+        blip = new Audio('assets/audio/text_sound_effect.mp3');
+        blip.volume = 0.55;
+      }
+      blip.currentTime = 0;
+      blip.play().catch(function () { /* avant le 1er geste : frappe muette */ });
+
+      var pos = 0;
+      text.textContent = '';
+      typer = setInterval(function () {
+        pos++;
+        text.textContent = msg.slice(0, pos);
+        if (pos >= msg.length) stopTyping();
+      }, 34);
     }
+
     img.addEventListener('click', function () {
       say();
       /* petit pop de la télé à chaque clic */
@@ -154,6 +179,7 @@
     });
     document.getElementById('clippy-close').addEventListener('click', function (e) {
       e.stopPropagation();
+      stopTyping();
       bubble.hidden = true;
     });
     setTimeout(say, 2500);

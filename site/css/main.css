@@ -27,6 +27,13 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* empêche les éléments volontairement débordants (la tête inclinée…)
+   d'élargir le viewport : sans ça, Safari iOS dézoome toute la page */
+html, body {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
 /* scrollbar rétro : thumb rectangulaire pleine largeur, sans arrondi.
    ATTENTION : ne PAS ajouter `scrollbar-color`/`scrollbar-width` ici — leur
    présence fait basculer Chromium/Brave sur les scrollbars standard (fines,
@@ -1228,30 +1235,36 @@ img.photo-frame {
   100% { transform: scale(1); }
 }
 @keyframes clippy-bob { 50% { transform: translateY(-7px) rotate(-2deg); } }
+/* bulle façon boîte de dialogue Undertale : noir, bordure blanche,
+   texte pixel blanc qui s'écrit à la machine */
 #clippy .bubble {
   position: absolute;
   bottom: 105%;
   right: 8px;
-  width: 210px;
-  background: #fffbe6;
-  color: #222;
-  border: 2px solid #000;
-  border-radius: 12px 12px 2px 12px;
+  width: 240px;
+  min-height: 58px;
+  background: #000;
+  color: #fff;
+  border: 3px solid #fff;
+  outline: 2px solid #000;
+  border-radius: 0;
   padding: 10px 12px;
-  font-size: 13px;
-  box-shadow: 3px 3px 0 rgba(0,0,0,.4);
+  font-family: var(--font-lcd);
+  font-size: 18px;
+  line-height: 1.3;
+  letter-spacing: 0.5px;
 }
-/* queue de bulle : losange à cheval sur le bord bas, bordé côté extérieur */
+/* queue : losange noir bordé de blanc côté extérieur */
 #clippy .bubble::after {
   content: "";
   position: absolute;
-  bottom: -9px;
+  bottom: -10px;
   right: 26px;
   width: 15px;
   height: 15px;
-  background: #fffbe6;
-  border-right: 2px solid #000;
-  border-bottom: 2px solid #000;
+  background: #000;
+  border-right: 3px solid #fff;
+  border-bottom: 3px solid #fff;
   transform: rotate(45deg);
 }
 #clippy .bubble .close-clippy {
@@ -1259,7 +1272,9 @@ img.photo-frame {
   top: 2px; right: 6px;
   cursor: pointer;
   font-weight: bold;
-  color: #a00;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
 }
 
 /* ==========================================================================
@@ -1384,12 +1399,12 @@ section { margin-top: 30px; }
   min-height: 0;
   overflow: hidden;
 }
-/* le visuel vise 220px et rétrécit en premier si l'écran est petit */
-.product-modal #modal-visual { flex: 0 1 220px; min-height: 90px; }
+/* hauteur CONCRÈTE en vh (pas de height:100% sur flex-basis : Safari iOS
+   la considère indéfinie et retombe sur la hauteur de base) */
+.product-modal #modal-visual { flex: 0 0 auto; }
 .product-modal #modal-visual .product-visual {
-  height: 100%;
+  height: min(32vh, 240px);
   min-height: 90px;
-  max-height: 240px;
 }
 
 /* visuel produit = vraie photo (absolue : boîte définie pour object-fit) */
@@ -2104,10 +2119,12 @@ section#art {
   /* fan-arts : 2 par ligne */
   .art-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
-  /* modal produit : plus large et photo nettement plus grande */
-  .product-modal { width: 96vw; }
-  .product-modal #modal-visual { flex-basis: 400px; }
-  .product-modal #modal-visual .product-visual { max-height: 430px; }
+  /* modal produit : plus large et photo nettement plus grande.
+     Largeur relative au conteneur (pas au viewport) : sinon la fenêtre
+     déborde de la zone paddée de l'overlay et se décale */
+  #modal-overlay { padding: 10px; }
+  .product-modal { width: 100%; }
+  .product-modal #modal-visual .product-visual { height: min(46vh, 430px); }
 
   /* --- merch : produits côte à côte, tout tient dans un écran --- */
   .bento-board { grid-template-columns: 10fr 9fr; min-height: 210px; }
