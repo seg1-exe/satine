@@ -19,7 +19,9 @@
   --lcd-green: #49ff6a;
   --font-display: 'Audiowide', 'Impact', sans-serif;
   --font-lcd: 'VT323', 'Courier New', monospace;
-  --font-body: 'Comic Sans MS', 'Comic Neue', cursive;
+  /* iOS n'a pas Comic Sans MS : Comic Relief (Google Fonts) est un clone
+     fidèle et aussi épais — Comic Neue, trop fine, reste en dernier recours */
+  --font-body: 'Comic Sans MS', 'Comic Relief', 'Comic Neue', cursive;
   --font-alt: Helvetica, 'Helvetica Neue', Arial, sans-serif;
   --rail-w: 270px;
   --player-h: 64px;
@@ -437,6 +439,8 @@ img.photo-frame {
   text-shadow: 0 1px 2px rgba(60, 0, 0, .6);
 }
 .xp-btns span:hover { filter: brightness(1.1); }
+/* fenêtres à bouton unique (modal, panier) : le ✕ est arrondi des deux côtés */
+.xp-btns span:only-child { border-radius: 0 0 5px 5px; }
 
 /* barre de menu opaque gris-bleu, comme la maquette */
 .xp-menubar {
@@ -775,8 +779,8 @@ img.photo-frame {
 .cart-total {
   font-family: var(--font-alt);
 }
-/* exception : la bio About me en Comic Sans bold */
-.g-about .leo-box .inner { font-family: var(--font-body); font-weight: bold; }
+/* exception : la bio About me en Comic Sans regular */
+.g-about .leo-box .inner { font-family: var(--font-body); font-weight: normal; }
 
 /* table interests : lignes espacées */
 .interests {
