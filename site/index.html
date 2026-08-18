@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SATINE ★ MySAT'S BLOG - A space for US</title>
+  <meta name="description" content="Le blog officiel de SATINE : chanteuse, productrice. Merch, tournée, clip et secrets.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=VT323&family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="js/shared.js" defer></script>
+  <script src="js/player.js" defer></script>
+  <script src="js/chat.js" defer></script>
+</head>
+<body data-page="home">
+<div id="page-main">
+
+  <!-- ==================== PROFIL + MERCH ==================== -->
+  <div class="profile-grid" id="top">
+    <div class="profile-left">
+      <h1 class="satine-title">SATINE</h1>
+      <p class="satine-sub">Chanteuse / productrice</p>
+      <img class="photo-frame" src="assets/img/pfp.webp" alt="Photo de SATINE">
+
+      <div class="bgroup g-about">
+      <div class="section-bar"><h2>About me :</h2></div>
+      <div class="leo-box" style="margin-top:10px">
+        <div class="inner">
+          je suis SATINE la celebre chanteuse qui fait de la musiuqe. je fais des sons qui font
+          bzzzt et parfois piou piou. j'aime les barrettes, les vieux ordis et la télé qui gresille.
+          <i>(bio placeholder : le vrai texte arrive avec les assets)</i>
+        </div>
+      </div>
+
+      </div>
+    </div>
+
+    <div class="xp-window" id="merch">
+      <div class="xp-titlebar">
+        <span class="xp-ico">📝</span>
+        <span class="xp-title">Merch - Bloc-notes</span>
+        <span class="xp-btns"><span>—</span><span class="xp-max">□</span><span class="xp-close">✕</span></span>
+      </div>
+      <div class="xp-menubar">
+        <span>Fichier</span><span>Edition</span><span>Format</span><span>Affichage</span><span>?</span>
+      </div>
+      <div class="hazard merch-bento">
+        <div class="bento-board">
+          <span class="price-burst pb-tr"><b>10€</b></span>
+          <span class="price-burst pb-bl"><b>35€</b></span>
+          <div class="bento-item bento-barrettes">
+            <img class="product-click" src="assets/img/barretes.webp" alt="Pack de 3 barrettes « !! »" onclick="SatineModal.open('barrettes')">
+          </div>
+          <div class="bento-item bento-poster product-click" onclick="SatineModal.open('poster')">
+            <img src="assets/img/poster.webp" alt="Poster anomalisa">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BENTO ABOUT / TOURNÉE ==================== -->
+  <div class="home-bento">
+
+    <div class="bento-col">
+      <div class="bgroup g-interests">
+      <div class="section-bar"><h2>My interests :</h2></div>
+      <div class="leo-box" style="margin-top:10px">
+        <table class="interests">
+          <tr><td class="k">一般</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">Music</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">映画</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">テレビ</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">Books</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">英雄</td><td class="v">bla bla bla blabla bla</td></tr>
+        </table>
+      </div>
+      </div>
+
+        <!-- ==================== LE CLIP ==================== -->
+        <section id="clip">
+          <!-- Player "Headspace" (skin WMP d'origine, reconstruit en HTML/CSS) -->
+          <div class="headspace">
+            <img class="hs-ear hs-ear-l" src="assets/img/wmp/ear-left.png" alt="">
+            <img class="hs-ear hs-ear-r" src="assets/img/wmp/ear-right.png" alt="">
+            <div class="hs-video">
+              <iframe id="clip-frame" class="clip-embed"
+                src="https://www.youtube.com/embed/pLmsvejt9RU?si=M7--nDRdLOlINgcJ&enablejsapi=1"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <img class="hs-head" src="assets/img/wmp/head.png" alt="Player Headspace (la tête verte)">
+            <img class="hs-strip" src="assets/img/wmp/controls-default.png" alt="">
+            <button class="hs-btn" id="hs-prev" style="--bx:1" title="Reculer de 10s"></button>
+            <button class="hs-btn" id="hs-play" style="--bx:26" title="Lecture"></button>
+            <button class="hs-btn" id="hs-stop" style="--bx:52" title="Stop"></button>
+            <button class="hs-btn" id="hs-next" style="--bx:77" title="Avancer de 10s"></button>
+            <button class="hs-btn" id="hs-vis" style="--bx:119" title="Regarder sur YouTube"></button>
+            <button id="hs-pause" title="Pause" hidden></button>
+            <div class="hs-progress" id="hs-progress" title="Avancer / reculer dans le clip">
+              <div class="hs-progress-fill" id="hs-progress-fill"></div>
+              <img class="hs-thumb" id="hs-thumb" src="assets/img/wmp/thumb-default.png" alt="">
+            </div>
+            <button class="hs-mini hs-eq" title="Égaliseur (décoratif, comme à l'époque)"></button>
+            <button class="hs-mini hs-pl" title="Playlist (décoratif)"></button>
+            <button id="hs-theme" title="Plein écran"></button>
+          </div>
+        </section>
+    </div>
+
+    <div class="bento-col" id="tournee">
+      <div class="bgroup g-tour">
+      <div class="section-bar"><h2>Tournée</h2></div>
+      <div class="tour-strip" style="margin-top:10px">
+        <span style="font-size:26px">🚌💨</span>
+        <span>Je pars en tournée avec <b>The Living Tombstone</b> aux US et EU !!</span>
+      </div>
+      <div class="leo-box" style="margin-top:14px">
+        <div class="table-scroll">
+        <table class="tour-table collapsible" id="tour-table">
+          <tr><th>Date</th><th>Ville</th><th>Salle</th><th>Billets</th></tr>
+          <tr><td>--/--/2026</td><td>Paris, FR</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr><td>--/--/2026</td><td>Londres, UK</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr><td>--/--/2026</td><td>Berlin, DE</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr><td>--/--/2026</td><td>Amsterdam, NL</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr class="extra"><td>--/--/2026</td><td>New York, US</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr class="extra"><td>--/--/2026</td><td>Los Angeles, US</td><td>[à confirmer]</td><td><span class="soldout">SOLD OUT (exemple)</span></td></tr>
+          <tr class="extra"><td>--/--/2026</td><td>Chicago, US</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr class="extra"><td>--/--/2026</td><td>Austin, US</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+        </table>
+        </div>
+        <button class="btn-red see-more" data-target="tour-table">VOIR PLUS ▼</button>
+      </div>
+
+      </div>
+
+      <div class="ad-slot ad-inline"><span>PUB M1<br>~440px de large</span></div>
+
+      <div class="bgroup g-friends">
+      <div class="section-bar"><h2>My friends space :</h2></div>
+      <div class="friends-grid" style="margin-top:10px">
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ==================== CHAT ==================== -->
+  <section id="chat">
+    <div class="xp-window">
+      <div class="xp-titlebar">
+        <span class="xp-ico">💬</span>
+        <span class="xp-title">satine_chat.exe - 42 connecté·es</span>
+        <span class="xp-btns"><span>—</span><span class="xp-max">□</span><span class="xp-close">✕</span></span>
+      </div>
+      <div class="xp-body">
+        <!--
+          PHASE 2 : remplacer ce faux chat par l'embed Chatango :
+          <iframe src="https://xxxxx.chatango.com/..." ...> (groupe à créer)
+          + image de fond custom dans les réglages de style Chatango.
+        -->
+        <div class="chat-log" id="chat-log"></div>
+        <div class="chat-input-row">
+          <input id="chat-input" placeholder="dis un truc gentil…" maxlength="140">
+          <button class="btn-red" id="chat-send">ENVOYER</button>
+        </div>
+        <p style="font-size:11px;color:#666;margin-top:6px">
+          [démo locale : le vrai chat Chatango sera branché ici, avec fond custom aux couleurs de Satine]
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ad-slot ad-inline"><span>PUB M2<br>~440px de large</span></div>
+
+  <!-- ==================== FAN ARTS ==================== -->
+  <section id="art">
+    <div class="section-bar"><h2>Fan arts</h2></div>
+    <div class="art-grid collapsible" id="art-grid" style="margin-top:12px">
+      <div class="art-piece" style="--tilt:-3deg"><div class="ph">🎨</div><p class="cap">fan-art #1 (placeholder)</p></div>
+      <div class="art-piece" style="--tilt:2deg"><div class="ph">🖼️</div><p class="cap">fan-art #2 (placeholder)</p></div>
+      <div class="art-piece" style="--tilt:-1deg"><div class="ph">✏️</div><p class="cap">fan-art #3 (placeholder)</p></div>
+      <div class="art-piece" style="--tilt:3deg"><div class="ph">🖌️</div><p class="cap">fan-art #4 (placeholder)</p></div>
+      <div class="art-piece" style="--tilt:-2deg"><div class="ph">📺</div><p class="cap">fan-art #5 (placeholder)</p></div>
+      <div class="art-piece" style="--tilt:1deg"><div class="ph">💖</div><p class="cap">fan-art #6 (placeholder)</p></div>
+      <div class="art-piece extra" style="--tilt:-3deg"><div class="ph">⭐</div><p class="cap">fan-art #7 (placeholder)</p></div>
+      <div class="art-piece extra" style="--tilt:2deg"><div class="ph">🎤</div><p class="cap">fan-art #8 (placeholder)</p></div>
+      <div class="art-piece extra" style="--tilt:-1deg"><div class="ph">🧷</div><p class="cap">fan-art #9 (placeholder)</p></div>
+      <div class="art-piece extra" style="--tilt:2deg"><div class="ph">📼</div><p class="cap">fan-art #10 (placeholder)</p></div>
+      <div class="art-piece extra" style="--tilt:-2deg"><div class="ph">🩷</div><p class="cap">fan-art #11 (placeholder)</p></div>
+      <div class="art-piece extra" style="--tilt:3deg"><div class="ph">🐈</div><p class="cap">fan-art #12 (placeholder)</p></div>
+    </div>
+    <button class="btn-red see-more" data-target="art-grid">VOIR PLUS ▼</button>
+  </section>
+
+</div>
+<script>
+  /* boutons VOIR PLUS / VOIR MOINS */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.see-more').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = document.getElementById(btn.getAttribute('data-target'));
+        var expanded = target.classList.toggle('expanded');
+        btn.textContent = expanded ? 'VOIR MOINS ▲' : 'VOIR PLUS ▼';
+      });
+    });
+  });
+
+  /* player Headspace → iframe YouTube (widget API via postMessage) */
+  document.addEventListener('DOMContentLoaded', function () {
+    var frame = document.getElementById('clip-frame');
+    var pauseBtn = document.getElementById('hs-pause');
+    var progress = document.getElementById('hs-progress');
+    var fill = document.getElementById('hs-progress-fill');
+    var hs = document.querySelector('.headspace');
+    var playing = false, currentTime = 0, duration = 0;
+
+    /* --- piste rythmique : anomalisa.mp3 joué en silence, en parallèle du
+       clip (même morceau), analysé en WebAudio pour faire pomper les
+       enceintes sur les vraies basses --- */
+    var beat = new Audio('assets/audio/anomalisa.mp3');
+    beat.preload = 'auto';
+    var actx = null, analyser = null, bassData = null, bassDisp = 0;
+
+    function ensureBeatGraph() {
+      if (actx) { actx.resume(); return; }
+      var C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return;
+      actx = new C();
+      var src = actx.createMediaElementSource(beat);
+      analyser = actx.createAnalyser();
+      analyser.fftSize = 256;
+      bassData = new Uint8Array(analyser.frequencyBinCount);
+      var mute = actx.createGain();
+      mute.gain.value = 0; /* on n'entend jamais le mp3, seul le clip a le son */
+      src.connect(analyser);
+      analyser.connect(mute);
+      mute.connect(actx.destination);
+    }
+
+    function startBeat() {
+      ensureBeatGraph();
+      beat.play().then(function () {
+        if (analyser) hs.classList.add('live');
+      }).catch(function () {
+        /* autoplay bloqué (lecture lancée depuis l'iframe YouTube) :
+           on réessaie au prochain geste utilisateur */
+        document.addEventListener('pointerdown', function retry() {
+          document.removeEventListener('pointerdown', retry);
+          if (playing) startBeat();
+        });
+      });
+    }
+    function stopBeat() { beat.pause(); }
+
+    var bassAvg = 0;
+    (function bassLoop() {
+      requestAnimationFrame(bassLoop);
+      if (!analyser || !playing) { hs.style.setProperty('--bass', 0); return; }
+      analyser.getByteFrequencyData(bassData);
+      var sum = 0, n = 6;
+      for (var i = 1; i <= n; i++) sum += bassData[i];
+      var raw = sum / n / 255;
+      /* seuil adaptatif : on pulse sur ce qui dépasse la moyenne glissante */
+      bassAvg = bassAvg * 0.97 + raw * 0.03;
+      var level = Math.min(1, Math.max(0, (raw - bassAvg) * 9));
+      bassDisp = Math.max(level, bassDisp * 0.82);
+      hs.style.setProperty('--bass', bassDisp.toFixed(3));
+    })();
+
+    function cmd(func, args) {
+      frame.contentWindow.postMessage(JSON.stringify({
+        event: 'command', func: func, args: args || []
+      }), 'https://www.youtube.com');
+    }
+
+    /* poignée de main : demande à YouTube de nous envoyer ses infos */
+    function listen() {
+      frame.contentWindow.postMessage(JSON.stringify({
+        event: 'listening', id: 'satine-hs', channel: 'widget'
+      }), 'https://www.youtube.com');
+    }
+    frame.addEventListener('load', listen);
+    listen();
+
+    window.addEventListener('message', function (e) {
+      if (e.origin !== 'https://www.youtube.com') return;
+      var d;
+      try { d = JSON.parse(e.data); } catch (err) { return; }
+      if (!d.info) return;
+      if (typeof d.info.currentTime === 'number') {
+        currentTime = d.info.currentTime;
+        /* resynchronise le mp3 rythmique s'il dérive du clip */
+        if (playing && !beat.paused && Math.abs(beat.currentTime - currentTime) > 0.35) {
+          beat.currentTime = currentTime;
+        }
+      }
+      if (typeof d.info.duration === 'number' && d.info.duration > 0) duration = d.info.duration;
+      if (duration > 0) {
+        var frac = Math.min(1, currentTime / duration);
+        fill.style.width = (frac * 100) + '%';
+        progress.style.setProperty('--frac', frac);
+      }
+      if (typeof d.info.playerState === 'number') {
+        playing = d.info.playerState === 1;
+        pauseBtn.hidden = !playing;
+        hs.classList.toggle('playing', playing);
+        if (playing) {
+          beat.currentTime = currentTime;
+          startBeat();
+        } else {
+          stopBeat();
+        }
+      }
+    });
+
+    document.getElementById('hs-play').addEventListener('click', function () {
+      /* créer le contexte audio dans le clic garantit qu'il démarre débloqué */
+      ensureBeatGraph();
+      cmd('playVideo');
+    });
+    pauseBtn.addEventListener('click', function () { cmd('pauseVideo'); });
+    document.getElementById('hs-stop').addEventListener('click', function () {
+      cmd('stopVideo');
+      fill.style.width = '0%';
+      progress.style.setProperty('--frac', 0);
+      stopBeat();
+      beat.currentTime = 0;
+    });
+    document.getElementById('hs-prev').addEventListener('click', function () {
+      cmd('seekTo', [Math.max(0, currentTime - 10), true]);
+    });
+    document.getElementById('hs-next').addEventListener('click', function () {
+      cmd('seekTo', [Math.min(duration || 1e9, currentTime + 10), true]);
+    });
+    document.getElementById('hs-vis').addEventListener('click', function () {
+      window.open('https://www.youtube.com/watch?v=pLmsvejt9RU', '_blank');
+    });
+    document.getElementById('hs-theme').addEventListener('click', function () {
+      var v = document.querySelector('.hs-video');
+      if (v.requestFullscreen) v.requestFullscreen();
+    });
+    progress.addEventListener('click', function (e) {
+      if (!duration) return;
+      var r = progress.getBoundingClientRect();
+      var frac = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      cmd('seekTo', [frac * duration, true]);
+    });
+  });
+</script>
+</body>
+</html>
