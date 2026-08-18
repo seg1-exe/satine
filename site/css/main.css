@@ -768,8 +768,8 @@ img.photo-frame {
 .cart-total {
   font-family: var(--font-alt);
 }
-/* exception : la bio About me reste en Comic Sans */
-.g-about .leo-box .inner { font-family: var(--font-body); }
+/* exception : la bio About me en Comic Sans bold */
+.g-about .leo-box .inner { font-family: var(--font-body); font-weight: bold; }
 
 /* table interests : lignes espacées */
 .interests {
@@ -2070,14 +2070,18 @@ section#art {
   #navbar { display: none; }
   #burger { display: block; }
 
-  /* --- identité éclair : pfp miniature + titre sur une rangée --- */
-  .profile-grid { gap: 12px; margin-bottom: 16px; }
-  .profile-left {
+  /* --- identité éclair + ordre mobile : pfp/titre, puis MERCH, puis bio.
+     La colonne profil passe en display:contents pour que ses enfants
+     deviennent des items de la grille et puissent encadrer le merch --- */
+  .profile-grid {
     display: grid;
     grid-template-columns: 64px 1fr;
     column-gap: 12px;
+    row-gap: 0;
     align-items: center;
+    margin-bottom: 16px;
   }
+  .profile-left { display: contents; }
   .profile-left .photo-frame {
     grid-column: 1;
     grid-row: 1 / 3;
@@ -2087,10 +2091,13 @@ section#art {
     border-width: 2px;
     outline-width: 2px;
   }
-  .satine-title { grid-column: 2; font-size: 32px; }
-  .satine-sub { grid-column: 2; margin: 0; font-size: 15px; }
-  /* le bloc About (déplacé sous la pfp) s'étale sous la rangée identité */
-  .profile-left .g-about { grid-column: 1 / -1; }
+  .satine-title { grid-column: 2; grid-row: 1; font-size: 32px; }
+  .satine-sub { grid-column: 2; grid-row: 2; margin: 0; font-size: 15px; }
+  #merch { grid-column: 1 / -1; grid-row: 3; margin-top: 12px; }
+  .profile-left .g-about { grid-column: 1 / -1; grid-row: 4; }
+
+  /* fan-arts : 2 par ligne */
+  .art-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
   /* --- merch : produits côte à côte, tout tient dans un écran --- */
   .bento-board { grid-template-columns: 10fr 9fr; min-height: 210px; }
