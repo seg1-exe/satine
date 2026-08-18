@@ -1013,7 +1013,11 @@ img.photo-frame {
   z-index: 50;
   display: flex;
   align-items: flex-end;
+  /* la boîte du dock s'étend même replié : elle ne doit jamais bloquer
+     les clics sur ce qu'il y a derrière (la télé Clippy notamment) */
+  pointer-events: none;
 }
+#p-toggle, #player-bar { pointer-events: auto; }
 /* toggle = un CD holographique. Replié : il dépasse du bord gauche de
    l'écran. Ouvert : il glisse avec l'autoradio et reste à moitié sorti de
    la fente (clic = éjection). Il tourne quand la musique joue. */
@@ -1494,7 +1498,7 @@ section#art {
   transform: rotate(-4deg) translateX(calc(-14 * var(--u)));
 }
 @media (max-width: 820px) {
-  .headspace { --u: calc((100vw - 62px) / 342); }
+  .headspace { --u: calc((100vw - 26px) / 342); }
 }
 .headspace img { image-rendering: pixelated; }
 
@@ -2098,6 +2102,10 @@ section#art {
 
   /* fan-arts : 2 par ligne */
   .art-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+  /* modal produit : photo bien plus grande */
+  .product-modal #modal-visual { flex-basis: 320px; }
+  .product-modal #modal-visual .product-visual { max-height: 330px; }
 
   /* --- merch : produits côte à côte, tout tient dans un écran --- */
   .bento-board { grid-template-columns: 10fr 9fr; min-height: 210px; }
