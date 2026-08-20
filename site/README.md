@@ -62,8 +62,10 @@ volontairement aucun drapeau « déjà entré ». Le script inline en tête du
    refresh, ce qui est pratique en développement. C'est la cible du lien
    « passer » en bas d'`intro.html`.
 
-L'ancre est conservée dans l'aller-retour : `index.html#tournee` passe par
-`intro.html#tournee` et revient au bon endroit.
+L'ancre n'est PAS conservée dans l'aller-retour : franchir la porte fait
+toujours atterrir en haut de la home (le hash est retiré et la restauration de
+scroll neutralisée pendant la révélation). Un lien profond `index.html#tournee`
+perd donc son ancre s'il passe par la porte — assumé.
 
 Sans `sessionStorage` (navigation privée stricte) aucune redirection n'a lieu :
 le site est servi directement, pas de boucle possible.
@@ -172,21 +174,30 @@ panier). Panier localStorage, checkout branché sur Shopify en phase 2.
 
 ## Réseaux sociaux
 
-Badges **88x31** sous la photo de profil — le format des boutons de site des
-années 2000 — en grille 2x2. Les logos sont les **vrais fichiers**, récupérés
-sur Wikimedia Commons et servis en local depuis `assets/img/socials/` :
+Six badges pleine largeur de la colonne profil (une colonne, comme la pfp),
+format bouton de site des années 2000 : fond dégradé clair, bordure noire,
+ombre portée. Liens en place, `target="_blank" rel="me noopener noreferrer"`.
+Sur mobile la grille passe en 2 colonnes, et le bouton panier (fixe) descend en
+bas à droite pour ne pas recouvrir les badges.
 
-| fichier | logo | licence Commons |
-| --- | --- | --- |
-| `instagram-2010.svg` | Instagram 2010 | domaine public |
-| `youtube-2006.svg` | YouTube 2006-2011 (le « You » + boîte rouge) | domaine public |
-| `discord-2015.svg` | Discord 2015-2021, ancien blurple #7289DA | domaine public |
-| `tiktok-text.svg` | TikTok — pas d'ancienne version, c'est l'actuel | domaine public |
+Tous les logos fournis sont désormais des **logos-mots** : Spotify, YouTube,
+Instagram (script bleu), TikTok, Twitch, Discord. Fichiers d'origine et
+versions servies dans `assets/img/socials/` — détourage + ~400px + WebP, sauf
+Discord, servi tel quel : c'est un SVG, vectoriel. Le badge Twitch garde un
+fond sombre : son logo d'époque est argenté et disparaîtrait sur fond clair.
+Le fond blanc du fichier Instagram fourni a été rendu transparent au passage.
 
-Ce sont tous des logos-mots, d'où le format large plutôt que des pastilles
-carrées, et le fond clair du badge : leurs couleurs (rouge, blurple, noir) sont
-faites pour ça. Marques déposées de leurs propriétaires respectifs, usage
-nominatif pour pointer vers les comptes de l'artiste.
+Marques déposées de leurs propriétaires respectifs, usage nominatif.
+
+## Curseurs
+
+Pack « Hatsune Miku » (`assets/img/cursor-pack/`, domaine public — voir son
+readme). Les fichiers utilisés sont renommés sans espaces dans
+`assets/cursors/` : normal, link, text, help, unavailable. Tous les `cursor:`
+du site passent par les variables `--cur-*` déclarées en tête de
+`css/main.css` ; pour changer de pack, ne toucher qu'à ces cinq lignes. Le
+hotspot est embarqué dans les `.cur`, et chaque valeur garde son mot-clé de
+fallback (`default`, `pointer`…), obligatoire.
 
 ## Page secrète
 
@@ -200,9 +211,8 @@ recacheront dans leurs visuels finaux. Saisie via la page Secret OU la barre
 - Visuels produits (fenêtre bento + modal — `CATALOG` dans `js/shared.js`)
 - Les 8 pubs des rails (`ADS_LEFT` / `ADS_RIGHT` dans `js/shared.js`) — y
   recacher les 3 fragments du mot de passe
-- Bio « About me », interests, friends, fan-arts
-- **Liens des réseaux sociaux** : les 4 `href="#"` sous la photo de profil.
-  Les logos, eux, sont en place (voir ci-dessous)
+- Bio « About me », interests, fan-arts (les friends sont en place :
+  TLT / Miku / Freddy / Kappa, vignettes optimisées dans `assets/img/friends/`)
 - Morceaux du player (`PLAYLIST` dans `js/player.js`) — mp3 placeholder générés
 - Rushs BTS (`secret.html`), dates/salles de tournée (`index.html#tournee`)
 - Messages des pop-ups d'erreur (`ERRORS` dans `js/intro.js`) — le son, lui,

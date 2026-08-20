@@ -54,7 +54,7 @@
         }
         if (/[?&]nointro\b/.test(location.search)) return;
         if (internalNav()) return;
-        location.replace(GATE_URL + location.hash);
+        location.replace(GATE_URL);
       } catch (e) { /* quota/refus : on laisse passer */ }
     })();
   </script>
@@ -70,18 +70,19 @@
   <div class="profile-grid" id="top">
     <div class="profile-left">
       <h1 class="satine-title" data-rv>SATINE</h1>
-      <p class="satine-sub" data-rv>Chanteuse / productrice</p>
       <img class="photo-frame" src="assets/img/pfp.webp" alt="Photo de SATINE" data-rv>
 
-      <!-- Badges 88x31, le format bouton des années 2000. Les logos sont les
-           vrais fichiers récupérés sur Wikimedia Commons (domaine public /
-           CC0), pas des redessins : voir assets/img/socials/. Ce sont les
-           anciennes versions, sauf TikTok qui n'a pas d'ancien logo. -->
+      <!-- Badges pleine largeur de la colonne, façon boutons de site des
+           années 2000. Tous les logos sont désormais des logos-mots (fournis
+           dans assets/img/socials/, détourés/convertis en webp — Discord est
+           le SVG d'origine, vectoriel). -->
       <ul class="socials" data-rv aria-label="Réseaux sociaux de SATINE">
-        <li><a class="social-btn" href="#" title="Instagram"><img src="assets/img/socials/instagram-2010.svg" alt="Instagram"></a></li>
-        <li><a class="social-btn" href="#" title="YouTube"><img src="assets/img/socials/youtube-2006.svg" alt="YouTube"></a></li>
-        <li><a class="social-btn" href="#" title="TikTok"><img src="assets/img/socials/tiktok-text.svg" alt="TikTok"></a></li>
-        <li><a class="social-btn" href="#" title="Discord"><img src="assets/img/socials/discord-2015.svg" alt="Discord"></a></li>
+        <li><a class="social-btn" href="https://open.spotify.com/artist/7Abx1tdwQoBDWr1nD1o62B" target="_blank" rel="me noopener noreferrer" title="Spotify"><img src="assets/img/socials/spotify.webp" alt="Spotify"></a></li>
+        <li><a class="social-btn" href="https://www.youtube.com/@SatineWall%C3%A9" target="_blank" rel="me noopener noreferrer" title="YouTube"><img src="assets/img/socials/youtube.webp" alt="YouTube"></a></li>
+        <li><a class="social-btn" href="https://www.instagram.com/satine_walle/" target="_blank" rel="me noopener noreferrer" title="Instagram"><img src="assets/img/socials/instagram.webp" alt="Instagram"></a></li>
+        <li><a class="social-btn" href="https://www.tiktok.com/@lasateuch" target="_blank" rel="me noopener noreferrer" title="TikTok"><img src="assets/img/socials/tiktok.webp" alt="TikTok"></a></li>
+        <li><a class="social-btn s-twitch" href="https://www.twitch.tv/lasatine" target="_blank" rel="me noopener noreferrer" title="Twitch"><img src="assets/img/socials/twitch.webp" alt="Twitch"></a></li>
+        <li><a class="social-btn" href="https://discord.gg/SB7ChjVabK" target="_blank" rel="me noopener noreferrer" title="Discord"><img src="assets/img/socials/discord.svg" alt="Discord"></a></li>
       </ul>
 
     </div>
@@ -202,14 +203,10 @@
       <div class="bgroup g-friends" data-rv>
       <div class="section-bar"><h2>My friends space :</h2></div>
       <div class="friends-grid" style="margin-top:10px">
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
-        <div class="friend"><p class="name">FRIEND</p><div class="ph">👤</div></div>
+        <div class="friend"><p class="name">TLT</p><div class="ph"><img src="assets/img/friends/the-living-tombstone.webp" alt="The Living Tombstone" loading="lazy"></div></div>
+        <div class="friend"><p class="name">MIKU</p><div class="ph"><img src="assets/img/friends/miku.webp" alt="Hatsune Miku" loading="lazy"></div></div>
+        <div class="friend"><p class="name">FREDDY</p><div class="ph"><img src="assets/img/friends/freddy.webp" alt="Freddy Fazbear" loading="lazy"></div></div>
+        <div class="friend"><p class="name">KAPPA</p><div class="ph"><img src="assets/img/friends/kappa.webp" alt="Kappa" loading="lazy"></div></div>
       </div>
       </div>
     </div>

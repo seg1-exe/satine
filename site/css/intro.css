@@ -172,7 +172,7 @@ body[data-page='intro'] {
   padding: 0;
   border: none;
   background: none;
-  cursor: pointer;
+  cursor: var(--cur-link);
   /* pulsation du halo plutôt qu'un clignotement en opacité : à 45 % d'opacité
      sur fond noir la flèche avait l'air cassée, pas clignotante */
   animation: enter-pulse 1.15s ease-in-out infinite;

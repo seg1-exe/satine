@@ -200,8 +200,9 @@
         try { s.setItem(KEY_REVEAL, '1'); }
         catch (e) { /* stockage refusé : on entre sans la révélation */ }
       }
-      /* on conserve l'ancre : index.html?#tournee renvoie ici avec son hash */
-      window.location.href = HOME_URL + (window.location.hash || '');
+      /* volontairement SANS l'ancre d'origine : franchir la porte doit
+         toujours faire atterrir en haut de la home, pas sur #tournee */
+      window.location.href = HOME_URL;
     }
 
     function enter() {
@@ -211,7 +212,7 @@
       /* respect de prefers-reduced-motion : ni avalanche ni mâchoires */
       if (reducedMotion()) {
         /* index.html ne renverra pas ici : le referer est interne */
-        window.location.href = HOME_URL + (window.location.hash || '');
+        window.location.href = HOME_URL;
         return;
       }
 
@@ -243,6 +244,13 @@
   /* --------------------------------------------- index.html : ouverture */
 
   function initReveal() {
+    /* double garde anti-« j'arrive sur la tournée » : le hash éventuel est
+       retiré avant que le navigateur saute à l'ancre, et la restauration de
+       scroll (F5, back) est neutralisée le temps de la révélation */
+    if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
     var jaws = buildJaws(true);
     whenJawsReady(jaws, 1500, function () {
       setTimeout(function () {

@@ -33,14 +33,16 @@
   var ADS_LEFT = [adSlot('G1'), adSlot('G2'), adSlot('G3'), adSlot('G4')];
   var ADS_RIGHT = [adSlot('D1'), adSlot('D2'), adSlot('D3'), adSlot('D4')];
 
+  /* `goto` : pendant que ce message est affiché, la bulle est cliquable et
+     emmène à l'ancre indiquée. */
   var CLIPPY_MSGS = [
-    'Salut !! On dirait que tu visites le site de SATINE. Besoin d’aide ?',
-    'Psst… il paraît qu’un code est caché dans les pubs. Juste un bruit de couloir hein.',
-    'Le pack de barrettes part super vite. Je dis ça, je dis rien.',
-    'SATINE part en tournée avec The Living Tombstone !! US + EU !!',
-    'Tu as vu le nouveau clip ? Onglet Vidéos. Fonce.',
-    'Astuce : la barre de recherche en haut ne cherche qu’une seule chose…',
-    'bzzzt… 📺… bzzzt… pardon, mauvaise réception.'
+    { t: 'Salut !! On dirait que tu visites le site de SATINE. Besoin d’aide ?' },
+    { t: 'Psst… il paraît qu’un code est caché dans les pubs. Juste un bruit de couloir hein.' },
+    { t: 'Le pack de barrettes part super vite. Je dis ça, je dis rien.' },
+    { t: 'SATINE part en tournée avec The Living Tombstone !! US + EU !!' },
+    { t: 'Tu as vu le nouveau clip ? Clique ici, je t’emmène.', goto: '#clip' },
+    { t: 'Astuce : la barre de recherche en haut ne cherche qu’une seule chose…' },
+    { t: 'bzzzt… 📺… bzzzt… pardon, mauvaise réception.' }
   ];
 
   /* -------------------------------------------------------------- zoom
@@ -172,7 +174,9 @@
     /* écriture façon Undertale : lettre par lettre + son de frappe */
     function say() {
       i = (i + 1) % CLIPPY_MSGS.length;
-      var msg = '* ' + CLIPPY_MSGS[i];
+      var msg = '* ' + CLIPPY_MSGS[i].t;
+      /* message cliquable : la bulle devient un lien le temps de l'afficher */
+      bubble.classList.toggle('linky', !!CLIPPY_MSGS[i].goto);
       bubble.hidden = false;
       stopTyping();
 
@@ -198,6 +202,14 @@
       box.classList.remove('pop');
       void box.offsetWidth;
       box.classList.add('pop');
+    });
+    /* clic sur le texte d'un message `goto` : on suit l'ancre */
+    bubble.addEventListener('click', function (e) {
+      if (e.target.id === 'clippy-close') return;
+      var dest = CLIPPY_MSGS[i] && CLIPPY_MSGS[i].goto;
+      if (!dest) return;
+      var el = document.querySelector(dest);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     document.getElementById('clippy-close').addEventListener('click', function (e) {
       e.stopPropagation();

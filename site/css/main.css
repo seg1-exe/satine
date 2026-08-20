@@ -25,6 +25,15 @@
   --font-alt: Helvetica, 'Helvetica Neue', Arial, sans-serif;
   --rail-w: 270px;
   --player-h: 64px;
+  /* Curseurs Hatsune Miku (assets/img/cursor-pack, domaine public — versions
+     renommées sans espaces dans assets/cursors/). Le hotspot est embarqué
+     dans les .cur ; le mot-clé final est le fallback obligatoire. Tous les
+     `cursor:` du site passent par ces variables. */
+  --cur-normal: url('../assets/cursors/normal.cur'), default;
+  --cur-link: url('../assets/cursors/link.cur'), pointer;
+  --cur-text: url('../assets/cursors/text.cur'), text;
+  --cur-help: url('../assets/cursors/help.cur'), help;
+  --cur-unavailable: url('../assets/cursors/unavailable.cur'), not-allowed;
   /* facteur de zoom global sur les grands écrans, calculé par js/shared.js
      (voir le bloc "ECRANS LARGES" en bas de ce fichier) */
   --page-zoom: 1;
@@ -58,7 +67,7 @@ body {
     #050505;
   color: #fff;
   overflow-x: hidden;
-  cursor: default;
+  cursor: var(--cur-normal);
 }
 
 img { max-width: 100%; display: block; }
@@ -141,7 +150,7 @@ a { color: var(--yellow); }
   border-radius: 18px;
   border: 2px solid #000;
   background: linear-gradient(#fff, #cfcfcf);
-  cursor: pointer;
+  cursor: var(--cur-link);
   box-shadow: 0 2px 0 #000;
 }
 .secret-search button:active { transform: translateY(2px); box-shadow: none; }
@@ -265,8 +274,10 @@ img.photo-frame {
 
 .satine-title {
   font-family: var(--font-display);
-  font-size: clamp(36px, 3.8vw, 58px);
-  letter-spacing: 3px;
+  /* cqw = largeur de la colonne profil (container-type sur .profile-left) :
+     le titre remplit sa colonne sans jamais déborder sous la fenêtre merch */
+  font-size: clamp(26px, 16.5cqw, 58px);
+  letter-spacing: 2px;
   color: #fff;
   text-shadow:
     3px 3px 0 #000,
@@ -293,40 +304,49 @@ img.photo-frame {
 
 .profile-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  /* ratio réglé pour que la colonne profil (titre + pfp carrée + réseaux)
+     culmine à la même hauteur que la fenêtre merch, plus large qu'avant */
+  grid-template-columns: 1fr 2.62fr;
   gap: 26px;
   align-items: start;
   margin-bottom: 30px;
 }
-.profile-left { min-width: 0; }
-.profile-left .photo-frame { margin-top: 14px; max-width: 230px; }
+.profile-left { min-width: 0; container-type: inline-size; }
+/* la pfp et les réseaux occupent toute la largeur de la colonne */
+.profile-left .photo-frame { margin-top: 14px; width: 100%; max-width: none; }
 
-/* --- réseaux sociaux : badges 88x31, le format des boutons de site des
-   années 2000. Les logos sont les vrais fichiers (anciennes versions) tirés
-   de Wikimedia Commons, dans assets/img/socials/ — ce sont tous des
-   logos-mots, d'où le format large plutôt que des pastilles carrées. Fond
-   clair obligatoire : leurs couleurs (rouge, blurple, noir) sont faites pour
-   ça. --- */
+/* --- réseaux sociaux : badges façon boutons de site des années 2000, en
+   deux colonnes occupant toute la largeur de la colonne profil.
+   Tous les logos sont des logos-mots. Le Twitch d'époque est argenté : son
+   badge garde un fond sombre pour qu'il reste lisible. --- */
 .socials {
   display: grid;
-  grid-template-columns: repeat(2, 88px);
-  gap: 8px;
-  margin-top: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+  margin-top: 14px;
   list-style: none;
 }
 .social-btn {
   display: grid;
   place-items: center;
-  width: 88px;
-  height: 31px;
-  padding: 4px 6px;
+  width: 100%;
+  height: 40px;
+  padding: 6px 10px;
   background: linear-gradient(180deg, #fff, #dcdcdc);
   border: 2px solid #000;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .9);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .9);
   transition: transform .13s ease-out, filter .13s;
 }
-.social-btn img { width: 100%; height: 100%; object-fit: contain; }
-.social-btn:hover { transform: translateY(-2px) rotate(-2deg) scale(1.07); filter: brightness(1.06); }
+.social-btn.s-twitch { background: linear-gradient(180deg, #3c3c46, #131318); }
+/* Bornes en pixels et non en % : un `height:100%` se résoudrait contre une
+   zone de grille de hauteur indéfinie et retomberait en `auto`. */
+.social-btn img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 24px;
+}
+.social-btn:hover { transform: translateY(-2px) rotate(-1deg) scale(1.04); filter: brightness(1.08); }
 .social-btn:active { transform: translateY(1px) scale(.97); box-shadow: 1px 1px 0 rgba(0, 0, 0, .45); }
 
 /* ==========================================================================
@@ -439,7 +459,7 @@ img.photo-frame {
     rgba(170, 200, 225, .55) 52%,
     rgba(240, 250, 255, .75));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9);
-  cursor: pointer;
+  cursor: var(--cur-link);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
 }
 .xp-btns span + span { border-left: none; }
@@ -684,7 +704,7 @@ img.photo-frame {
   background: linear-gradient(var(--pink), #c1006e);
   color: #fff;
   text-shadow: 1px 1px 0 #700;
-  cursor: pointer;
+  cursor: var(--cur-link);
 }
 .btn-buy:active { border-style: inset; }
 .btn-buy:hover { filter: brightness(1.15); }
@@ -720,7 +740,7 @@ img.photo-frame {
   text-transform: uppercase;
   padding: 0 7px;
   line-height: 1.15;
-  cursor: pointer;
+  cursor: var(--cur-link);
   box-shadow: 3px 3px 0 rgba(0, 0, 0, .35);
   transform: rotate(-1deg) scaleY(2.2);
   transform-origin: center;
@@ -973,7 +993,9 @@ img.photo-frame {
   color: #555;
   font-size: 30px;
   transition: transform .15s;
+  overflow: hidden;
 }
+.friend .ph img { width: 100%; height: 100%; object-fit: cover; }
 .friend:hover .ph { transform: rotate(-3deg) scale(1.05); box-shadow: 0 0 14px var(--pink); }
 .friend .name {
   font-family: var(--font-display);
@@ -1126,7 +1148,7 @@ img.photo-frame {
   height: 66px;
   border: 0;
   padding: 0;
-  cursor: pointer;
+  cursor: var(--cur-link);
   border-radius: 50%;
   z-index: 0; /* derrière la façade : l'autre moitié est "dans la fente" */
   background:
@@ -1188,7 +1210,7 @@ img.photo-frame {
   position: absolute;
   border: 0;
   padding: 0;
-  cursor: pointer;
+  cursor: var(--cur-link);
   z-index: 5;
   background-color: transparent;
   background-repeat: no-repeat;
@@ -1273,7 +1295,7 @@ img.photo-frame {
   width: 215px;
   height: 5px;
   z-index: 4;
-  cursor: pointer;
+  cursor: var(--cur-link);
   background: rgba(0, 0, 0, .35);
   touch-action: none;
 }
@@ -1310,7 +1332,7 @@ img.photo-frame {
 }
 #clippy img {
   width: 100%;
-  cursor: pointer;
+  cursor: var(--cur-link);
   filter: drop-shadow(0 4px 10px rgba(0,0,0,.7));
   animation: clippy-bob 3.4s ease-in-out infinite;
 }
@@ -1360,7 +1382,7 @@ img.photo-frame {
 #clippy .bubble .close-clippy {
   position: absolute;
   top: 2px; right: 6px;
-  cursor: pointer;
+  cursor: var(--cur-link);
   font-weight: bold;
   color: #fff;
   font-family: var(--font-body);
@@ -1403,7 +1425,7 @@ img.photo-frame {
   padding: 8px 10px;
   font-size: 14px;
 }
-.cart-line button { cursor: pointer; border: 2px outset #ccc; background: #eee; font-weight: bold; }
+.cart-line button { cursor: var(--cur-link); border: 2px outset #ccc; background: #eee; font-weight: bold; }
 .cart-total { font-weight: bold; font-size: 16px; text-align: right; padding: 4px 2px; }
 .cart-actions { padding: 10px; border-top: 1px solid #d9d9d9; background: #f0f0f0; }
 .cart-actions .btn-buy { width: 100%; }
@@ -1421,7 +1443,7 @@ img.photo-frame {
   background: radial-gradient(circle at 30% 25%, #ff8cd2, var(--pink) 60%);
   color: #fff;
   font-size: 23px;
-  cursor: pointer;
+  cursor: var(--cur-link);
   box-shadow: 3px 4px 0 rgba(0,0,0,.5);
   display: grid;
   place-items: center;
@@ -1455,7 +1477,7 @@ section { margin-top: 30px; }
 .see-more { display: block; margin: 30px auto 12px; }
 
 /* clic produit */
-.product-click { cursor: pointer; }
+.product-click { cursor: var(--cur-link); }
 
 /* modal produit */
 #modal-overlay {
@@ -1532,7 +1554,7 @@ section { margin-top: 30px; }
   font-weight: bold;
   border: 2px outset #ccc;
   background: linear-gradient(#f5f5f5, #c9c9c9);
-  cursor: pointer;
+  cursor: var(--cur-link);
 }
 .qty-row button:active { border-style: inset; }
 .qty-row input {
@@ -1716,7 +1738,7 @@ section#art {
   height: calc(23 * var(--u));
   border: 0;
   padding: 0;
-  cursor: pointer;
+  cursor: var(--cur-link);
   z-index: 5;
   background: url('../assets/img/wmp/controls-default.png') no-repeat;
   background-size: calc(144 * var(--u)) calc(25 * var(--u));
@@ -1735,7 +1757,7 @@ section#art {
   height: calc(23 * var(--u));
   border: 0;
   padding: 0;
-  cursor: pointer;
+  cursor: var(--cur-link);
   z-index: 6;
   background: url('../assets/img/wmp/pause-default.png') no-repeat center/100% 100%;
   image-rendering: pixelated;
@@ -1752,7 +1774,7 @@ section#art {
   width: calc(163 * var(--u));
   height: calc(9 * var(--u));
   z-index: 5;
-  cursor: pointer;
+  cursor: var(--cur-link);
   background: url('../assets/img/wmp/progress-bg.png') no-repeat center/100% 100%;
 }
 .hs-progress-fill {
@@ -1779,7 +1801,7 @@ section#art {
   position: absolute;
   border: 0;
   padding: 0;
-  cursor: pointer;
+  cursor: var(--cur-link);
   z-index: 5;
   background: no-repeat center/100% 100%;
   image-rendering: pixelated;
@@ -1811,6 +1833,10 @@ section#art {
 }
 #hs-theme:hover { background-image: url('../assets/img/wmp/theme-hover.png'); }
 #hs-theme:active { background-image: url('../assets/img/wmp/theme-down.png'); }
+
+/* bulle Clippy porteuse d'un lien (message `goto` dans shared.js) */
+#clippy .bubble.linky { cursor: var(--cur-link); }
+#clippy .bubble.linky:hover #clippy-text { text-decoration: underline; }
 
 /* ==========================================================================
    SPARKLES (traînée de curseur)
@@ -1999,7 +2025,7 @@ section#art {
   background: linear-gradient(180deg, #f8f9fc, #b9bcca);
   color: #223;
   font-size: 12px;
-  cursor: pointer;
+  cursor: var(--cur-link);
 }
 .dp-play:active { border-style: inset; }
 .dp-lcd {
@@ -2019,7 +2045,7 @@ section#art {
   height: 12px;
   background: #041b07;
   border: 2px inset #778;
-  cursor: pointer;
+  cursor: var(--cur-link);
   position: relative;
   touch-action: none;
 }
@@ -2129,7 +2155,7 @@ section#art {
   background: transparent;
   color: #fff;
   font-size: 20px;
-  cursor: pointer;
+  cursor: var(--cur-link);
   flex-shrink: 0;
 }
 #burger-menu {
@@ -2158,7 +2184,7 @@ section#art {
   background: transparent;
   color: #fff;
   font-size: 19px;
-  cursor: pointer;
+  cursor: var(--cur-link);
 }
 .burger-link {
   display: block;
@@ -2223,9 +2249,13 @@ section#art {
   .socials {
     grid-column: 1 / -1;
     grid-row: 3;
-    justify-content: center;
+    grid-template-columns: repeat(2, 1fr);
     margin-top: 10px;
   }
+  .social-btn { height: 38px; padding: 5px 10px; }
+  /* les badges pleine largeur passent sous le bouton panier (fixe, en haut à
+     droite) : on le descend au niveau de la fenêtre merch, moins gênant */
+  #cart-fab { top: auto; bottom: 118px; right: 10px; width: 52px; height: 52px; }
   #merch { grid-column: 1 / -1; grid-row: 4; margin-top: 12px; }
 
   /* fan-arts : 2 par ligne */
@@ -2304,3 +2334,11 @@ html.rv-ready [data-rv].rv-in {
   html.rv-ready [data-rv] { opacity: 1; scale: none; transition: none; }
   .see-more, #chat-send, .price-burst, .tour-bus .bus { animation: none; }
 }
+
+/* ==========================================================================
+   CURSEURS — application globale (les valeurs sont dans :root en tête)
+   ========================================================================== */
+input:not([type='button']):not([type='submit']), textarea { cursor: var(--cur-text); }
+/* les liens n'héritent pas du curseur du body : l'UA leur impose `pointer` */
+a, button { cursor: var(--cur-link); }
+.soldout { cursor: var(--cur-unavailable); }
