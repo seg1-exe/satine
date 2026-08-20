@@ -25,6 +25,9 @@
   --font-alt: Helvetica, 'Helvetica Neue', Arial, sans-serif;
   --rail-w: 270px;
   --player-h: 64px;
+  /* facteur de zoom global sur les grands écrans, calculé par js/shared.js
+     (voir le bloc "ECRANS LARGES" en bas de ce fichier) */
+  --page-zoom: 1;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -297,6 +300,34 @@ img.photo-frame {
 }
 .profile-left { min-width: 0; }
 .profile-left .photo-frame { margin-top: 14px; max-width: 230px; }
+
+/* --- réseaux sociaux : badges 88x31, le format des boutons de site des
+   années 2000. Les logos sont les vrais fichiers (anciennes versions) tirés
+   de Wikimedia Commons, dans assets/img/socials/ — ce sont tous des
+   logos-mots, d'où le format large plutôt que des pastilles carrées. Fond
+   clair obligatoire : leurs couleurs (rouge, blurple, noir) sont faites pour
+   ça. --- */
+.socials {
+  display: grid;
+  grid-template-columns: repeat(2, 88px);
+  gap: 8px;
+  margin-top: 12px;
+  list-style: none;
+}
+.social-btn {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 31px;
+  padding: 4px 6px;
+  background: linear-gradient(180deg, #fff, #dcdcdc);
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .9);
+  transition: transform .13s ease-out, filter .13s;
+}
+.social-btn img { width: 100%; height: 100%; object-fit: contain; }
+.social-btn:hover { transform: translateY(-2px) rotate(-2deg) scale(1.07); filter: brightness(1.06); }
+.social-btn:active { transform: translateY(1px) scale(.97); box-shadow: 1px 1px 0 rgba(0, 0, 0, .45); }
 
 /* ==========================================================================
    BENTO des sections de la home (maquette : About/Interests à gauche,
@@ -621,7 +652,7 @@ img.photo-frame {
   /* étoile à 12 pointes longues et fines, comme la maquette */
   clip-path: polygon(50% 0%, 55.4% 29.7%, 75% 6.7%, 64.9% 35.2%, 93.3% 25%, 70.3% 44.6%, 100% 50%, 70.3% 55.4%, 93.3% 75%, 64.9% 64.9%, 75% 93.3%, 55.4% 70.3%, 50% 100%, 44.6% 70.3%, 25% 93.3%, 35.1% 64.9%, 6.7% 75%, 29.7% 55.4%, 0% 50%, 29.7% 44.6%, 6.7% 25%, 35.1% 35.1%, 25% 6.7%, 44.6% 29.7%);
   transform: rotate(8deg);
-  animation: burst-pulse 1.6s infinite;
+  animation: burst-pulse 1.5s ease-in-out infinite;
   z-index: 3;
 }
 .price-burst b {
@@ -632,7 +663,17 @@ img.photo-frame {
   transform: rotate(-8deg);
   text-shadow: none;
 }
-@keyframes burst-pulse { 0%,100% { scale: 1; } 50% { scale: 1.09; } }
+/* L'étoile a déjà un transform: rotate(8deg) ; on anime les propriétés
+   individuelles `scale` et `rotate`, qui se composent avec lui au lieu de
+   l'écraser. Rythme : gros coup, rebond, retour au calme. */
+@keyframes burst-pulse {
+  0%   { scale: 1;    rotate: 0deg; }
+  12%  { scale: 1.26; rotate: -7deg; }
+  24%  { scale: .94;  rotate: 5deg; }
+  36%  { scale: 1.15; rotate: -4deg; }
+  48%  { scale: .99;  rotate: 2deg; }
+  60%, 100% { scale: 1; rotate: 0deg; }
+}
 
 .btn-buy {
   font-family: var(--font-body);
@@ -687,6 +728,22 @@ img.photo-frame {
 .btn-red:hover { filter: brightness(1.15); }
 .btn-red:active { transform: rotate(-1deg) scaleY(2.2) translateY(2px); box-shadow: none; }
 @keyframes blink-soft { 50% { filter: brightness(1.35); } }
+
+/* VOIR PLUS / ENVOYER : ils gigotent pour attraper l'œil. Comme .btn-red porte
+   déjà un transform (rotate + scaleY), on passe par les propriétés
+   individuelles `rotate` et `translate`, qui se composent avec lui. Secousse
+   sur la première moitié du cycle, repos sur la seconde. */
+@keyframes btn-wiggle {
+  0%, 100% { rotate: 0deg; translate: 0 0; }
+  6%  { rotate: -4deg; translate: -3px 0; }
+  12% { rotate: 4deg;  translate: 3px 0; }
+  18% { rotate: -3deg; translate: -2px 0; }
+  24% { rotate: 3deg;  translate: 2px 0; }
+  30% { rotate: -1.5deg; translate: -1px 0; }
+  36%, 100% { rotate: 0deg; translate: 0 0; }
+}
+.see-more, #chat-send { animation: btn-wiggle 2.6s ease-in-out infinite; }
+.see-more:hover, #chat-send:hover { animation-play-state: paused; }
 
 /* ==========================================================================
    BANDEAUX DE SECTION (barres bleues pailletées)
@@ -815,6 +872,35 @@ img.photo-frame {
 /* ==========================================================================
    TOURNÉE
    ========================================================================== */
+
+/* Le bus traverse son couloir de la droite vers la gauche, disparaît derrière
+   le bord, et repart de la droite. Le couloir masque le débordement : c'est
+   lui qui fait « disparaître » le bus, pas un fondu. */
+.tour-bus {
+  position: relative;
+  /* le couloir prend une ligne entière du bandeau : le texte passe dessous */
+  flex: 0 0 100%;
+  width: 100%;
+  height: 36px;
+  overflow: hidden;
+}
+.tour-bus .bus {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  font-size: 26px;
+  line-height: 36px;
+  white-space: nowrap;
+  animation: bus-drive 5s linear infinite;
+}
+/* On anime `left` en plus de translateX : c'est le seul moyen de traverser
+   toute la largeur du couloir sans la connaître (translateX(100%) ne vaudrait
+   que 100 % de la largeur du bus). Départ hors cadre à droite, arrivée hors
+   cadre à gauche, l'overflow:hidden du couloir fait le reste. */
+@keyframes bus-drive {
+  from { left: 100%; transform: translateX(0); }
+  to   { left: 0;    transform: translateX(-100%); }
+}
 
 .tour-strip {
   display: flex;
@@ -1508,6 +1594,18 @@ section#art {
   z-index: 2;
 }
 
+/* Le clip rend la colonne gauche du bento nettement plus haute que la droite :
+   sans ça le chat démarrait ~220px sous la fin de la colonne de droite. On le
+   remonte par-dessus le bas du player — #chat est en z-index 2 et #clip en 1,
+   donc il passe devant, menton de la tête compris. On s'arrête juste au-dessus
+   de la barre de progression pour que le player reste utilisable ; pousser
+   plus loin la recouvrirait. Valeur à réajuster quand le contenu des colonnes
+   changera. Réglée pour laisser 30px sous le bloc friends, soit le même
+   écart que partout ailleurs (chat → fan-arts, profil → bento…). */
+@media (min-width: 821px) {
+  section#chat { margin-top: -123px; }
+}
+
 .headspace {
   --u: 1.32px;
   position: relative;
@@ -1814,7 +1912,8 @@ section#art {
 
 .art-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  /* 3 colonnes sur desktop (2 sous 820px, voir le bloc MOBILE) */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 .art-piece {
@@ -2117,8 +2216,17 @@ section#art {
   }
   .satine-title { grid-column: 2; grid-row: 1; font-size: 32px; }
   .satine-sub { grid-column: 2; grid-row: 2; margin: 0; font-size: 15px; }
-  #merch { grid-column: 1 / -1; grid-row: 3; margin-top: 12px; }
-  .profile-left .g-about { grid-column: 1 / -1; grid-row: 4; }
+  /* réseaux : rangée pleine largeur juste sous l'identité. .profile-left étant
+     en display:contents, sans placement explicite le <ul> irait se caser tout
+     seul dans la grille. Icônes réduites pour ne pas repousser MERCH hors du
+     premier écran. */
+  .socials {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  #merch { grid-column: 1 / -1; grid-row: 4; margin-top: 12px; }
 
   /* fan-arts : 2 par ligne */
   .art-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -2145,4 +2253,54 @@ section#art {
   #clippy { width: 104px; }
   #clippy .bubble { width: 170px; font-size: 12px; }
   #cart-drawer { width: calc(100vw - 24px); right: calc(-100vw - 24px); }
+}
+
+/* ==========================================================================
+   ÉCRANS LARGES — le design est calibré pour une fenêtre de 1400px.
+   Au-delà, on ne l'étale PAS : les rails feraient toujours 1/3 de la largeur
+   mais en beaucoup plus gros, et le contenu flotterait entre deux bandes
+   noires. On zoome donc toute la page pour garder exactement les proportions
+   du petit écran. --page-zoom est calculé dans js/shared.js (1 → 1.85).
+   ========================================================================== */
+
+@media (min-width: 1101px) {
+  #layout,
+  #player-dock,
+  #clippy,
+  #cart-fab,
+  #cart-drawer,
+  .product-modal {
+    zoom: var(--page-zoom);
+  }
+
+  /* les hauteurs en vh sont mesurées hors zoom : il faut les ramener dans
+     le repère zoomé, sinon elles débordent du viewport */
+  #layout { min-height: calc(100vh / var(--page-zoom)); }
+  #cart-drawer { max-height: calc((100vh - 110px) / var(--page-zoom)); }
+  .product-modal { max-height: calc(92vh / var(--page-zoom)); }
+}
+
+/* ==========================================================================
+   APPARITION AU SCROLL
+   La liste des blocs concernés vit dans index.html (attribut `data-rv`) ;
+   js/shared.js se contente d'observer et de poser .rv-in.
+   `rv-ready` est posée par le script inline du <head>, donc AVANT le premier
+   paint — sans JS elle n'existe pas et tout reste visible.
+   On anime la propriété `scale` et non `transform` : les .art-piece ont déjà un
+   `transform: rotate(var(--tilt))` qu'il ne faut pas écraser.
+   ========================================================================== */
+
+html.rv-ready [data-rv] { opacity: 0; scale: .8; }
+html.rv-ready [data-rv].rv-in {
+  opacity: 1;
+  scale: 1;
+  /* la courbe dépasse 1 en fin de course : le bloc grossit un poil trop puis
+     se cale, ça donne le petit « pop » */
+  transition: opacity .45s ease-out, scale .55s cubic-bezier(.22, .9, .3, 1.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* filet de sécurité si la classe traîne : rien ne doit rester caché */
+  html.rv-ready [data-rv] { opacity: 1; scale: none; transition: none; }
+  .see-more, #chat-send, .price-burst, .tour-bus .bus { animation: none; }
 }

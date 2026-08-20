@@ -43,6 +43,28 @@
     'bzzzt… 📺… bzzzt… pardon, mauvaise réception.'
   ];
 
+  /* -------------------------------------------------------------- zoom
+     Le design est calibré pour une fenêtre de ~1400px (= la largeur max de
+     #layout). Sur un écran plus large, l'étaler ne servirait à rien : les
+     rails de pubs occuperaient toujours 1/3 de la largeur, mais en beaucoup
+     plus gros, et le contenu se retrouverait noyé entre deux bandes noires.
+     On zoome donc toute la page pour conserver EXACTEMENT les proportions
+     du petit écran. Le CSS lit ce facteur via --page-zoom.
+     ------------------------------------------------------------------ */
+  var DESIGN_W = 1400;   /* doit rester synchro avec #layout { width } */
+  var ZOOM_MAX = 1.85;   /* garde-fou ultra-wide : au-delà le texte devient absurde */
+  var MOBILE_BP = 1101;  /* sous ce seuil les rails disparaissent : pas de zoom */
+
+  function applyZoom() {
+    /* clientWidth = largeur hors scrollbar, sinon on déclenche un scroll
+       horizontal d'une quinzaine de pixels */
+    var w = document.documentElement.clientWidth;
+    var z = w < MOBILE_BP ? 1 : w / DESIGN_W;
+    if (z < 1) z = 1;
+    if (z > ZOOM_MAX) z = ZOOM_MAX;
+    document.documentElement.style.setProperty('--page-zoom', z.toFixed(4));
+  }
+
   /* ------------------------------------------------------------ chrome */
 
   function build() {
@@ -369,6 +391,72 @@
     sections.forEach(function (s) { obs.observe(s.el); });
   }
 
+  /* ------------------------------------------------ apparition au scroll */
+
+  /* Les blocs concernés portent `data-rv` dans index.html ; la classe
+     `rv-ready` sur <html> (posée par le script inline du <head>) les cache
+     avant le premier paint. Ici on se contente de poser .rv-in au passage
+     dans le viewport. Si l'observer n'existe pas ou si l'utilisateur a demandé
+     moins d'animations, on retire `rv-ready` : tout redevient visible. */
+  function initReveal() {
+    var root = document.documentElement;
+    var items = document.querySelectorAll('[data-rv]');
+    if (!items.length) { root.classList.remove('rv-ready'); return; }
+
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!('IntersectionObserver' in window) || reduce) {
+      root.classList.remove('rv-ready');
+      return;
+    }
+
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) show(e.target); });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 });
+
+    function show(el) {
+      el.classList.add('rv-in');
+      obs.unobserve(el); /* une seule fois : pas de disparition au retour */
+    }
+
+    function start() {
+      /* décalage en cascade entre voisins d'un même parent (identité du profil,
+         grilles de fan-arts, de pubs…) : les blocs isolés démarrent tous à 0 */
+      var lastParent = null, rank = 0;
+      Array.prototype.forEach.call(items, function (el) {
+        if (el.parentNode !== lastParent) { lastParent = el.parentNode; rank = 0; }
+        var step = Math.min(rank, 8) * 45;
+        rank++;
+        if (step) el.style.transitionDelay = step + 'ms';
+        obs.observe(el);
+      });
+
+      /* Filet de sécurité. Un document masqué (onglet ouvert en arrière-plan)
+         ne fait pas tourner l'IntersectionObserver : sans ça la page resterait
+         entièrement invisible jusqu'au premier rendu. Au bout d'une seconde on
+         découvre donc à la main tout ce qui est déjà dans le viewport. */
+      setTimeout(function () {
+        Array.prototype.forEach.call(items, function (el) {
+          if (el.classList.contains('rv-in')) return;
+          var r = el.getBoundingClientRect();
+          if (r.top < window.innerHeight && r.bottom > 0) show(el);
+        });
+      }, 1000);
+    }
+
+    /* Au retour de la porte d'entrée, la bouche couvre encore tout l'écran :
+       démarrer maintenant jouerait l'apparition du haut de page (pfp, réseaux,
+       fenêtre merch) derrière les dents, pour rien. js/intro.js émet
+       `satine:reveal-ready` quand la gueule s'ouvre. */
+    if (root.classList.contains('intro-reveal')) {
+      var fired = false;
+      var go = function () { if (!fired) { fired = true; start(); } };
+      document.addEventListener('satine:reveal-ready', go);
+      setTimeout(go, 3000); /* filet si l'événement n'arrive jamais */
+    } else {
+      start();
+    }
+  }
+
   /* ------------------------------------------------------- burger menu */
 
   function initBurger() {
@@ -388,6 +476,10 @@
     });
   }
 
+  /* appliqué avant le DOMContentLoaded pour éviter un flash à 1400px */
+  applyZoom();
+  window.addEventListener('resize', applyZoom);
+
   document.addEventListener('DOMContentLoaded', function () {
     build();
     initClippy();
@@ -395,6 +487,7 @@
     initModal();
     initScrollspy();
     initBurger();
+    initReveal();
     initSparkles();
     document.dispatchEvent(new CustomEvent('satine:ready'));
   });

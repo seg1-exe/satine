@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SATINE ★ entrer</title>
+  <meta name="description" content="Porte d'entrée du blog de SATINE.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=VT323&family=Comic+Relief:wght@400;700&family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <!-- les deux moitiés de bouche sont préchargées : elles doivent être prêtes
+       au moment du claquement, et servent ensuite au reveal d'index.html -->
+  <link rel="preload" as="image" href="assets/img/anim-intro-top.webp">
+  <link rel="preload" as="image" href="assets/img/anim-intro-bottom.webp">
+  <script src="js/intro.js" defer></script>
+</head>
+<body data-page="intro">
+
+  <canvas id="stars"></canvas>
+
+  <div id="gate">
+    <h1 class="intro-title" data-text="SATINE">SATINE</h1>
+    <!-- flèche en SVG : le double clip-path précédent ne se refermait pas
+         correctement (le polygone intérieur était recalculé sur une boîte plus
+         petite, d'où un contour en deux morceaux). Un seul tracé règle ça. -->
+    <button class="enter-arrow" id="enter-btn" aria-label="Entrer sur le site">
+      <svg viewBox="0 0 340 112" aria-hidden="true" focusable="false">
+        <polygon points="5,27 232,27 232,6 335,56 232,106 232,85 5,85"/>
+        <text x="118" y="57">Entrer</text>
+      </svg>
+    </button>
+    <p class="intro-hint">cliquez pour entrer sur MySAT’S BLOG</p>
+  </div>
+
+  <div id="popups"></div>
+
+  <noscript>
+    <p style="position:fixed;inset:auto 0 40px;text-align:center;z-index:20">
+      <a href="index.html?nointro=1" style="color:#ffe600;font-size:22px">Entrer sur le site →</a>
+    </p>
+  </noscript>
+
+</body>
+</html>
