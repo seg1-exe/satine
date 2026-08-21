@@ -33,13 +33,40 @@
   var ADS_LEFT = [adSlot('G1'), adSlot('G2'), adSlot('G3'), adSlot('G4')];
   var ADS_RIGHT = [adSlot('D1'), adSlot('D2'), adSlot('D3'), adSlot('D4')];
 
+  /* Les vraies pubs prennent des emplacements AU HASARD (et distincts) à
+     chaque chargement, comme une régie qui tourne :
+     - PUB_SATINE, webp animé (le gif source de 30 Mo reste dans pubs/)
+     - l'affiche de tournée, cliquable → tableau des dates (#tournee ; depuis
+       secret.html on repasse par index.html, comme la nav) */
+  (function () {
+    var tourHref = (document.body.getAttribute('data-page') === 'secret' ? 'index.html' : '') + '#tournee';
+    var ads = [
+      '<div class="ad ad-live"><img src="assets/img/pubs/pub-satine.webp" ' +
+        'alt="Publicité SATINE" loading="lazy" decoding="async"></div>',
+      '<div class="ad ad-live"><a href="' + tourHref + '" title="Toutes les dates de la tournée">' +
+        '<img src="assets/img/pubs/pub-tour.webp" alt="European Tour — voir les dates" ' +
+        'loading="lazy" decoding="async"></a></div>'
+    ];
+    var total = ADS_LEFT.length + ADS_RIGHT.length;
+    var slots = [];
+    while (slots.length < ads.length) {
+      var n = (Math.random() * total) | 0;
+      if (slots.indexOf(n) === -1) slots.push(n);
+    }
+    ads.forEach(function (ad, i) {
+      var n = slots[i];
+      if (n < ADS_LEFT.length) ADS_LEFT[n] = ad;
+      else ADS_RIGHT[n - ADS_LEFT.length] = ad;
+    });
+  })();
+
   /* `goto` : pendant que ce message est affiché, la bulle est cliquable et
      emmène à l'ancre indiquée. */
   var CLIPPY_MSGS = [
     { t: 'Salut !! On dirait que tu visites le site de SATINE. Besoin d’aide ?' },
     { t: 'Psst… il paraît qu’un code est caché dans les pubs. Juste un bruit de couloir hein.' },
     { t: 'Le pack de barrettes part super vite. Je dis ça, je dis rien.' },
-    { t: 'SATINE part en tournée avec The Living Tombstone !! US + EU !!' },
+    { t: 'SATINE part en tournée avec The Living Tombstone !! Partout en Europe !!', goto: '#tournee' },
     { t: 'Tu as vu le nouveau clip ? Clique ici, je t’emmène.', goto: '#clip' },
     { t: 'Astuce : la barre de recherche en haut ne cherche qu’une seule chose…' },
     { t: 'bzzzt… 📺… bzzzt… pardon, mauvaise réception.' }
@@ -93,7 +120,6 @@
         '<div id="center-col">' +
           '<header id="topbar">' +
             '<a class="logo" href="index.html">' +
-              '<span class="my"><span>my</span><span>space</span></span>' +
               '<span><span class="blogname">SAT’S BLOG</span>' +
               '<span class="tagline">A space for US</span></span>' +
             '</a>' +
@@ -228,14 +254,14 @@
       price: 35,
       desc: 'Trois barrettes point d’exclamation : une blanche, une noire, une rouge énervée. ' +
         'Comme celle que je porte, mais pour TES cheveux.',
-      visual: '<div class="product-visual has-img"><img src="assets/img/barretes.webp" alt="Pack de 3 barrettes"></div>'
+      visual: '<div class="product-visual has-img"><img src="assets/img/products/barretes.webp" alt="Pack de 3 barrettes"></div>'
     },
     poster: {
       name: 'Poster du dernier clip',
       price: 10,
       desc: 'L’artwork du clip anomalisa en grand format, pour remplacer ce vieux poster que tu ' +
         'n’assumes plus. Impression de qualité, mur non fourni.',
-      visual: '<div class="product-visual has-img"><img src="assets/img/poster.webp" alt="Poster anomalisa"></div>'
+      visual: '<div class="product-visual has-img"><img src="assets/img/products/poster.webp" alt="Poster anomalisa"></div>'
     }
   };
 

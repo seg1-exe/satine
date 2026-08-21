@@ -214,7 +214,12 @@ recacheront dans leurs visuels finaux. Saisie via la page Secret OU la barre
 - Bio « About me », interests, fan-arts (les friends sont en place :
   TLT / Miku / Freddy / Kappa, vignettes optimisées dans `assets/img/friends/`)
 - Morceaux du player (`PLAYLIST` dans `js/player.js`) — mp3 placeholder générés
-- Rushs BTS (`secret.html`), dates/salles de tournée (`index.html#tournee`)
+- Rushs BTS (`secret.html`) — la tournée, elle, est en place : tableau des
+  dates dans la DA de l'affiche (`.tour-wrap`, dates réelles de l'affiche) +
+  l'affiche officielle en dessous
+- Les 7 emplacements de pub restants — le 8e est servi : `PUB_SATINE`
+  (webp animé 4,6 Mo dérivé du gif de 30 Mo, `assets/img/pubs/`) prend un
+  slot AU HASARD des deux rails à chaque chargement
 - Messages des pop-ups d'erreur (`ERRORS` dans `js/intro.js`) — le son, lui,
   est en place : `assets/audio/error.mp3`
 

@@ -101,10 +101,12 @@
           <span class="price-burst pb-tr"><b>10€</b></span>
           <span class="price-burst pb-bl"><b>35€</b></span>
           <div class="bento-item bento-barrettes">
-            <img class="product-click" src="assets/img/barretes.webp" alt="Pack de 3 barrettes « !! »" onclick="SatineModal.open('barrettes')">
+            <span class="item-tag">Barrettes</span>
+            <img class="product-click" src="assets/img/products/barretes.webp" alt="Pack de 3 barrettes « !! »" onclick="SatineModal.open('barrettes')">
           </div>
           <div class="bento-item bento-poster product-click" onclick="SatineModal.open('poster')">
-            <img src="assets/img/poster.webp" alt="Poster anomalisa">
+            <span class="item-tag">Poster</span>
+            <img src="assets/img/products/poster.webp" alt="Poster anomalisa">
           </div>
         </div>
       </div>
@@ -177,24 +179,30 @@
       <div class="section-bar"><h2>Tournée</h2></div>
       <div class="tour-strip" style="margin-top:10px">
         <span class="tour-bus" aria-hidden="true"><span class="bus">🚌💨</span></span>
-        <span>Je pars en tournée avec <b>The Living Tombstone</b> aux US et EU !!</span>
+        <span>Je pars en tournée avec <b>The Living Tombstone</b> en Europe !!</span>
       </div>
-      <div class="leo-box" style="margin-top:14px">
+      <!-- Tableau des dates, dans la DA de l'affiche (rose/bleu bubble).
+           Les dates et les SOLD OUT sont ceux de l'affiche officielle. -->
+      <div class="leo-box tour-wrap" style="margin-top:14px">
         <div class="table-scroll">
         <table class="tour-table collapsible" id="tour-table">
-          <tr><th>Date</th><th>Ville</th><th>Salle</th><th>Billets</th></tr>
-          <tr><td>--/--/2026</td><td>Paris, FR</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr><td>--/--/2026</td><td>Londres, UK</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr><td>--/--/2026</td><td>Berlin, DE</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr><td>--/--/2026</td><td>Amsterdam, NL</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr class="extra"><td>--/--/2026</td><td>New York, US</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr class="extra"><td>--/--/2026</td><td>Los Angeles, US</td><td>[à confirmer]</td><td><span class="soldout">SOLD OUT (exemple)</span></td></tr>
-          <tr class="extra"><td>--/--/2026</td><td>Chicago, US</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr class="extra"><td>--/--/2026</td><td>Austin, US</td><td>[à confirmer]</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr><th>Date</th><th>Ville</th><th>Billets</th></tr>
+          <tr><td class="d">26/08</td><td class="v">London</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr><td class="d">28/08</td><td class="v">Hamburg</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr><td class="d">29/08</td><td class="v">Utrecht</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr><td class="d">30/08</td><td class="v">Utrecht</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr><td class="d">01/09</td><td class="v">Cologne</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr class="extra"><td class="d">02/09</td><td class="v">Paris</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr class="extra"><td class="d">04/09</td><td class="v">Madrid</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr class="extra"><td class="d">05/09</td><td class="v">Madrid</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr class="extra"><td class="d">07/09</td><td class="v">Barcelona</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr class="extra"><td class="d">09/09</td><td class="v">Lisbon</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr class="extra"><td class="d">11/09</td><td class="v">Luxembourg</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
         </table>
         </div>
         <button class="btn-red see-more" data-target="tour-table">VOIR PLUS ▼</button>
       </div>
+
 
       </div>
 
@@ -252,12 +260,12 @@
       <div class="art-piece" data-rv style="--tilt:3deg"><div class="ph">🖌️</div><p class="cap">fan-art #4 (placeholder)</p></div>
       <div class="art-piece" data-rv style="--tilt:-2deg"><div class="ph">📺</div><p class="cap">fan-art #5 (placeholder)</p></div>
       <div class="art-piece" data-rv style="--tilt:1deg"><div class="ph">💖</div><p class="cap">fan-art #6 (placeholder)</p></div>
-      <div class="art-piece " data-rv extra" style="--tilt:-3deg"><div class="ph">⭐</div><p class="cap">fan-art #7 (placeholder)</p></div>
-      <div class="art-piece " data-rv extra" style="--tilt:2deg"><div class="ph">🎤</div><p class="cap">fan-art #8 (placeholder)</p></div>
-      <div class="art-piece " data-rv extra" style="--tilt:-1deg"><div class="ph">🧷</div><p class="cap">fan-art #9 (placeholder)</p></div>
-      <div class="art-piece " data-rv extra" style="--tilt:2deg"><div class="ph">📼</div><p class="cap">fan-art #10 (placeholder)</p></div>
-      <div class="art-piece " data-rv extra" style="--tilt:-2deg"><div class="ph">🩷</div><p class="cap">fan-art #11 (placeholder)</p></div>
-      <div class="art-piece " data-rv extra" style="--tilt:3deg"><div class="ph">🐈</div><p class="cap">fan-art #12 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:-3deg"><div class="ph">⭐</div><p class="cap">fan-art #7 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:2deg"><div class="ph">🎤</div><p class="cap">fan-art #8 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:-1deg"><div class="ph">🧷</div><p class="cap">fan-art #9 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:2deg"><div class="ph">📼</div><p class="cap">fan-art #10 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:-2deg"><div class="ph">🩷</div><p class="cap">fan-art #11 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:3deg"><div class="ph">🐈</div><p class="cap">fan-art #12 (placeholder)</p></div>
     </div>
     <button class="btn-red see-more" data-target="art-grid" data-rv>VOIR PLUS ▼</button>
   </section>

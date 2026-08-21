@@ -78,7 +78,7 @@ a { color: var(--yellow); }
    ========================================================================== */
 
 #topbar {
-  background: #000 url('../assets/img/headerBG.png') no-repeat right center / cover;
+  background: #000 url('../assets/img/backgrouds/headerBG.png') no-repeat right center / cover;
   border-bottom: 2px solid #000;
   display: flex;
   align-items: center;
@@ -90,16 +90,6 @@ a { color: var(--yellow); }
 }
 
 .logo { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
-.logo .my {
-  font-family: var(--font-body);
-  font-weight: bold;
-  font-size: 13px;
-  color: #fff;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.logo .my span { display: block; }
 .logo .blogname {
   font-family: var(--font-display);
   font-size: 30px;
@@ -169,7 +159,7 @@ img.photo-frame {
    ========================================================================== */
 
 #navbar {
-  background: #0b2d0b url('../assets/img/navBG.png') no-repeat center / cover;
+  background: #0b2d0b url('../assets/img/backgrouds/navBG.png') no-repeat center / cover;
   padding: 9px 26px;
   display: flex;
   align-items: center;
@@ -232,16 +222,19 @@ img.photo-frame {
    personnages (Steve à ~27% de son image, Miku à ~75% de la sienne)
    dans la tranche visible de chaque colonne. */
 #rail-left {
-  background: #0a0a0a url('../assets/img/bgLeft.webp') no-repeat fixed;
+  background: #0a0a0a url('../assets/img/backgrouds/bgLeft.webp') no-repeat fixed;
   background-size: auto 100%;
   background-position: -180px 0;
 }
 #rail-right {
-  background: #0a0a0a url('../assets/img/bgRight.webp') no-repeat fixed;
+  background: #0a0a0a url('../assets/img/backgrouds/bgRight.webp') no-repeat fixed;
   background-size: auto 100%;
   background-position: calc(100% + 170px) 0;
 }
 .rail .ad { flex-shrink: 0; }
+.rail .ad-live img { width: 100%; height: auto; display: block; }
+.rail .ad-live a { display: block; transition: transform .13s ease-out; }
+.rail .ad-live a:hover { transform: scale(1.03) rotate(-1deg); }
 .rail .ad:last-of-type { flex: 1; min-height: 170px; }
 
 /* emplacements de pub vides (les visuels des graphistes prendront la place) */
@@ -263,7 +256,7 @@ img.photo-frame {
 /* --- zone de contenu : damier grunge fourni par les graphistes --- */
 #main-col {
   flex: 1;
-  background: var(--teal-2) url('../assets/img/mainBG.png') top center / 100% auto repeat-y;
+  background: var(--teal-2) url('../assets/img/backgrouds/mainBG.png') top center / 100% auto repeat-y;
   padding: 24px 26px 60px;
   position: relative;
 }
@@ -516,10 +509,29 @@ img.photo-frame {
 .xp-window .xp-body { background: #f4f4f4; }
 .xp-body { padding: 12px; }
 
-/* contenu merch : rayures danger */
+/* Contenu merch : rayures danger qui défilent comme un ruban de chantier.
+   CONTINUITÉ DU MOTIF — deux invariants à ne pas casser :
+   1. la boucle : le motif -45° a une période horizontale de 52px/sin(45°) ;
+      la keyframe se termine EXACTEMENT dessus (calc ci-dessous), donc le
+      raccord de fin de cycle est indétectable ;
+   2. la phase : la bande du haut (::before de .merch-bento) et celle du bas
+      (le fond de l'élément) partent du même origin (padding-box), donc du
+      même dessin — elles ne divergent que par leur sens de défilement, et le
+      plateau blanc les sépare toujours. */
+/* L'élément .hazard ne peint AUCUNE rayure lui-même : les deux bandes sont
+   des calques dédiés (::before en haut, ::after en bas, voir .merch-bento),
+   dimensionnés pile sur les zones de padding. C'est ce qui garantit qu'aucune
+   rayure ne peut apparaître ailleurs — ni sous les bordures, ni le long du
+   plateau, quelle que soit la phase de l'animation. */
 .hazard {
-  background: repeating-linear-gradient(-45deg, var(--yellow) 0 26px, #111 26px 52px);
+  background: #111;
   padding: 14px;
+}
+@keyframes hazard-roll {
+  to { background-position: calc(52px / 0.70710678) 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hazard { animation: none; }
 }
 
 /* ==========================================================================
@@ -529,7 +541,38 @@ img.photo-frame {
 
 /* bandes danger visibles seulement en haut et en bas : le plateau blanc
    est en pleine largeur (maquette) */
-.merch-bento { position: relative; padding: 46px 0 38px; }
+.merch-bento {
+  --hz-top: 46px;
+  --hz-bot: 38px;
+  position: relative;
+  padding: var(--hz-top) 0 var(--hz-bot);
+  background: none; /* les rayures ne vivent que dans les deux calques */
+}
+/* Bande du haut : vers la gauche ; bande du bas : vers la droite.
+   background-size EXPLICITE et égal à une période horizontale du motif
+   (52px/sin 45°) : sans lui, la « tuile » du dégradé fait la largeur de la
+   bande, et comme cette largeur n'est pas un multiple de la période, animer
+   background-position fait apparaître une couture au niveau de la phase —
+   le décalage qu'on voyait près du bord gauche. Avec une tuile
+   période-exacte, sa répétition est invisible quelle que soit la phase.
+   Le retrait latéral de 1px évite qu'un arrondi de rendu (zoom grands
+   écrans) fasse déborder les calques d'un pixel hors de la zone. */
+.merch-bento::before,
+.merch-bento::after {
+  content: '';
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  background: repeating-linear-gradient(-45deg, var(--yellow) 0 26px, #111 26px 52px);
+  background-size: calc(52px / 0.70710678) 100%;
+  background-repeat: repeat;
+  animation: hazard-roll 1.6s linear infinite;
+}
+.merch-bento::before { top: 0; height: var(--hz-top); animation-direction: reverse; }
+.merch-bento::after { bottom: 0; height: var(--hz-bot); }
+@media (prefers-reduced-motion: reduce) {
+  .merch-bento::before, .merch-bento::after { animation: none; }
+}
 .merch-bento .more-info-tag {
   position: absolute;
   top: 10px;
@@ -540,6 +583,7 @@ img.photo-frame {
 
 .bento-board {
   position: relative;
+  z-index: 1; /* devant les calques rayés ::before/::after de .merch-bento */
   display: grid;
   grid-template-columns: 10fr 9fr;
   min-height: 300px;
@@ -557,6 +601,29 @@ img.photo-frame {
   padding: 20px 16px 16px;
   min-width: 0;
 }
+
+/* bandeau nom de produit : même famille que les tags .btn-red / .more-info-tag
+   (Helvetica bold très étirée verticalement), mais NOIR sur rouge */
+.bento-item .item-tag {
+  align-self: flex-start;
+  position: relative;
+  z-index: 4; /* au-dessus des étoiles de prix (z-index 3) */
+  background: var(--red);
+  color: #000;
+  font-family: var(--font-alt);
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  padding: 0 7px;
+  line-height: 1.15;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .35);
+  transform: rotate(-2deg) scaleY(2.2);
+  transform-origin: left center;
+  margin: 8px 0 10px;
+}
+/* côté gauche du polaroid : le coin droit est occupé par l'étoile 10€ */
+.bento-poster .item-tag { transform: rotate(2deg) scaleY(2.2); }
 
 /* photo du pack de barrettes : entière, en découpe sur le blanc (maquette) */
 .bento-barrettes img {
@@ -765,6 +832,21 @@ img.photo-frame {
 .see-more, #chat-send { animation: btn-wiggle 2.6s ease-in-out infinite; }
 .see-more:hover, #chat-send:hover { animation-play-state: paused; }
 
+/* affiche de tournée : cadre blanc façon poster punaisé, léger redressement
+   au survol comme les fan-arts */
+.tour-poster {
+  display: block;
+  margin-top: 14px;
+  background: #fff;
+  padding: 10px;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, .4);
+  transform: rotate(-1.2deg);
+  transition: transform .15s;
+}
+.tour-poster:hover { transform: rotate(0deg) scale(1.015); }
+.tour-poster img { width: 100%; height: auto; display: block; }
+
 /* ==========================================================================
    BANDEAUX DE SECTION (barres bleues pailletées)
    ========================================================================== */
@@ -787,7 +869,7 @@ img.photo-frame {
   content: "";
   position: absolute;
   inset: 0;
-  background: url('../assets/img/backgroundHeadSection.png') center / cover no-repeat;
+  background: url('../assets/img/backgrouds/backgroundHeadSection.png') center / cover no-repeat;
   filter: hue-rotate(-100deg) saturate(1.05);
   z-index: 0;
 }
@@ -816,7 +898,7 @@ img.photo-frame {
   content: "";
   position: absolute;
   inset: 0;
-  background: url('../assets/img/backgroundMainSection.png') center / cover no-repeat;
+  background: url('../assets/img/backgrouds/backgroundMainSection.png') center / cover no-repeat;
   filter: grayscale(.8) brightness(1.1);
   opacity: .32;
   z-index: 0;
@@ -884,7 +966,7 @@ img.photo-frame {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: url('../assets/img/backgroundHeadSection.png') center / cover no-repeat;
+  background: url('../assets/img/backgrouds/backgroundHeadSection.png') center / cover no-repeat;
   filter: hue-rotate(-100deg) saturate(1.05);
 }
 .interests td.v { background: #fff; color: #222; }
@@ -939,37 +1021,85 @@ img.photo-frame {
    le tableau scrolle dans sa boîte au lieu d'en sortir */
 .table-scroll { overflow-x: auto; max-width: 100%; }
 
-.tour-table { width: 100%; border-collapse: collapse; background: #fff; color: #111; }
+/* Tableau de tournée dans la DA de l'affiche : rose bonbon / bleu ciel,
+   lettres blanches gonflées à contour (empilement de text-shadow, le stroke
+   CSS peignant vers l'intérieur), rangées qui alternent rose et bleu. */
+.tour-wrap {
+  --tp-pink: #f56ab4;
+  --tp-pink-soft: #fbc9e4;
+  --tp-blue: #56b6ea;
+  --tp-blue-soft: #bfe6fb;
+  background:
+    linear-gradient(115deg, var(--tp-pink-soft) 0 34%, #fff 34% 38%, var(--tp-blue-soft) 38% 72%, #fff 72% 76%, var(--tp-pink-soft) 76%);
+}
+/* pas de texture léopard ici : le fond rose/bleu est la DA de l'affiche */
+.tour-wrap::before, .tour-wrap::after { display: none; }
+.tour-table { width: 100%; border-collapse: separate; border-spacing: 0 7px; }
 .tour-table th {
   font-family: var(--font-display);
   font-size: 12px;
-  letter-spacing: 1px;
-  background: #111;
-  color: var(--yellow);
-  padding: 6px 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, var(--tp-blue), #2f8ac9);
+  border: 2px solid #fff;
+  text-shadow: 1px 1px 0 #1a6ca8;
+  padding: 6px 10px;
   text-align: left;
 }
 .tour-table td {
-  padding: 7px 8px;
-  border-bottom: 2px dotted #bbb;
-  font-size: 13px;
+  padding: 7px 10px;
+  border-top: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  font-size: 14px;
 }
-.tour-table td:first-child { white-space: nowrap; }
-.tour-table tr:hover td { background: #fff3fb; }
-.tour-table .soldout { color: var(--red); font-weight: bold; font-size: 12px; }
+.tour-table td:first-child { border-left: 2px solid #fff; white-space: nowrap; }
+.tour-table td:last-child { border-right: 2px solid #fff; }
+/* rangées : rose, puis bleu, en alternance — comme les lignes de l'affiche */
+.tour-table tr:nth-child(even) td { background: linear-gradient(180deg, var(--tp-pink-soft), #f7a8d2); }
+.tour-table tr:nth-child(odd) td { background: linear-gradient(180deg, var(--tp-blue-soft), #8fd0f4); }
+.tour-table tr:hover td { filter: saturate(1.35) brightness(1.04); }
+/* date et ville : bulles blanches à contour, façon typographie de l'affiche */
+.tour-table .d,
+.tour-table .v {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.tour-table .d { text-shadow: -2px -2px 0 var(--tp-pink), 2px -2px 0 var(--tp-pink), -2px 2px 0 var(--tp-pink), 2px 2px 0 var(--tp-pink), 3px 4px 0 rgba(0,0,0,.18); }
+.tour-table .v { text-shadow: -2px -2px 0 var(--tp-blue), 2px -2px 0 var(--tp-blue), -2px 2px 0 var(--tp-blue), 2px 2px 0 var(--tp-blue), 3px 4px 0 rgba(0,0,0,.18); }
+/* SOLD OUT : la pastille blanche sur bleu de l'affiche, légèrement penchée */
+.tour-table .soldout {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(180deg, #9bd7f7, var(--tp-blue));
+  border: 2px solid #fff;
+  padding: 2px 8px;
+  transform: rotate(-3deg);
+  text-shadow: 1px 1px 0 #2f8ac9;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.15);
+}
 .btn-tix {
   display: inline-block;
+  font-family: var(--font-display);
   font-weight: bold;
   font-size: 11px;
-  padding: 4px 9px;
-  border: 2px outset #8f8;
-  background: linear-gradient(#33cc33, #1d7a1d);
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border: 2px solid #fff;
+  background: linear-gradient(180deg, #ff9ed0, var(--tp-pink) 60%, #e0459c);
   color: #fff;
   text-decoration: none;
-  text-shadow: 1px 1px 0 #030;
+  text-shadow: 1px 1px 0 #c02780;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.2);
   white-space: nowrap;
+  transition: transform .12s;
 }
-.btn-tix:hover { filter: brightness(1.15); }
+.btn-tix:hover { filter: brightness(1.1); transform: scale(1.08) rotate(-2deg); }
 
 /* ==========================================================================
    FRIENDS
@@ -1616,17 +1746,6 @@ section#art {
   z-index: 2;
 }
 
-/* Le clip rend la colonne gauche du bento nettement plus haute que la droite :
-   sans ça le chat démarrait ~220px sous la fin de la colonne de droite. On le
-   remonte par-dessus le bas du player — #chat est en z-index 2 et #clip en 1,
-   donc il passe devant, menton de la tête compris. On s'arrête juste au-dessus
-   de la barre de progression pour que le player reste utilisable ; pousser
-   plus loin la recouvrirait. Valeur à réajuster quand le contenu des colonnes
-   changera. Réglée pour laisser 30px sous le bloc friends, soit le même
-   écart que partout ailleurs (chat → fan-arts, profil → bento…). */
-@media (min-width: 821px) {
-  section#chat { margin-top: -123px; }
-}
 
 .headspace {
   --u: 1.32px;
@@ -2190,7 +2309,7 @@ section#art {
   display: block;
   width: min(320px, 82vw);
   padding: 13px 10px;
-  background: #0b2d0b url('../assets/img/navBG.png') center / cover no-repeat;
+  background: #0b2d0b url('../assets/img/backgrouds/navBG.png') center / cover no-repeat;
   border: 2px solid #000;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, .5);
   color: #fff;
@@ -2212,7 +2331,6 @@ section#art {
 
   /* --- header minimal : logo + burger, pas de searchbar ni de nav --- */
   #topbar { gap: 6px; padding: 8px 12px; }
-  .logo .my { display: none; }
   .logo .tagline { display: none; }
   .logo .blogname { font-size: 22px; text-shadow: 1px 1px 0 #333; }
   .secret-search { display: none; }
@@ -2275,7 +2393,7 @@ section#art {
   .price-burst.pb-tr { width: 84px; height: 84px; top: -22px; right: -6px; }
   .price-burst.pb-bl { width: 84px; height: 84px; bottom: -20px; left: -6px; }
   .price-burst.pb-tr b, .price-burst.pb-bl b { font-size: 22px; }
-  .merch-bento { padding: 40px 0 30px; }
+  .merch-bento { --hz-top: 40px; --hz-bot: 30px; padding: var(--hz-top) 0 var(--hz-bot); }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
