@@ -28,11 +28,11 @@
          GATE_URL devient '/pages/entrer'. */
       var GATE_URL = 'intro.html';
 
-      /* La porte se rejoue à CHAQUE arrivée sur le site, refresh compris —
-         il n'y a volontairement aucun drapeau « déjà entré ». Seule exception :
-         la navigation interne (retour de secret.html, bouton Précédent), qui
-         n'est pas une arrivée sur le site et ne doit pas rejouer les 3 s
-         d'intro. Un F5 est bien traité comme une arrivée. */
+      /* La porte ne se joue qu'UNE fois par visiteur : le passage est
+         mémorisé en localStorage (persistant, survit à la fermeture du
+         navigateur). S'y ajoutent : la navigation interne (retour de
+         secret.html, bouton Précédent), qui n'est pas une arrivée sur le
+         site, et ?nointro=1. */
       function internalNav() {
         var e = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
         var type = e ? e.type
@@ -54,6 +54,7 @@
         }
         if (/[?&]nointro\b/.test(location.search)) return;
         if (internalNav()) return;
+        try { if (window.localStorage && localStorage.getItem('satine-entered')) return; } catch (e) { return; }
         location.replace(GATE_URL);
       } catch (e) { /* quota/refus : on laisse passer */ }
     })();
@@ -76,7 +77,7 @@
            années 2000. Tous les logos sont désormais des logos-mots (fournis
            dans assets/img/socials/, détourés/convertis en webp — Discord est
            le SVG d'origine, vectoriel). -->
-      <ul class="socials" data-rv aria-label="Réseaux sociaux de SATINE">
+      <ul class="socials" data-rv data-rv-each="li" aria-label="Réseaux sociaux de SATINE">
         <li><a class="social-btn" href="https://open.spotify.com/artist/7Abx1tdwQoBDWr1nD1o62B" target="_blank" rel="me noopener noreferrer" title="Spotify"><img src="assets/img/socials/spotify.webp" alt="Spotify"></a></li>
         <li><a class="social-btn" href="https://www.youtube.com/@SatineWall%C3%A9" target="_blank" rel="me noopener noreferrer" title="YouTube"><img src="assets/img/socials/youtube.webp" alt="YouTube"></a></li>
         <li><a class="social-btn" href="https://www.instagram.com/satine_walle/" target="_blank" rel="me noopener noreferrer" title="Instagram"><img src="assets/img/socials/instagram.webp" alt="Instagram"></a></li>
@@ -128,21 +129,6 @@
 
       </div>
 
-      <div class="bgroup g-interests" data-rv>
-      <div class="section-bar"><h2>My interests :</h2></div>
-      <div class="leo-box" style="margin-top:10px">
-        <table class="interests">
-          <tr><td class="k">一般</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">Music</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">映画</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">テレビ</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">Books</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">英雄</td><td class="v">bla bla bla blabla bla</td></tr>
-        </table>
-      </div>
-      </div>
-
-        <!-- ==================== LE CLIP ==================== -->
         <section id="clip" data-rv>
           <!-- Player "Headspace" (skin WMP d'origine, reconstruit en HTML/CSS) -->
           <div class="headspace">
@@ -172,35 +158,45 @@
             <button id="hs-theme" title="Plein écran"></button>
           </div>
         </section>
+      <div class="bgroup g-interests" data-rv data-rv-each=".interests tr">
+      <div class="section-bar"><h2>My interests :</h2></div>
+      <div class="leo-box" style="margin-top:10px">
+        <table class="interests">
+          <tr><td class="k">一般</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">Music</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">映画</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">テレビ</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">Books</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">英雄</td><td class="v">bla bla bla blabla bla</td></tr>
+        </table>
+      </div>
+      </div>
+
+        <!-- ==================== LE CLIP ==================== -->
     </div>
 
     <div class="bento-col" id="tournee">
-      <div class="bgroup g-tour" data-rv>
-      <div class="section-bar"><h2>Tournée</h2></div>
-      <div class="tour-strip" style="margin-top:10px">
-        <span class="tour-bus" aria-hidden="true"><span class="bus">🚌💨</span></span>
-        <span>Je pars en tournée avec <b>The Living Tombstone</b> en Europe !!</span>
-      </div>
-      <!-- Tableau des dates, dans la DA de l'affiche (rose/bleu bubble).
-           Les dates et les SOLD OUT sont ceux de l'affiche officielle. -->
-      <div class="leo-box tour-wrap" style="margin-top:14px">
+      <div class="bgroup g-tour" data-rv data-rv-each=".tour-table tr">
+      <!-- Dates réelles du Multiplayer Tour ; liens billetterie récupérés sur
+           thelivingtombstone.com (widget Bandsintown, URLs nettoyées de leurs
+           paramètres de tracking). Les SOLD OUT suivent l'affiche. -->
+      <div class="tour-wrap">
+        <img class="tour-typo" src="assets/img/maintypo.webp" alt="European Tour — satine opening for The Living Tombstone" width="1200" height="613">
         <div class="table-scroll">
-        <table class="tour-table collapsible" id="tour-table">
-          <tr><th>Date</th><th>Ville</th><th>Billets</th></tr>
-          <tr><td class="d">26/08</td><td class="v">London</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr><td class="d">28/08</td><td class="v">Hamburg</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+        <table class="tour-table" id="tour-table">
+          <tr><td class="d">26/08</td><td class="v">London</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108108895" target="_blank" rel="noopener">BILLETS</a></td></tr>
+          <tr><td class="d">28/08</td><td class="v">Hamburg</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108036628" target="_blank" rel="noopener">BILLETS</a></td></tr>
           <tr><td class="d">29/08</td><td class="v">Utrecht</td><td><span class="soldout">SOLD OUT</span></td></tr>
           <tr><td class="d">30/08</td><td class="v">Utrecht</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr><td class="d">01/09</td><td class="v">Cologne</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr class="extra"><td class="d">02/09</td><td class="v">Paris</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr class="extra"><td class="d">04/09</td><td class="v">Madrid</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr class="extra"><td class="d">05/09</td><td class="v">Madrid</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr class="extra"><td class="d">07/09</td><td class="v">Barcelona</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
-          <tr class="extra"><td class="d">09/09</td><td class="v">Lisbon</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr class="extra"><td class="d">11/09</td><td class="v">Luxembourg</td><td><a class="btn-tix" href="#" onclick="alert('Billetterie bientôt disponible !');return false">BILLETS</a></td></tr>
+          <tr><td class="d">01/09</td><td class="v">Cologne</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108036663" target="_blank" rel="noopener">BILLETS</a></td></tr>
+          <tr><td class="d">02/09</td><td class="v">Paris</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr><td class="d">04/09</td><td class="v">Madrid</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr><td class="d">05/09</td><td class="v">Madrid</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108052631" target="_blank" rel="noopener">BILLETS</a></td></tr>
+          <tr><td class="d">07/09</td><td class="v">Barcelona</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108036708" target="_blank" rel="noopener">BILLETS</a></td></tr>
+          <tr><td class="d">09/09</td><td class="v">Lisbon</td><td><span class="soldout">SOLD OUT</span></td></tr>
+          <tr><td class="d">11/09</td><td class="v">Luxembourg</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108036750" target="_blank" rel="noopener">BILLETS</a></td></tr>
         </table>
         </div>
-        <button class="btn-red see-more" data-target="tour-table">VOIR PLUS ▼</button>
       </div>
 
 
@@ -208,7 +204,7 @@
 
       <div class="ad-slot ad-inline" data-rv><span>PUB M1<br>~440px de large</span></div>
 
-      <div class="bgroup g-friends" data-rv>
+      <div class="bgroup g-friends" data-rv data-rv-each=".friend">
       <div class="section-bar"><h2>My friends space :</h2></div>
       <div class="friends-grid" style="margin-top:10px">
         <div class="friend"><p class="name">TLT</p><div class="ph"><img src="assets/img/friends/the-living-tombstone.webp" alt="The Living Tombstone" loading="lazy"></div></div>

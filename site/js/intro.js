@@ -42,9 +42,14 @@
     if (shut) el.className = 'shut shut-veil';
     el.innerHTML =
       '<div class="veil"></div>' +
-      '<img class="jaw jaw-top" src="assets/img/anim-intro-top.webp" alt="">' +
-      '<img class="jaw jaw-bot" src="assets/img/anim-intro-bottom.webp" alt="">';
+      '<img class="jaw jaw-top" src="assets/img/anim-intro-top.webp" fetchpriority="high" alt="">' +
+      '<img class="jaw jaw-bot" src="assets/img/anim-intro-bottom.webp" fetchpriority="high" alt="">';
     document.body.appendChild(el);
+    /* décodage anticipé : sans ça le premier affichage peut sauter une frame
+       (l'image arrive pendant la fermeture) */
+    Array.prototype.forEach.call(el.querySelectorAll('img'), function (img) {
+      if (img.decode) img.decode().catch(function () {});
+    });
     return el;
   }
 
@@ -68,14 +73,16 @@
   function initStars(canvas) {
     var ctx = canvas.getContext('2d');
     var stars = [];
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    /* palette relevée sur la référence : blanc, cyan, violet, bleu */
+    /* dpr COMPLET (plafonné à 3) : le plafond à 2 d'avant rendait le canvas
+       flou/étiré sur les mobiles en 3x */
+    var dpr = Math.min(window.devicePixelRatio || 1, 3);
     var COLORS = ['255,255,255', '130,240,235', '170,150,255', '120,180,255', '255,190,235'];
 
     function seed() {
       var w = canvas.clientWidth, h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      if (!w || !h) return; /* jamais de canvas 300x150 par défaut étiré */
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       stars = [];
       var n = Math.round(w * h / 5200);
@@ -86,26 +93,33 @@
           r: Math.random() < .08 ? 2.2 + Math.random() * 2.6 : .6 + Math.random() * 1.3,
           c: COLORS[(Math.random() * COLORS.length) | 0],
           ph: Math.random() * Math.PI * 2,
-          sp: .6 + Math.random() * 1.9
+          sp: .6 + Math.random() * 1.9,
+          rot: Math.random() * Math.PI / 2
         });
       }
     }
 
-    /* les grosses étoiles sont dessinées en croix à 4 branches, comme la réf */
+    /* grosse étoile : vraie forme à 4 branches (deux quadratiques par
+       branche), plus les croix en fillRect qui bavaient en s'étirant */
     function sparkle(s, a) {
-      var arm = s.r * 3.4;
-      var g = ctx.createLinearGradient(s.x - arm, s.y, s.x + arm, s.y);
-      g.addColorStop(0, 'rgba(' + s.c + ',0)');
-      g.addColorStop(.5, 'rgba(' + s.c + ',' + a + ')');
-      g.addColorStop(1, 'rgba(' + s.c + ',0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(s.x - arm, s.y - s.r * .28, arm * 2, s.r * .56);
-      g = ctx.createLinearGradient(s.x, s.y - arm, s.x, s.y + arm);
-      g.addColorStop(0, 'rgba(' + s.c + ',0)');
-      g.addColorStop(.5, 'rgba(' + s.c + ',' + a + ')');
-      g.addColorStop(1, 'rgba(' + s.c + ',0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(s.x - s.r * .28, s.y - arm, s.r * .56, arm * 2);
+      var arm = s.r * 3.6, waist = s.r * .5;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.rot);
+      ctx.fillStyle = 'rgba(' + s.c + ',' + a + ')';
+      ctx.beginPath();
+      ctx.moveTo(0, -arm);
+      ctx.quadraticCurveTo(waist, -waist, arm, 0);
+      ctx.quadraticCurveTo(waist, waist, 0, arm);
+      ctx.quadraticCurveTo(-waist, waist, -arm, 0);
+      ctx.quadraticCurveTo(-waist, -waist, 0, -arm);
+      ctx.fill();
+      /* cœur lumineux */
+      ctx.fillStyle = 'rgba(255,255,255,' + (a * .9) + ')';
+      ctx.beginPath();
+      ctx.arc(0, 0, s.r * .55, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
     }
 
     function draw(t) {
@@ -113,11 +127,11 @@
       for (var i = 0; i < stars.length; i++) {
         var s = stars[i];
         var a = .32 + .68 * Math.abs(Math.sin(t / 1000 * s.sp + s.ph));
+        if (s.r > 2) { sparkle(s, a); continue; }
         ctx.fillStyle = 'rgba(' + s.c + ',' + a + ')';
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fill();
-        if (s.r > 2) sparkle(s, a * .8);
       }
     }
 
@@ -126,7 +140,9 @@
     else {
       (function loop(t) { draw(t); requestAnimationFrame(loop); })(0);
     }
-    window.addEventListener('resize', function () { seed(); if (reducedMotion()) draw(0); });
+    function reseed() { seed(); if (reducedMotion()) draw(0); }
+    window.addEventListener('resize', reseed);
+    window.addEventListener('orientationchange', reseed);
   }
 
   /* --------------------------------------------------- pop-ups d'erreur */
@@ -200,6 +216,8 @@
         try { s.setItem(KEY_REVEAL, '1'); }
         catch (e) { /* stockage refusé : on entre sans la révélation */ }
       }
+      /* passage mémorisé durablement : la porte ne se rejouera plus */
+      try { if (window.localStorage) localStorage.setItem('satine-entered', '1'); } catch (e) {}
       /* volontairement SANS l'ancre d'origine : franchir la porte doit
          toujours faire atterrir en haut de la home, pas sur #tournee */
       window.location.href = HOME_URL;
@@ -211,7 +229,7 @@
 
       /* respect de prefers-reduced-motion : ni avalanche ni mâchoires */
       if (reducedMotion()) {
-        /* index.html ne renverra pas ici : le referer est interne */
+        try { if (window.localStorage) localStorage.setItem('satine-entered', '1'); } catch (e) {}
         window.location.href = HOME_URL;
         return;
       }
@@ -220,20 +238,26 @@
       /* le clic est un geste utilisateur : la lecture est autorisée */
       if (alarm) { try { alarm.play().catch(function () {}); } catch (e) {} }
 
-      /* cadence qui s'emballe : 170ms au début, 35ms à la fin */
-      var n = 34, i = 0;
+      /* cadence qui s'emballe. Sur desktop l'avalanche est plus dense et
+         plus rapide (60 pop-ups, 60→15ms) ; sur mobile on reste sobre,
+         l'écran est vite couvert (34 pop-ups, 170→35ms). */
+      var mobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+      var n = mobile ? 34 : 60, i = 0;
       (function next() {
         makePopup(host, i);
-        if (++i < n) setTimeout(next, 170 - (135 * i / n));
+        if (++i < n) setTimeout(next, mobile ? 170 - (135 * i / n) : 60 - (45 * i / n));
       })();
 
-      /* la bouche se referme sur le carnage */
+      /* la bouche se referme sur le carnage — en s'assurant que les deux
+         images sont chargées, sinon on refermerait une bouche invisible */
       setTimeout(function () {
-        jaws.classList.add('chomp', 'shut');
-        setTimeout(function () {
-          document.body.classList.add('chomp-shake');
-          goToSite();
-        }, CLOSE_MS);
+        whenJawsReady(jaws, 1200, function () {
+          jaws.classList.add('chomp', 'shut');
+          setTimeout(function () {
+            document.body.classList.add('chomp-shake');
+            goToSite();
+          }, CLOSE_MS);
+        });
       }, 2250);
     }
 

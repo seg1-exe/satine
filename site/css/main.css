@@ -232,6 +232,9 @@ img.photo-frame {
   background-position: calc(100% + 170px) 0;
 }
 .rail .ad { flex-shrink: 0; }
+/* les vraies pubs gardent la bordure noire du gabarit .ad, seule la hauteur
+   minimum saute (c'est le visuel qui dicte la sienne) */
+.rail .ad-live { min-height: 0; }
 .rail .ad-live img { width: 100%; height: auto; display: block; }
 .rail .ad-live a { display: block; transition: transform .13s ease-out; }
 .rail .ad-live a:hover { transform: scale(1.03) rotate(-1deg); }
@@ -542,8 +545,8 @@ img.photo-frame {
 /* bandes danger visibles seulement en haut et en bas : le plateau blanc
    est en pleine largeur (maquette) */
 .merch-bento {
-  --hz-top: 46px;
-  --hz-bot: 38px;
+  --hz-top: 42px;
+  --hz-bot: 42px; /* mêmes hauteurs haut/bas, à la demande de l'artiste */
   position: relative;
   padding: var(--hz-top) 0 var(--hz-bot);
   background: none; /* les rayures ne vivent que dans les deux calques */
@@ -983,16 +986,15 @@ img.photo-frame {
   /* le couloir prend une ligne entière du bandeau : le texte passe dessous */
   flex: 0 0 100%;
   width: 100%;
-  height: 36px;
+  height: 42px;
   overflow: hidden;
 }
 .tour-bus .bus {
   position: absolute;
   top: 0;
   left: 100%;
-  font-size: 26px;
-  line-height: 36px;
-  white-space: nowrap;
+  height: 100%;
+  width: auto;
   animation: bus-drive 5s linear infinite;
 }
 /* On anime `left` en plus de translateX : c'est le seul moyen de traverser
@@ -1021,85 +1023,66 @@ img.photo-frame {
    le tableau scrolle dans sa boîte au lieu d'en sortir */
 .table-scroll { overflow-x: auto; max-width: 100%; }
 
-/* Tableau de tournée dans la DA de l'affiche : rose bonbon / bleu ciel,
-   lettres blanches gonflées à contour (empilement de text-shadow, le stroke
-   CSS peignant vers l'intérieur), rangées qui alternent rose et bleu. */
+/* Tableau de tournée : dégradé bleu → rose demandé par l'artiste, texte
+   Helvetica bold resserré (letter-spacing -6%), sans en-tête. */
 .tour-wrap {
-  --tp-pink: #f56ab4;
-  --tp-pink-soft: #fbc9e4;
-  --tp-blue: #56b6ea;
-  --tp-blue-soft: #bfe6fb;
-  background:
-    linear-gradient(115deg, var(--tp-pink-soft) 0 34%, #fff 34% 38%, var(--tp-blue-soft) 38% 72%, #fff 72% 76%, var(--tp-pink-soft) 76%);
+  background: linear-gradient(180deg, #56C0FF, #FF67BA);
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, .4);
+  padding: 14px;
 }
-/* pas de texture léopard ici : le fond rose/bleu est la DA de l'affiche */
-.tour-wrap::before, .tour-wrap::after { display: none; }
-.tour-table { width: 100%; border-collapse: separate; border-spacing: 0 7px; }
-.tour-table th {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+.tour-typo { width: 100%; height: auto; display: block; margin-bottom: 10px; }
+.tour-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-alt);
+  font-weight: bold;
+  letter-spacing: -0.06em;
   color: #fff;
-  background: linear-gradient(180deg, var(--tp-blue), #2f8ac9);
-  border: 2px solid #fff;
-  text-shadow: 1px 1px 0 #1a6ca8;
-  padding: 6px 10px;
-  text-align: left;
 }
+/* textes plus gros, lignes resserrées */
 .tour-table td {
-  padding: 7px 10px;
-  border-top: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  font-size: 14px;
+  padding: 0 10px;
+  border-bottom: 2px solid rgba(255, 255, 255, .5);
+  font-size: 19px;
+  line-height: 1.35;
 }
-.tour-table td:first-child { border-left: 2px solid #fff; white-space: nowrap; }
-.tour-table td:last-child { border-right: 2px solid #fff; }
-/* rangées : rose, puis bleu, en alternance — comme les lignes de l'affiche */
-.tour-table tr:nth-child(even) td { background: linear-gradient(180deg, var(--tp-pink-soft), #f7a8d2); }
-.tour-table tr:nth-child(odd) td { background: linear-gradient(180deg, var(--tp-blue-soft), #8fd0f4); }
-.tour-table tr:hover td { filter: saturate(1.35) brightness(1.04); }
-/* date et ville : bulles blanches à contour, façon typographie de l'affiche */
+.tour-table td:first-child { white-space: nowrap; }
+.tour-table td:last-child { text-align: right; }
+.tour-table tr:hover td { background: rgba(255, 255, 255, .14); }
 .tour-table .d,
 .tour-table .v {
-  font-family: var(--font-display);
-  font-size: 16px;
-  color: #fff;
-  letter-spacing: 1px;
+  font-size: 30px;
+  line-height: 1.15;
+  text-shadow: 1px 2px 0 rgba(0, 0, 0, .25);
 }
-.tour-table .d { text-shadow: -2px -2px 0 var(--tp-pink), 2px -2px 0 var(--tp-pink), -2px 2px 0 var(--tp-pink), 2px 2px 0 var(--tp-pink), 3px 4px 0 rgba(0,0,0,.18); }
-.tour-table .v { text-shadow: -2px -2px 0 var(--tp-blue), 2px -2px 0 var(--tp-blue), -2px 2px 0 var(--tp-blue), 2px 2px 0 var(--tp-blue), 3px 4px 0 rgba(0,0,0,.18); }
-/* SOLD OUT : la pastille blanche sur bleu de l'affiche, légèrement penchée */
 .tour-table .soldout {
   display: inline-block;
-  font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: 12px;
+  letter-spacing: -0.06em;
   color: #fff;
-  background: linear-gradient(180deg, #9bd7f7, var(--tp-blue));
   border: 2px solid #fff;
   padding: 2px 8px;
   transform: rotate(-3deg);
-  text-shadow: 1px 1px 0 #2f8ac9;
-  box-shadow: 2px 2px 0 rgba(0,0,0,.15);
+  opacity: .85;
 }
 .btn-tix {
   display: inline-block;
-  font-family: var(--font-display);
+  font-family: var(--font-alt);
   font-weight: bold;
-  font-size: 11px;
-  letter-spacing: 1px;
-  padding: 4px 10px;
-  border: 2px solid #fff;
-  background: linear-gradient(180deg, #ff9ed0, var(--tp-pink) 60%, #e0459c);
-  color: #fff;
+  font-size: 12px;
+  letter-spacing: -0.06em;
+  padding: 4px 12px;
+  border: 2px solid #000;
+  background: #fff;
+  color: #e0459c;
   text-decoration: none;
-  text-shadow: 1px 1px 0 #c02780;
-  box-shadow: 2px 2px 0 rgba(0,0,0,.2);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .25);
   white-space: nowrap;
   transition: transform .12s;
 }
-.btn-tix:hover { filter: brightness(1.1); transform: scale(1.08) rotate(-2deg); }
+.btn-tix:hover { transform: scale(1.08) rotate(-2deg); }
 
 /* ==========================================================================
    FRIENDS
@@ -1558,7 +1541,7 @@ img.photo-frame {
 .cart-line button { cursor: var(--cur-link); border: 2px outset #ccc; background: #eee; font-weight: bold; }
 .cart-total { font-weight: bold; font-size: 16px; text-align: right; padding: 4px 2px; }
 .cart-actions { padding: 10px; border-top: 1px solid #d9d9d9; background: #f0f0f0; }
-.cart-actions .btn-buy { width: 100%; }
+.cart-actions .btn-red { display: block; width: calc(100% - 14px); margin: 12px auto; }
 .cart-actions .note { font-size: 11px; color: #666; text-align: center; margin-top: 6px; }
 
 #cart-fab {
@@ -1739,6 +1722,9 @@ section { margin-top: 30px; }
   z-index: 1;
   margin: 2px 0 -110px;
 }
+/* le clip est suivi de My interests dans la colonne : le menton de la tête
+   (marge négative ci-dessus) passe SOUS la boîte, comme sur mobile */
+.g-interests { position: relative; z-index: 2; }
 #tournee,
 section#chat,
 section#art {
@@ -1750,6 +1736,12 @@ section#art {
 .headspace {
   --u: 1.32px;
   position: relative;
+  /* respiration : léger zoom + balancement, sur le bloc ENTIER (tête, vidéo,
+     contrôles ensemble). Propriétés individuelles scale/rotate : elles se
+     composent avec le transform de base (rotate -4deg + translateX) au lieu
+     de l'écraser. */
+  transform-origin: 50% 60%;
+  animation: head-sway 5.6s ease-in-out infinite;
   width: calc(342 * var(--u));
   height: calc(394 * var(--u));
   margin: 4px auto 0;
@@ -1956,6 +1948,34 @@ section#art {
 /* bulle Clippy porteuse d'un lien (message `goto` dans shared.js) */
 #clippy .bubble.linky { cursor: var(--cur-link); }
 #clippy .bubble.linky:hover #clippy-text { text-decoration: underline; }
+
+/* ==========================================================================
+   EASTER EGG — boss kappa (double-clic sur KAPPA dans le friends space)
+   ========================================================================== */
+
+#kappa-boss {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: auto;
+  z-index: 90; /* au-dessus de tout sauf rien : c'est un jumpscare gentil */
+  pointer-events: none;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .6));
+  animation: boss-in .45s cubic-bezier(.25, 1.2, .4, 1) both;
+}
+@keyframes boss-in {
+  from { transform: translate(-50%, -103%); }
+  to { transform: translate(-50%, 0); }
+}
+#kappa-boss.out { animation: boss-out .5s cubic-bezier(.6, -0.2, .8, .5) both; }
+@keyframes boss-out {
+  from { transform: translate(-50%, 0); }
+  to { transform: translate(-50%, -103%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #kappa-boss { display: none; }
+}
 
 /* ==========================================================================
    SPARKLES (traînée de curseur)
@@ -2373,7 +2393,9 @@ section#art {
   .social-btn { height: 38px; padding: 5px 10px; }
   /* les badges pleine largeur passent sous le bouton panier (fixe, en haut à
      droite) : on le descend au niveau de la fenêtre merch, moins gênant */
-  #cart-fab { top: auto; bottom: 118px; right: 10px; width: 52px; height: 52px; }
+  /* en bas à GAUCHE : la TV Clippy occupe le coin droit (et dépasse 118px de
+     haut entre 560 et 820px), impossible de cohabiter de ce côté */
+  #cart-fab { top: auto; bottom: 136px; right: auto; left: 10px; width: 52px; height: 52px; }
   #merch { grid-column: 1 / -1; grid-row: 4; margin-top: 12px; }
 
   /* fan-arts : 2 par ligne */
@@ -2393,13 +2415,13 @@ section#art {
   .price-burst.pb-tr { width: 84px; height: 84px; top: -22px; right: -6px; }
   .price-burst.pb-bl { width: 84px; height: 84px; bottom: -20px; left: -6px; }
   .price-burst.pb-tr b, .price-burst.pb-bl b { font-size: 22px; }
-  .merch-bento { --hz-top: 40px; --hz-bot: 30px; padding: var(--hz-top) 0 var(--hz-bot); }
+  .merch-bento { --hz-top: 36px; --hz-bot: 36px; padding: var(--hz-top) 0 var(--hz-bot); }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
   #main-col { padding: 14px 12px 40px; }
   #clippy { width: 104px; }
-  #clippy .bubble { width: 170px; font-size: 12px; }
+  #clippy .bubble { width: min(260px, calc(100vw - 40px)); font-size: 12px; }
   #cart-drawer { width: calc(100vw - 24px); right: calc(-100vw - 24px); }
 }
 
@@ -2447,9 +2469,32 @@ html.rv-ready [data-rv].rv-in {
   transition: opacity .45s ease-out, scale .55s cubic-bezier(.22, .9, .3, 1.22);
 }
 
+@keyframes head-sway {
+  0%, 100% { scale: 1; rotate: -1.4deg; }
+  50% { scale: 1.03; rotate: 1.4deg; }
+}
+
+/* --- cascade interne (conteneurs [data-rv-each], voir shared.js) --- */
+html.rv-ready .rv-it { opacity: 0; translate: 0 12px; }
+html.rv-ready .rv-in .rv-it {
+  opacity: 1;
+  translate: none;
+  transition: opacity .4s ease-out, translate .45s cubic-bezier(.2, .85, .3, 1);
+}
+
+/* le lockup de la tournée POP à l'arrivée du bloc */
+html.rv-ready .g-tour .tour-typo { opacity: 0; }
+html.rv-ready .g-tour.rv-in .tour-typo { opacity: 1; animation: typo-pop .55s cubic-bezier(.24, 1.1, .35, 1.25) both; }
+@keyframes typo-pop {
+  from { scale: .45; rotate: -4deg; }
+  to { scale: 1; rotate: 0deg; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* filet de sécurité si la classe traîne : rien ne doit rester caché */
   html.rv-ready [data-rv] { opacity: 1; scale: none; transition: none; }
+  html.rv-ready .rv-it, html.rv-ready .g-tour .tour-typo { opacity: 1; translate: none; scale: none; animation: none; transition: none; }
+  .headspace { animation: none; }
   .see-more, #chat-send, .price-burst, .tour-bus .bus { animation: none; }
 }
 

@@ -65,11 +65,9 @@
   var CLIPPY_MSGS = [
     { t: 'Salut !! On dirait que tu visites le site de SATINE. Besoin d’aide ?' },
     { t: 'Psst… il paraît qu’un code est caché dans les pubs. Juste un bruit de couloir hein.' },
-    { t: 'Le pack de barrettes part super vite. Je dis ça, je dis rien.' },
+    { t: 'Le pack de barrettes part super vite. Je dis ça, je dis rien.', goto: '#merch' },
     { t: 'SATINE part en tournée avec The Living Tombstone !! Partout en Europe !!', goto: '#tournee' },
-    { t: 'Tu as vu le nouveau clip ? Clique ici, je t’emmène.', goto: '#clip' },
-    { t: 'Astuce : la barre de recherche en haut ne cherche qu’une seule chose…' },
-    { t: 'bzzzt… 📺… bzzzt… pardon, mauvaise réception.' }
+    { t: 'Tu as vu le nouveau clip ? Clique ici, je t’emmène.', goto: '#clip' }
   ];
 
   /* -------------------------------------------------------------- zoom
@@ -114,6 +112,10 @@
       return '<a class="burger-link" href="' + href + '">' + p.label + '</a>';
     }).join('');
 
+    /* lien Panier : ouvre le tiroir, sur toutes les pages */
+    nav += '<span class="sep">|</span><a href="#" id="nav-cart">Panier</a>';
+    burgerLinks += '<a class="burger-link" href="#" id="burger-cart">Panier</a>';
+
     var chrome =
       '<div id="layout">' +
         '<aside class="rail" id="rail-left">' + ADS_LEFT.join('') + '</aside>' +
@@ -146,7 +148,7 @@
         '<div class="xp-body" id="cart-body"></div>' +
         '<div class="cart-actions">' +
           '<div class="cart-total" id="cart-total"></div>' +
-          '<button class="btn-buy" id="cart-checkout">COMMANDER ♡</button>' +
+          '<button class="btn-red" id="cart-checkout">COMMANDER ♡</button>' +
           '<p class="note">checkout Shopify branché en phase 2 : pour l’instant c’est du décor !</p>' +
         '</div>' +
       '</div></div>' +
@@ -369,6 +371,16 @@
     document.getElementById('cart-close').addEventListener('click', function () {
       document.getElementById('cart-drawer').classList.remove('open');
     });
+    /* liens Panier de la nav et du burger : même tiroir */
+    document.getElementById('nav-cart').addEventListener('click', function (e) {
+      e.preventDefault();
+      document.getElementById('cart-drawer').classList.toggle('open');
+    });
+    document.getElementById('burger-cart').addEventListener('click', function (e) {
+      e.preventDefault();
+      document.getElementById('cart-drawer').classList.add('open');
+      /* la fermeture du burger est gérée par initBurger (clic sur .burger-link) */
+    });
     document.getElementById('cart-body').addEventListener('click', function (e) {
       var inc = e.target.getAttribute('data-inc');
       var dec = e.target.getAttribute('data-dec');
@@ -468,6 +480,20 @@
         obs.observe(el);
       });
 
+      /* cascade INTERNE : un conteneur [data-rv-each="sel"] déroule ses
+         éléments un à un quand il entre dans le viewport (réseaux sociaux,
+         lignes des tableaux tournée/interests, friends). Les éléments sont
+         marqués .rv-it et reçoivent chacun leur délai ; le CSS les révèle
+         quand le conteneur gagne .rv-in. */
+      Array.prototype.forEach.call(document.querySelectorAll('[data-rv-each]'), function (c) {
+        var kids = c.querySelectorAll(c.getAttribute('data-rv-each'));
+        Array.prototype.forEach.call(kids, function (it, j) {
+          it.classList.add('rv-it');
+          it.style.transitionDelay = (120 + j * 90) + 'ms';
+        });
+        if (!c.hasAttribute('data-rv')) obs.observe(c); /* sinon déjà observé */
+      });
+
       /* Filet de sécurité. Un document masqué (onglet ouvert en arrière-plan)
          ne fait pas tourner l'IntersectionObserver : sans ça la page resterait
          entièrement invisible jusqu'au premier rendu. Au bout d'une seconde on
@@ -493,6 +519,45 @@
     } else {
       start();
     }
+  }
+
+  /* -------------------------------------------- easter egg : boss kappa */
+
+  /* Deux clics d'affilée (moins de 600 ms d'écart) sur la vignette KAPPA du
+     friends space : anomalisa-boss surgit du haut de l'écran, reste 1,5 s,
+     et repart. L'image (webp allégé) n'est chargée qu'au premier déclenchement. */
+  function initKappaBoss() {
+    var card = null;
+    document.querySelectorAll('.friend').forEach(function (f) {
+      var img = f.querySelector('img');
+      if (img && /kappa/i.test(img.getAttribute('src') || '')) card = f;
+    });
+    if (!card) return;
+
+    var lastClick = 0;
+    var active = false;
+
+    card.addEventListener('click', function () {
+      var now = Date.now();
+      var dbl = now - lastClick < 600;
+      lastClick = now;
+      if (!dbl || active) return;
+      active = true;
+
+      var boss = document.createElement('img');
+      boss.src = 'assets/img/anomalisa-boss.webp';
+      boss.alt = '';
+      boss.id = 'kappa-boss';
+      boss.addEventListener('load', function () {
+        document.body.appendChild(boss);
+        /* slide-in (CSS), pause 1,5 s, slide-out (CSS), nettoyage */
+        setTimeout(function () {
+          boss.classList.add('out');
+          setTimeout(function () { boss.remove(); active = false; }, 500);
+        }, 450 + 1500);
+      });
+      boss.addEventListener('error', function () { active = false; });
+    });
   }
 
   /* ------------------------------------------------------- burger menu */
@@ -526,6 +591,7 @@
     initScrollspy();
     initBurger();
     initReveal();
+    initKappaBoss();
     initSparkles();
     document.dispatchEvent(new CustomEvent('satine:ready'));
   });

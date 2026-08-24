@@ -44,9 +44,13 @@ avalanche de ~34 pop-ups d'erreur Windows (cadence qui s'emballe de 170 à
 navigation vers `index.html` a lieu**, donc invisible, et la bouche se rouvre
 sur le site.
 
-**La porte se rejoue à chaque arrivée sur le site, refresh compris** : il n'y a
-volontairement aucun drapeau « déjà entré ». Le script inline en tête du
-`<head>` d'`index.html` renvoie sur `intro.html` sauf dans trois cas :
+**La porte ne se joue qu'une fois par visiteur** : le passage est mémorisé en
+`localStorage` (clé `satine-entered`, persistante — elle survit à la fermeture
+du navigateur ; le visiteur reverra l'intro s'il vide ses données de site, et
+elle se rejoue en navigation privée). Pour la revoir en dev : effacer la clé
+dans la console (`localStorage.removeItem('satine-entered')`). Le script inline
+en tête du `<head>` d'`index.html` renvoie sur `intro.html` sauf dans quatre
+cas — passage mémorisé, plus :
 
 1. `satine-reveal` est présent dans `sessionStorage` — jeton à usage unique
    posé par `intro.html` juste avant de naviguer. Le script le consomme et pose
