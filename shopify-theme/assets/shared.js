@@ -1,3 +1,6 @@
+/* Shopify : les assets du thème vivent dans un dossier plat servi par le CDN.
+   window.__ASSET_BASE est posé par layout/theme.liquid (et intro.liquid). */
+function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
 /* ==========================================================================
    SATINE — chrome partagé (header, nav, rails pubs, clippy, panier, sparkles)
    Lors du passage en thème Shopify, ce fichier deviendra le layout Liquid
@@ -15,7 +18,7 @@
     { id: 'clip',    label: 'Clip',    anchor: '#clip' },
     { id: 'chat',    label: 'Chat',    anchor: '#chat' },
     { id: 'art',     label: 'Art',     anchor: '#art' },
-    { id: 'secret',  label: 'Secret',  anchor: 'secret.html' }
+    { id: 'secret',  label: 'Secret',  anchor: '/pages/secret' }
   ];
 
   /* ------------------------------------------------------------------
@@ -39,12 +42,12 @@
      - l'affiche de tournée, cliquable → tableau des dates (#tournee ; depuis
        secret.html on repasse par index.html, comme la nav) */
   (function () {
-    var tourHref = (document.body.getAttribute('data-page') === 'secret' ? 'index.html' : '') + '#tournee';
+    var tourHref = (document.body.getAttribute('data-page') === 'secret' ? '/' : '') + '#tournee';
     var ads = [
-      '<div class="ad ad-live"><img src="assets/img/pubs/pub-satine.webp" ' +
+      '<div class="ad ad-live"><img src="' + ASSET('pub-satine.webp') + '" ' +
         'alt="Publicité SATINE" loading="lazy" decoding="async"></div>',
       '<div class="ad ad-live"><a href="' + tourHref + '" title="Toutes les dates de la tournée">' +
-        '<img src="assets/img/pubs/pub-tour.webp" alt="European Tour — voir les dates" ' +
+        '<img src="' + ASSET('pub-tour.webp') + '" alt="European Tour — voir les dates" ' +
         'loading="lazy" decoding="async"></a></div>'
     ];
     var total = ADS_LEFT.length + ADS_RIGHT.length;
@@ -99,7 +102,7 @@
     var pageMain = document.getElementById('page-main');
 
     /* sur secret.html, les ancres doivent repasser par index.html */
-    var prefix = page === 'secret' ? 'index.html' : '';
+    var prefix = page === 'secret' ? '/' : '';
     var nav = NAV.map(function (p) {
       var href = p.anchor.charAt(0) === '#' ? prefix + p.anchor : p.anchor;
       var active = (page === 'secret' && p.id === 'secret') || (page !== 'secret' && p.id === 'top');
@@ -121,7 +124,7 @@
         '<aside class="rail" id="rail-left">' + ADS_LEFT.join('') + '</aside>' +
         '<div id="center-col">' +
           '<header id="topbar">' +
-            '<a class="logo" href="index.html">' +
+            '<a class="logo" href="/">' +
               '<span><span class="blogname">SAT’S BLOG</span>' +
               '<span class="tagline">A space for US</span></span>' +
             '</a>' +
@@ -156,7 +159,7 @@
         '<div class="bubble" id="clippy-bubble" hidden>' +
           '<span class="close-clippy" id="clippy-close">✕</span>' +
           '<span id="clippy-text"></span></div>' +
-        '<img src="assets/img/clippy-tv.png" alt="Assistant TV de Satine" id="clippy-img">' +
+        '<img src="' + ASSET('clippy-tv.png') + '" alt="Assistant TV de Satine" id="clippy-img">' +
       '</div>' +
       '<div id="modal-overlay" hidden><div class="xp-window product-modal">' +
         '<div class="xp-titlebar"><span class="xp-ico">🛍️</span>' +
@@ -209,7 +212,7 @@
       stopTyping();
 
       if (!blip) {
-        blip = new Audio('assets/audio/text_sound_effect.mp3');
+        blip = new Audio(ASSET('text_sound_effect.mp3'));
         blip.volume = 0.55;
       }
       blip.currentTime = 0;
@@ -252,18 +255,18 @@
   /* prix conformes à la maquette : 35€ côté barrettes, 10€ côté poster */
   var CATALOG = {
     barrettes: {
-      name: 'Pack 3 barrettes',
+      name: 'Pack 3 barrettes “!!”',
       price: 35,
-      desc: 'Trois barrettes éclair « >< » : une blanche au tracé rose, une bleue, une noire. ' +
+      desc: 'Trois barrettes point d’exclamation : une blanche, une noire, une rouge énervée. ' +
         'Comme celle que je porte, mais pour TES cheveux.',
-      visual: '<div class="product-visual has-img"><img src="assets/img/products/barretes.webp" alt="Pack de 3 barrettes"></div>'
+      visual: '<div class="product-visual has-img"><img src="' + ASSET('barretes.webp') + '" alt="Pack de 3 barrettes"></div>'
     },
     poster: {
       name: 'Poster du dernier clip',
       price: 10,
       desc: 'L’artwork du clip anomalisa en grand format, pour remplacer ce vieux poster que tu ' +
         'n’assumes plus. Impression de qualité, mur non fourni.',
-      visual: '<div class="product-visual has-img"><img src="assets/img/products/poster.webp" alt="Poster anomalisa"></div>'
+      visual: '<div class="product-visual has-img"><img src="' + ASSET('poster.webp') + '" alt="Poster anomalisa"></div>'
     }
   };
 
@@ -545,7 +548,7 @@
       active = true;
 
       var boss = document.createElement('img');
-      boss.src = 'assets/img/anomalisa-boss.webp';
+      boss.src = ASSET('anomalisa-boss.webp');
       boss.alt = '';
       boss.id = 'kappa-boss';
       boss.addEventListener('load', function () {
@@ -558,114 +561,6 @@
       });
       boss.addEventListener('error', function () { active = false; });
     });
-  }
-
-  /* ---------------------------- easter eggs vidéo : chroma-key sur canvas */
-
-  /* Double clic sur une vignette du friends space : la vidéo au fond vert est
-     incrustée en direct sur un canvas plein écran (chroma-key pixel par
-     pixel) — seule approche de transparence vidéo qui marche partout, Safari
-     ne lisant pas l'alpha des WebM. Muet, plein viewport, retrait à la fin de
-     la vidéo. crossOrigin pour que getImageData reste licite derrière le CDN
-     Shopify (il envoie les en-têtes CORS). */
-  function initChromaEgg(matcher, src, id) {
-    var card = null;
-    document.querySelectorAll('.friend').forEach(function (f) {
-      var img = f.querySelector('img');
-      if (img && matcher.test(img.getAttribute('src') || '')) card = f;
-    });
-    if (!card) return;
-
-    var lastClick = 0;
-    var active = false;
-
-    card.addEventListener('click', function () {
-      var now = Date.now();
-      var dbl = now - lastClick < 600;
-      lastClick = now;
-      if (!dbl || active) return;
-      active = true;
-
-      var video = document.createElement('video');
-      video.crossOrigin = 'anonymous';
-      video.src = src;
-      video.playsInline = true;
-      video.muted = true;
-      video.preload = 'auto';
-      video.load(); /* certains navigateurs ne chargent pas un <video> détaché sans ça */
-
-      var canvas = document.createElement('canvas');
-      canvas.id = id;
-      canvas.className = 'chroma-egg';
-      var ctx = canvas.getContext('2d', { willReadFrequently: true });
-      var raf = 0;
-
-      function cleanup() {
-        cancelAnimationFrame(raf);
-        video.pause();
-        canvas.remove();
-        active = false;
-      }
-
-      function draw() {
-        if (video.ended) { cleanup(); return; }
-        if (video.readyState >= 2) {
-          if (canvas.width !== video.videoWidth) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-          }
-          ctx.drawImage(video, 0, 0);
-          var fr = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          var d = fr.data;
-          /* Chroma-key en trois zones, sur le ratio vert/max(r,b) :
-             > 1.38 : fond franc → transparent ;
-             1.10-1.38 : frange de bord → alpha progressif + despill (le vert
-                         est ramené à max(r,b), ce qui tue le liseré) ;
-             < 1.10 : pixel gardé tel quel — les cheveux TURQUOISE de Miku
-                      (vert ≈ bleu, ratio ~1.0-1.08) restent sous ce seuil,
-                      ne pas le baisser davantage. */
-          /* Critère d'entrée en DIFFÉRENCE absolue (g − max(r,b) > 8) et non
-             en luminosité : un plancher `g > 60` laissait passer le spill
-             SOMBRE (vert foncé des bords de bras, ratio fort mais g faible).
-             La différence de 8 protège quand même le bruit des pixels quasi
-             noirs, donc les contours sombres de Freddy. */
-          for (var i = 0; i < d.length; i += 4) {
-            var r = d[i], g = d[i + 1], b = d[i + 2];
-            var mx = r > b ? r : b;
-            var diff = g - mx;
-            if (diff > 8 && g * 10 > mx * 11) { /* ratio > 1.10 */
-              if (diff > 15 && g * 50 > mx * 69) { /* ratio > 1.38 : fond */
-                d[i + 3] = 0;
-              } else {
-                var t = (g / (mx || 1) - 1.10) / 0.28;
-                d[i + 3] = (255 * (1 - (t > 1 ? 1 : t))) | 0;
-                d[i + 1] = mx;
-              }
-            }
-          }
-          ctx.putImageData(fr, 0, 0);
-        }
-        raf = requestAnimationFrame(draw);
-      }
-
-      video.addEventListener('canplay', function () {
-        if (!active) return;
-        document.body.appendChild(canvas);
-        video.play().catch(cleanup);
-        draw();
-      }, { once: true });
-      video.addEventListener('error', cleanup);
-      /* filet calé sur la durée réelle de la vidéo (30 s si inconnue) */
-      video.addEventListener('loadedmetadata', function () {
-        var ms = (isFinite(video.duration) ? video.duration + 2 : 30) * 1000;
-        setTimeout(function () { if (active) cleanup(); }, ms);
-      }, { once: true });
-    });
-  }
-
-  function initVideoEggs() {
-    initChromaEgg(/freddy/i, 'assets/img/friends/freddy-scream.mp4', 'freddy-scream');
-    initChromaEgg(/miku/i, 'assets/img/friends/miku-dance.mp4', 'miku-dance');
   }
 
   /* ------------------------------------------------------- burger menu */
@@ -700,14 +595,6 @@
     initBurger();
     initReveal();
     initKappaBoss();
-    initVideoEggs();
-    /* prefers-reduced-motion : les vidéos décoratives ne tournent pas */
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.querySelectorAll('video[autoplay]').forEach(function (v) {
-        v.removeAttribute('autoplay');
-        v.pause();
-      });
-    }
     initSparkles();
     document.dispatchEvent(new CustomEvent('satine:ready'));
   });

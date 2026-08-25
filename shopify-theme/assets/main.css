@@ -29,11 +29,11 @@
      renommées sans espaces dans assets/cursors/). Le hotspot est embarqué
      dans les .cur ; le mot-clé final est le fallback obligatoire. Tous les
      `cursor:` du site passent par ces variables. */
-  --cur-normal: url('../assets/cursors/normal.cur'), default;
-  --cur-link: url('../assets/cursors/link.cur'), pointer;
-  --cur-text: url('../assets/cursors/text.cur'), text;
-  --cur-help: url('../assets/cursors/help.cur'), help;
-  --cur-unavailable: url('../assets/cursors/unavailable.cur'), not-allowed;
+  --cur-normal: url('normal.cur'), default;
+  --cur-link: url('link.cur'), pointer;
+  --cur-text: url('text.cur'), text;
+  --cur-help: url('help.cur'), help;
+  --cur-unavailable: url('unavailable.cur'), not-allowed;
   /* facteur de zoom global sur les grands écrans, calculé par js/shared.js
      (voir le bloc "ECRANS LARGES" en bas de ce fichier) */
   --page-zoom: 1;
@@ -78,7 +78,7 @@ a { color: var(--yellow); }
    ========================================================================== */
 
 #topbar {
-  background: #000 url('../assets/img/backgrouds/headerBG.png') no-repeat right center / cover;
+  background: #000 url('headerBG.png') no-repeat right center / cover;
   border-bottom: 2px solid #000;
   display: flex;
   align-items: center;
@@ -159,7 +159,7 @@ img.photo-frame {
    ========================================================================== */
 
 #navbar {
-  background: #0b2d0b url('../assets/img/backgrouds/navBG.png') no-repeat center / cover;
+  background: #0b2d0b url('navBG.png') no-repeat center / cover;
   padding: 9px 26px;
   display: flex;
   align-items: center;
@@ -222,12 +222,12 @@ img.photo-frame {
    personnages (Steve à ~27% de son image, Miku à ~75% de la sienne)
    dans la tranche visible de chaque colonne. */
 #rail-left {
-  background: #0a0a0a url('../assets/img/backgrouds/bgLeft.webp') no-repeat fixed;
+  background: #0a0a0a url('bgLeft.webp') no-repeat fixed;
   background-size: auto 100%;
   background-position: -180px 0;
 }
 #rail-right {
-  background: #0a0a0a url('../assets/img/backgrouds/bgRight.webp') no-repeat fixed;
+  background: #0a0a0a url('bgRight.webp') no-repeat fixed;
   background-size: auto 100%;
   background-position: calc(100% + 170px) 0;
 }
@@ -236,7 +236,8 @@ img.photo-frame {
    minimum saute (c'est le visuel qui dicte la sienne) */
 .rail .ad-live { min-height: 0; }
 .rail .ad-live img { width: 100%; height: auto; display: block; }
-.rail .ad-live a { display: block; }
+.rail .ad-live a { display: block; transition: transform .13s ease-out; }
+.rail .ad-live a:hover { transform: scale(1.03) rotate(-1deg); }
 .rail .ad:last-of-type { flex: 1; min-height: 170px; }
 
 /* emplacements de pub vides (les visuels des graphistes prendront la place) */
@@ -258,7 +259,7 @@ img.photo-frame {
 /* --- zone de contenu : damier grunge fourni par les graphistes --- */
 #main-col {
   flex: 1;
-  background: var(--teal-2) url('../assets/img/backgrouds/mainBG.png') top center / 100% auto repeat-y;
+  background: var(--teal-2) url('mainBG.png') top center / 100% auto repeat-y;
   padding: 24px 26px 60px;
   position: relative;
 }
@@ -308,28 +309,7 @@ img.photo-frame {
 }
 .profile-left { min-width: 0; container-type: inline-size; }
 /* la pfp et les réseaux occupent toute la largeur de la colonne */
-.profile-left .photo-glass { margin-top: 14px; width: 100%; max-width: none; }
-.photo-glass { position: relative; display: block; overflow: hidden; }
-.photo-glass .photo-frame { width: 100%; display: block; margin: 0; }
-/* reflet de verre : une lame de lumière diagonale balaie la photo */
-.photo-glass::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg,
-    transparent 38%,
-    rgba(255, 255, 255, .05) 44%,
-    rgba(255, 255, 255, .42) 50%,
-    rgba(255, 255, 255, .05) 56%,
-    transparent 62%);
-  background-size: 260% 100%;
-  animation: glass-sweep 4.8s ease-in-out infinite;
-}
-@keyframes glass-sweep {
-  0%, 55%, 100% { background-position: 140% 0; }
-  20%, 35% { background-position: -40% 0; }
-}
+.profile-left .photo-frame { margin-top: 14px; width: 100%; max-width: none; }
 
 /* --- réseaux sociaux : badges façon boutons de site des années 2000, en
    deux colonnes occupant toute la largeur de la colonne profil.
@@ -363,27 +343,6 @@ img.photo-frame {
   max-height: 24px;
 }
 .social-btn:hover { transform: translateY(-2px) rotate(-1deg) scale(1.04); filter: brightness(1.08); }
-/* reflet de verre au survol : même lame de lumière que la photo de profil */
-.social-btn { position: relative; overflow: hidden; }
-.social-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg,
-    transparent 38%,
-    rgba(255, 255, 255, .08) 44%,
-    rgba(255, 255, 255, .55) 50%,
-    rgba(255, 255, 255, .08) 56%,
-    transparent 62%);
-  background-size: 260% 100%;
-  background-position: 140% 0;
-}
-.social-btn:hover::after { animation: glass-sweep-once .7s ease-out; }
-@keyframes glass-sweep-once {
-  from { background-position: 140% 0; }
-  to { background-position: -40% 0; }
-}
 .social-btn:active { transform: translateY(1px) scale(.97); box-shadow: 1px 1px 0 rgba(0, 0, 0, .45); }
 
 /* ==========================================================================
@@ -678,7 +637,6 @@ img.photo-frame {
   transition: transform .15s;
 }
 .bento-barrettes:hover img { transform: scale(1.04); }
-.bento-barrettes img { animation: poster-float 4.2s ease-in-out infinite; animation-delay: -2.1s; }
 
 /* poster incliné, fin liseré blanc (maquette) */
 .bento-poster {
@@ -693,12 +651,6 @@ img.photo-frame {
   transition: transform .15s;
 }
 .bento-poster:hover { transform: rotate(0deg) scale(1.03); }
-/* flottement : oscillation douce qui se compose avec l'inclinaison de base */
-.bento-poster { animation: poster-float 4.2s ease-in-out infinite; }
-@keyframes poster-float {
-  0%, 100% { translate: 0 0; rotate: 0deg; }
-  50% { translate: 0 -8px; rotate: 1.6deg; }
-}
 .bento-poster img {
   width: 100%;
   flex: 1 1 0; /* basis 0 : ne pas imposer la hauteur naturelle de l'image */
@@ -920,7 +872,7 @@ img.photo-frame {
   content: "";
   position: absolute;
   inset: 0;
-  background: url('../assets/img/backgrouds/backgroundHeadSection.png') center / cover no-repeat;
+  background: url('backgroundHeadSection.png') center / cover no-repeat;
   filter: hue-rotate(-100deg) saturate(1.05);
   z-index: 0;
 }
@@ -949,7 +901,7 @@ img.photo-frame {
   content: "";
   position: absolute;
   inset: 0;
-  background: url('../assets/img/backgrouds/backgroundMainSection.png') center / cover no-repeat;
+  background: url('backgroundMainSection.png') center / cover no-repeat;
   filter: grayscale(.8) brightness(1.1);
   opacity: .32;
   z-index: 0;
@@ -991,6 +943,36 @@ img.photo-frame {
 }
 /* exception : la bio About me en Comic Sans regular */
 .g-about .leo-box .inner { font-family: var(--font-body); font-weight: normal; }
+
+/* table interests : lignes espacées */
+.interests {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin: -8px 0; /* compense l'espacement ajouté avant/après la 1re et dernière ligne */
+}
+.interests td { border: 2px solid #000; padding: 7px 12px; font-size: 15px; }
+.interests td.v { border-left: none; } /* évite la double bordure entre les deux cellules */
+.interests td.k {
+  width: 130px;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 0 #002;
+  position: relative;
+  isolation: isolate; /* garde le calque texture au-dessus du fond mais sous le texte */
+  overflow: hidden;
+  background: var(--blue-bar-1);
+}
+.interests td.k::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('backgroundHeadSection.png') center / cover no-repeat;
+  filter: hue-rotate(-100deg) saturate(1.05);
+}
+.interests td.v { background: #fff; color: #222; }
 
 /* ==========================================================================
    TOURNÉE
@@ -1149,8 +1131,9 @@ img.photo-frame {
   overflow: hidden;
   position: relative;
   min-height: 130px;
+  transition: transform .12s;
 }
-/* pas d'animation au survol des pubs (demande de l'artiste) */
+.ad:hover { transform: scale(1.02) rotate(.4deg); z-index: 2; }
 .ad .ad-inner { padding: 14px 12px; position: relative; z-index: 1; }
 .ad h3 { font-size: 21px; line-height: 1.05; margin-bottom: 6px; }
 .ad p { font-size: 12px; }
@@ -1346,17 +1329,17 @@ img.photo-frame {
   background-repeat: no-repeat;
 }
 .kw-left { background-image: none; }
-.kw-left:hover { background-image: url('../assets/img/kenwood/left-set-hover.jpg'); }
-.kw-left:active, .kw-left.on { background-image: url('../assets/img/kenwood/left-set-down.jpg'); }
+.kw-left:hover { background-image: url('left-set-hover.jpg'); }
+.kw-left:active, .kw-left.on { background-image: url('left-set-down.jpg'); }
 .kw-right { background-image: none; }
-.kw-right:hover { background-image: url('../assets/img/kenwood/right-set-hover.jpg'); }
-.kw-right:active, .kw-right.on { background-image: url('../assets/img/kenwood/right-set-down.jpg'); }
+.kw-right:hover { background-image: url('right-set-hover.jpg'); }
+.kw-right:active, .kw-right.on { background-image: url('right-set-down.jpg'); }
 .kw-set1 { background-image: none; }
-.kw-set1:hover { background-image: url('../assets/img/kenwood/main-set1-hover.jpg'); }
-.kw-set1:active, .kw-set1.on { background-image: url('../assets/img/kenwood/main-set1-down.jpg'); }
+.kw-set1:hover { background-image: url('main-set1-hover.jpg'); }
+.kw-set1:active, .kw-set1.on { background-image: url('main-set1-down.jpg'); }
 .kw-set2 { background-image: none; }
-.kw-set2:hover { background-image: url('../assets/img/kenwood/main-set2-hover.jpg'); }
-.kw-set2:active, .kw-set2.on { background-image: url('../assets/img/kenwood/main-set2-down.jpg'); }
+.kw-set2:hover { background-image: url('main-set2-hover.jpg'); }
+.kw-set2:active, .kw-set2.on { background-image: url('main-set2-down.jpg'); }
 
 /* ecran central : fond statique + animations GIF du skin par-dessus */
 .kw-screen {
@@ -1369,7 +1352,7 @@ img.photo-frame {
      zIndex 14-18 contre 1 pour le corps — l'écran du body (STATUS/horloge)
      n'est que le visuel "éteint" */
   z-index: 4;
-  background: #000 url('../assets/img/kenwood/screen-back.jpg') no-repeat 0 0;
+  background: #000 url('screen-back.jpg') no-repeat 0 0;
   overflow: hidden;
 }
 .kw-anim {
@@ -1435,7 +1418,7 @@ img.photo-frame {
   top: 0;
   bottom: 0;
   width: 0%;
-  background: url('../assets/img/kenwood/seek-back.gif') repeat-x 0 0;
+  background: url('seek-back.gif') repeat-x 0 0;
 }
 .kw-thumb {
   position: absolute;
@@ -1518,10 +1501,6 @@ img.photo-frame {
   font-family: var(--font-body);
   font-size: 12px;
 }
-
-/* embed Chatango : l'iframe injectée par leur script prend toute la largeur */
-.chat-embed { padding: 8px; }
-.chat-embed iframe { width: 100% !important; }
 
 /* ==========================================================================
    CART (tiroir panier XP)
@@ -1741,9 +1720,11 @@ section { margin-top: 30px; }
 #clip {
   position: relative;
   z-index: 1;
-  /* descendu depuis la suppression de My interests */
-  margin: 46px 0 -110px;
+  margin: 2px 0 -110px;
 }
+/* le clip est suivi de My interests dans la colonne : le menton de la tête
+   (marge négative ci-dessus) passe SOUS la boîte, comme sur mobile */
+.g-interests { position: relative; z-index: 2; }
 #tournee,
 section#chat,
 section#art {
@@ -1753,8 +1734,7 @@ section#art {
 
 
 .headspace {
-  /* 1.32 à l'origine : My interests supprimé, le player occupe la place */
-  --u: 1.52px;
+  --u: 1.32px;
   position: relative;
   /* respiration : léger zoom + balancement, sur le bloc ENTIER (tête, vidéo,
      contrôles ensemble). Propriétés individuelles scale/rotate : elles se
@@ -1833,14 +1813,14 @@ section#art {
   top: calc(59 * var(--u));
   width: calc(216 * var(--u));
   height: calc(158 * var(--u));
-  background: #000 url('../assets/img/wmp/vid-bkgd.png') center/100% 100%;
+  background: #000 url('vid-bkgd.png') center/100% 100%;
   overflow: hidden;
   z-index: 2;
   /* masque extrait du trou magenta de head.bmp : la vidéo est découpée
      exactement comme l'écran du skin, rien ne dépasse de la silhouette */
-  -webkit-mask-image: url('../assets/img/wmp/screen-mask.png');
+  -webkit-mask-image: url('screen-mask.png');
   -webkit-mask-size: 100% 100%;
-  mask-image: url('../assets/img/wmp/screen-mask.png');
+  mask-image: url('screen-mask.png');
   mask-size: 100% 100%;
 }
 .hs-video .clip-embed {
@@ -1871,13 +1851,13 @@ section#art {
   padding: 0;
   cursor: var(--cur-link);
   z-index: 5;
-  background: url('../assets/img/wmp/controls-default.png') no-repeat;
+  background: url('controls-default.png') no-repeat;
   background-size: calc(144 * var(--u)) calc(25 * var(--u));
   background-position: calc(var(--bx) * -1 * var(--u)) calc(-1 * var(--u));
   image-rendering: pixelated;
 }
-.hs-btn:hover { background-image: url('../assets/img/wmp/controls-hover.png'); }
-.hs-btn:active { background-image: url('../assets/img/wmp/controls-down.png'); }
+.hs-btn:hover { background-image: url('controls-hover.png'); }
+.hs-btn:active { background-image: url('controls-down.png'); }
 
 /* bouton pause : recouvre le bouton play pendant la lecture */
 #hs-pause {
@@ -1890,11 +1870,11 @@ section#art {
   padding: 0;
   cursor: var(--cur-link);
   z-index: 6;
-  background: url('../assets/img/wmp/pause-default.png') no-repeat center/100% 100%;
+  background: url('pause-default.png') no-repeat center/100% 100%;
   image-rendering: pixelated;
 }
-#hs-pause:hover { background-image: url('../assets/img/wmp/pause-hover.png'); }
-#hs-pause:active { background-image: url('../assets/img/wmp/pause-down.png'); }
+#hs-pause:hover { background-image: url('pause-hover.png'); }
+#hs-pause:active { background-image: url('pause-down.png'); }
 #hs-pause[hidden] { display: none; }
 
 /* barre de progression + curseur */
@@ -1906,7 +1886,7 @@ section#art {
   height: calc(9 * var(--u));
   z-index: 5;
   cursor: var(--cur-link);
-  background: url('../assets/img/wmp/progress-bg.png') no-repeat center/100% 100%;
+  background: url('progress-bg.png') no-repeat center/100% 100%;
 }
 .hs-progress-fill {
   position: absolute;
@@ -1915,7 +1895,7 @@ section#art {
   bottom: 0;
   width: 0%;
   overflow: hidden;
-  background: url('../assets/img/wmp/progress-fg.png') no-repeat left top;
+  background: url('progress-fg.png') no-repeat left top;
   background-size: calc(163 * var(--u)) calc(9 * var(--u));
 }
 .hs-thumb {
@@ -1942,28 +1922,28 @@ section#art {
   top: calc(214 * var(--u));
   width: calc(20 * var(--u));
   height: calc(19 * var(--u));
-  background-image: url('../assets/img/wmp/eq-default.png');
+  background-image: url('eq-default.png');
 }
-.hs-eq:hover { background-image: url('../assets/img/wmp/eq-hover.png'); }
-.hs-eq:active { background-image: url('../assets/img/wmp/eq-down.png'); }
+.hs-eq:hover { background-image: url('eq-hover.png'); }
+.hs-eq:active { background-image: url('eq-down.png'); }
 .hs-pl {
   left: calc(258 * var(--u));
   top: calc(214 * var(--u));
   width: calc(19 * var(--u));
   height: calc(20 * var(--u));
-  background-image: url('../assets/img/wmp/pl-default.png');
+  background-image: url('pl-default.png');
 }
-.hs-pl:hover { background-image: url('../assets/img/wmp/pl-hover.png'); }
-.hs-pl:active { background-image: url('../assets/img/wmp/pl-down.png'); }
+.hs-pl:hover { background-image: url('pl-hover.png'); }
+.hs-pl:active { background-image: url('pl-down.png'); }
 #hs-theme {
   left: calc(155 * var(--u));
   top: calc(232 * var(--u));
   width: calc(35 * var(--u));
   height: calc(31 * var(--u));
-  background-image: url('../assets/img/wmp/theme-default.png');
+  background-image: url('theme-default.png');
 }
-#hs-theme:hover { background-image: url('../assets/img/wmp/theme-hover.png'); }
-#hs-theme:active { background-image: url('../assets/img/wmp/theme-down.png'); }
+#hs-theme:hover { background-image: url('theme-hover.png'); }
+#hs-theme:active { background-image: url('theme-down.png'); }
 
 /* bulle Clippy porteuse d'un lien (message `goto` dans shared.js) */
 #clippy .bubble.linky { cursor: var(--cur-link); }
@@ -1972,23 +1952,6 @@ section#art {
 /* ==========================================================================
    EASTER EGG — boss kappa (double-clic sur KAPPA dans le friends space)
    ========================================================================== */
-
-/* easter eggs vidéo (double-clic sur FREDDY / MIKU) : canvas plein écran,
-   fond percé par le chroma-key — seul le personnage apparaît */
-.chroma-egg {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  /* le canvas garde le ratio de la vidéo : object-fit évite l'étirement */
-  object-fit: cover;
-  z-index: 91;
-  pointer-events: none;
-  filter: drop-shadow(0 8px 30px rgba(0, 0, 0, .5));
-}
-@media (prefers-reduced-motion: reduce) {
-  .chroma-egg { display: none; }
-}
 
 #kappa-boss {
   position: fixed;
@@ -2140,9 +2103,6 @@ section#art {
   margin-bottom: 8px;
 }
 .art-piece .cap { font-size: 12px; }
-.art-piece .cap a { color: var(--pink); font-weight: bold; }
-/* tuile vidéo : remplit la case carrée comme les images */
-.art-piece .ph video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* ==========================================================================
    SECRET
@@ -2300,6 +2260,7 @@ section#art {
   .home-bento .ad-inline { order: 2; }
   #clip { order: 3; margin: 0 0 -115px; }
   .g-about { order: 4; }
+  .g-interests { order: 5; }
   .g-friends { order: 6; }
 
   /* la tête passe SOUS tous les blocs qui suivent */
@@ -2368,7 +2329,7 @@ section#art {
   display: block;
   width: min(320px, 82vw);
   padding: 13px 10px;
-  background: #0b2d0b url('../assets/img/backgrouds/navBG.png') center / cover no-repeat;
+  background: #0b2d0b url('navBG.png') center / cover no-repeat;
   border: 2px solid #000;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, .5);
   color: #fff;
@@ -2408,14 +2369,15 @@ section#art {
     margin-bottom: 16px;
   }
   .profile-left { display: contents; }
-  .profile-left .photo-glass {
+  .profile-left .photo-frame {
     grid-column: 1;
     grid-row: 1 / 3;
     width: 64px;
     max-width: 64px;
     margin-top: 0;
+    border-width: 2px;
+    outline-width: 2px;
   }
-  .profile-left .photo-frame { border-width: 2px; outline-width: 2px; }
   .satine-title { grid-column: 2; grid-row: 1; font-size: 32px; }
   .satine-sub { grid-column: 2; grid-row: 2; margin: 0; font-size: 15px; }
   /* réseaux : rangée pleine largeur juste sous l'identité. .profile-left étant
@@ -2454,15 +2416,6 @@ section#art {
   .price-burst.pb-bl { width: 84px; height: 84px; bottom: -20px; left: -6px; }
   .price-burst.pb-tr b, .price-burst.pb-bl b { font-size: 22px; }
   .merch-bento { --hz-top: 36px; --hz-bot: 36px; padding: var(--hz-top) 0 var(--hz-bot); }
-
-  /* --- tableau tournée : tailles desktop (30px) impossibles dans ~320px,
-     on redescend tout pour que les 3 colonnes tiennent sans coupure --- */
-  .tour-wrap { padding: 10px; }
-  .tour-typo { margin-bottom: 6px; }
-  .tour-table td { padding: 0 5px; font-size: 12px; }
-  .tour-table .d, .tour-table .v { font-size: 17px; }
-  .tour-table .soldout { font-size: 10px; padding: 1px 5px; }
-  .btn-tix { font-size: 10px; padding: 3px 7px; }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
@@ -2523,10 +2476,6 @@ html.rv-ready [data-rv].rv-in {
 
 /* --- cascade interne (conteneurs [data-rv-each], voir shared.js) --- */
 html.rv-ready .rv-it { opacity: 0; translate: 0 12px; }
-/* les lignes de tableau ne bougent pas : Safari fige les transforms des
-   table-rows, ce qui laissait le tableau de tournée décalé/cassé sur mobile.
-   Pour elles, la cascade se fait à l'opacité seule. */
-html.rv-ready tr.rv-it { translate: none; }
 html.rv-ready .rv-in .rv-it {
   opacity: 1;
   translate: none;
@@ -2545,7 +2494,7 @@ html.rv-ready .g-tour.rv-in .tour-typo { opacity: 1; animation: typo-pop .55s cu
   /* filet de sécurité si la classe traîne : rien ne doit rester caché */
   html.rv-ready [data-rv] { opacity: 1; scale: none; transition: none; }
   html.rv-ready .rv-it, html.rv-ready .g-tour .tour-typo { opacity: 1; translate: none; scale: none; animation: none; transition: none; }
-  .headspace, .photo-glass::after, .bento-poster, .bento-barrettes img, .social-btn::after { animation: none; }
+  .headspace { animation: none; }
   .see-more, #chat-send, .price-burst, .tour-bus .bus { animation: none; }
 }
 
@@ -2556,5 +2505,3 @@ input:not([type='button']):not([type='submit']), textarea { cursor: var(--cur-te
 /* les liens n'héritent pas du curseur du body : l'UA leur impose `pointer` */
 a, button { cursor: var(--cur-link); }
 .soldout { cursor: var(--cur-unavailable); }
-/* l'easter egg se mérite : le curseur « ? » de Miku souffle qu'il y a un secret */
-.friend-kappa { cursor: var(--cur-help); }

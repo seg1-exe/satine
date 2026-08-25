@@ -1,0 +1,9 @@
+{% comment %} gabarit de compatibilité — le site est un one-pager, tout vit sur la home {% endcomment %}
+<div id="page-main">
+  <div class="leo-box" style="margin-top:40px">
+    <div class="inner">
+      <p style="font-size:18px"><b>{{ page.title }}{% if page.content != blank %}</b></p><div style="margin-top:10px">{{ page.content }}</div><p><b>{% endif %}</b></p>
+      <p style="margin-top:10px"><a href="/">← retour sur MySAT'S BLOG</a></p>
+    </div>
+  </div>
+</div>

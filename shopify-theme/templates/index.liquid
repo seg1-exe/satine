@@ -1,91 +1,23 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SATINE ★ MySAT'S BLOG - A space for US</title>
-  <meta name="description" content="Le blog officiel de SATINE : chanteuse, productrice. Merch, tournée, clip et secrets.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=VT323&family=Comic+Relief:wght@400;700&family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/intro.css">
-  <script>
-    /* apparition des sections au scroll : la classe doit être posée avant le
-       premier paint, sinon la page s'affiche entière puis se cache. Sans JS
-       elle n'est jamais posée et tout reste visible (voir initReveal). */
-    document.documentElement.className += ' rv-ready';
-
-    /* PORTE D'ENTRÉE (voir intro.html) — doit rester en tête du <head> et
-       synchrone : au retour de la porte, la classe .intro-reveal pose la
-       bouche fermée AVANT le premier paint, sinon on verrait le site.
-       Sans sessionStorage (navigation privée stricte) on sert le site
-       directement : jamais de boucle de redirection. */
-    (function () {
-      /* URL de la porte, à changer d'un seul endroit lors du passage en thème
-         Shopify : ce script devient un snippet du <head> de theme.liquid et
-         GATE_URL devient '/pages/entrer'. */
-      var GATE_URL = 'intro.html';
-
-      /* La porte ne se joue qu'UNE fois par visiteur : le passage est
-         mémorisé en localStorage (persistant, survit à la fermeture du
-         navigateur). S'y ajoutent : la navigation interne (retour de
-         secret.html, bouton Précédent), qui n'est pas une arrivée sur le
-         site, et ?nointro=1. */
-      function internalNav() {
-        var e = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-        var type = e ? e.type
-          : (performance.navigation && performance.navigation.type === 1 ? 'reload' : 'navigate');
-        if (type === 'reload') return false;
-        if (type === 'back_forward') return true;
-        return document.referrer.indexOf(location.origin + '/') === 0;
-      }
-
-      var s;
-      try { s = window.sessionStorage; } catch (e) { return; }
-      if (!s) return;
-      try {
-        /* jeton à usage unique posé par intro.html juste avant de naviguer */
-        if (s.getItem('satine-reveal')) {
-          s.removeItem('satine-reveal');
-          document.documentElement.className += ' intro-reveal';
-          return;
-        }
-        if (/[?&]nointro\b/.test(location.search)) return;
-        if (internalNav()) return;
-        try { if (window.localStorage && localStorage.getItem('satine-entered')) return; } catch (e) { return; }
-        location.replace(GATE_URL);
-      } catch (e) { /* quota/refus : on laisse passer */ }
-    })();
-  </script>
-  <script src="js/shared.js" defer></script>
-  <script src="js/player.js" defer></script>
-  <script src="js/intro.js" defer></script>
-</head>
-<body data-page="home">
+{% comment %} Home one-pager SATINE — contenu de site/index.html ; le chrome (header/nav/rails/player/clippy) est construit par shared.js {% endcomment %}
 <div id="page-main">
 
   <!-- ==================== PROFIL + MERCH ==================== -->
   <div class="profile-grid" id="top">
     <div class="profile-left">
       <h1 class="satine-title" data-rv>SATINE</h1>
-      <!-- wrapper : le reflet « verre » est un ::after, impossible sur un <img> -->
-      <span class="photo-glass" data-rv>
-        <img class="photo-frame" src="assets/img/pfp.webp" alt="Photo de SATINE">
-      </span>
+      <img class="photo-frame" src="{{ 'pfp.webp' | asset_url }}" alt="Photo de SATINE" data-rv>
 
       <!-- Badges pleine largeur de la colonne, façon boutons de site des
            années 2000. Tous les logos sont désormais des logos-mots (fournis
            dans assets/img/socials/, détourés/convertis en webp — Discord est
            le SVG d'origine, vectoriel). -->
       <ul class="socials" data-rv data-rv-each="li" aria-label="Réseaux sociaux de SATINE">
-        <li><a class="social-btn" href="https://open.spotify.com/artist/7Abx1tdwQoBDWr1nD1o62B" target="_blank" rel="me noopener noreferrer" title="Spotify"><img src="assets/img/socials/spotify.webp" alt="Spotify"></a></li>
-        <li><a class="social-btn" href="https://www.youtube.com/@SatineWall%C3%A9" target="_blank" rel="me noopener noreferrer" title="YouTube"><img src="assets/img/socials/youtube.webp" alt="YouTube"></a></li>
-        <li><a class="social-btn" href="https://www.instagram.com/satine_walle/" target="_blank" rel="me noopener noreferrer" title="Instagram"><img src="assets/img/socials/instagram.webp" alt="Instagram"></a></li>
-        <li><a class="social-btn" href="https://www.tiktok.com/@lasateuch" target="_blank" rel="me noopener noreferrer" title="TikTok"><img src="assets/img/socials/tiktok.webp" alt="TikTok"></a></li>
-        <li><a class="social-btn s-twitch" href="https://www.twitch.tv/lasatine" target="_blank" rel="me noopener noreferrer" title="Twitch"><img src="assets/img/socials/twitch.webp" alt="Twitch"></a></li>
-        <li><a class="social-btn" href="https://discord.gg/SB7ChjVabK" target="_blank" rel="me noopener noreferrer" title="Discord"><img src="assets/img/socials/discord.svg" alt="Discord"></a></li>
+        <li><a class="social-btn" href="https://open.spotify.com/artist/7Abx1tdwQoBDWr1nD1o62B" target="_blank" rel="me noopener noreferrer" title="Spotify"><img src="{{ 'spotify.webp' | asset_url }}" alt="Spotify"></a></li>
+        <li><a class="social-btn" href="https://www.youtube.com/@SatineWall%C3%A9" target="_blank" rel="me noopener noreferrer" title="YouTube"><img src="{{ 'youtube.webp' | asset_url }}" alt="YouTube"></a></li>
+        <li><a class="social-btn" href="https://www.instagram.com/satine_walle/" target="_blank" rel="me noopener noreferrer" title="Instagram"><img src="{{ 'instagram.webp' | asset_url }}" alt="Instagram"></a></li>
+        <li><a class="social-btn" href="https://www.tiktok.com/@lasateuch" target="_blank" rel="me noopener noreferrer" title="TikTok"><img src="{{ 'tiktok.webp' | asset_url }}" alt="TikTok"></a></li>
+        <li><a class="social-btn s-twitch" href="https://www.twitch.tv/lasatine" target="_blank" rel="me noopener noreferrer" title="Twitch"><img src="{{ 'twitch.webp' | asset_url }}" alt="Twitch"></a></li>
+        <li><a class="social-btn" href="https://discord.gg/SB7ChjVabK" target="_blank" rel="me noopener noreferrer" title="Discord"><img src="{{ 'discord.svg' | asset_url }}" alt="Discord"></a></li>
       </ul>
 
     </div>
@@ -105,11 +37,11 @@
           <span class="price-burst pb-bl"><b>35€</b></span>
           <div class="bento-item bento-barrettes">
             <span class="item-tag">Barrettes</span>
-            <img class="product-click" src="assets/img/products/barretes.webp" alt="Pack 3 barrettes" onclick="SatineModal.open('barrettes')">
+            <img class="product-click" src="{{ 'barretes.webp' | asset_url }}" alt="Pack de 3 barrettes « !! »" onclick="SatineModal.open('barrettes')">
           </div>
           <div class="bento-item bento-poster product-click" onclick="SatineModal.open('poster')">
             <span class="item-tag">Poster</span>
-            <img src="assets/img/products/poster.webp" alt="Poster anomalisa">
+            <img src="{{ 'poster.webp' | asset_url }}" alt="Poster anomalisa">
           </div>
         </div>
       </div>
@@ -134,8 +66,8 @@
         <section id="clip" data-rv>
           <!-- Player "Headspace" (skin WMP d'origine, reconstruit en HTML/CSS) -->
           <div class="headspace">
-            <img class="hs-ear hs-ear-l" src="assets/img/wmp/ear-left.png" alt="">
-            <img class="hs-ear hs-ear-r" src="assets/img/wmp/ear-right.png" alt="">
+            <img class="hs-ear hs-ear-l" src="{{ 'ear-left.png' | asset_url }}" alt="">
+            <img class="hs-ear hs-ear-r" src="{{ 'ear-right.png' | asset_url }}" alt="">
             <div class="hs-video">
               <iframe id="clip-frame" class="clip-embed"
                 src="https://www.youtube.com/embed/pLmsvejt9RU?si=M7--nDRdLOlINgcJ&enablejsapi=1"
@@ -143,8 +75,8 @@
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
-            <img class="hs-head" src="assets/img/wmp/head.png" alt="Player Headspace (la tête verte)">
-            <img class="hs-strip" src="assets/img/wmp/controls-default.png" alt="">
+            <img class="hs-head" src="{{ 'head.png' | asset_url }}" alt="Player Headspace (la tête verte)">
+            <img class="hs-strip" src="{{ 'controls-default.png' | asset_url }}" alt="">
             <button class="hs-btn" id="hs-prev" style="--bx:1" title="Reculer de 10s"></button>
             <button class="hs-btn" id="hs-play" style="--bx:26" title="Lecture"></button>
             <button class="hs-btn" id="hs-stop" style="--bx:52" title="Stop"></button>
@@ -153,13 +85,26 @@
             <button id="hs-pause" title="Pause" hidden></button>
             <div class="hs-progress" id="hs-progress" title="Avancer / reculer dans le clip">
               <div class="hs-progress-fill" id="hs-progress-fill"></div>
-              <img class="hs-thumb" id="hs-thumb" src="assets/img/wmp/thumb-default.png" alt="">
+              <img class="hs-thumb" id="hs-thumb" src="{{ 'thumb-default.png' | asset_url }}" alt="">
             </div>
             <button class="hs-mini hs-eq" title="Égaliseur (décoratif, comme à l'époque)"></button>
             <button class="hs-mini hs-pl" title="Playlist (décoratif)"></button>
             <button id="hs-theme" title="Plein écran"></button>
           </div>
         </section>
+      <div class="bgroup g-interests" data-rv data-rv-each=".interests tr">
+      <div class="section-bar"><h2>My interests :</h2></div>
+      <div class="leo-box" style="margin-top:10px">
+        <table class="interests">
+          <tr><td class="k">一般</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">Music</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">映画</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">テレビ</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">Books</td><td class="v">bla bla bla blabla bla</td></tr>
+          <tr><td class="k">英雄</td><td class="v">bla bla bla blabla bla</td></tr>
+        </table>
+      </div>
+      </div>
 
         <!-- ==================== LE CLIP ==================== -->
     </div>
@@ -170,7 +115,7 @@
            thelivingtombstone.com (widget Bandsintown, URLs nettoyées de leurs
            paramètres de tracking). Les SOLD OUT suivent l'affiche. -->
       <div class="tour-wrap">
-        <img class="tour-typo" src="assets/img/maintypo.webp" alt="European Tour — satine opening for The Living Tombstone" width="1200" height="613">
+        <img class="tour-typo" src="{{ 'maintypo.webp' | asset_url }}" alt="European Tour — satine opening for The Living Tombstone" width="1200" height="613">
         <div class="table-scroll">
         <table class="tour-table" id="tour-table">
           <tr><td class="d">26/08</td><td class="v">London</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108108895" target="_blank" rel="noopener">BILLETS</a></td></tr>
@@ -196,10 +141,10 @@
       <div class="bgroup g-friends" data-rv data-rv-each=".friend">
       <div class="section-bar"><h2>My friends space :</h2></div>
       <div class="friends-grid" style="margin-top:10px">
-        <div class="friend"><p class="name">TLT</p><div class="ph"><img src="assets/img/friends/the-living-tombstone.webp" alt="The Living Tombstone" loading="lazy"></div></div>
-        <div class="friend"><p class="name">MIKU</p><div class="ph"><img src="assets/img/friends/miku.webp" alt="Hatsune Miku" loading="lazy"></div></div>
-        <div class="friend"><p class="name">FREDDY</p><div class="ph"><img src="assets/img/friends/freddy.webp" alt="Freddy Fazbear" loading="lazy"></div></div>
-        <div class="friend friend-kappa"><p class="name">KAPPA</p><div class="ph"><img src="assets/img/friends/kappa.webp" alt="Kappa" loading="lazy"></div></div>
+        <div class="friend"><p class="name">TLT</p><div class="ph"><img src="{{ 'the-living-tombstone.webp' | asset_url }}" alt="The Living Tombstone" loading="lazy"></div></div>
+        <div class="friend"><p class="name">MIKU</p><div class="ph"><img src="{{ 'miku.webp' | asset_url }}" alt="Hatsune Miku" loading="lazy"></div></div>
+        <div class="friend"><p class="name">FREDDY</p><div class="ph"><img src="{{ 'freddy.webp' | asset_url }}" alt="Freddy Fazbear" loading="lazy"></div></div>
+        <div class="friend"><p class="name">KAPPA</p><div class="ph"><img src="{{ 'kappa.webp' | asset_url }}" alt="Kappa" loading="lazy"></div></div>
       </div>
       </div>
     </div>
@@ -212,18 +157,23 @@
     <div class="xp-window">
       <div class="xp-titlebar">
         <span class="xp-ico">💬</span>
-        <span class="xp-title">satine-chat.chatango.com</span>
+        <span class="xp-title">satine_chat.exe - 42 connecté·es</span>
         <span class="xp-btns"><span>—</span><span class="xp-max">□</span><span class="xp-close">✕</span></span>
       </div>
-      <div class="xp-body chat-embed">
-        <!-- Chatango, groupe satine-chat. Les styles INLINE ci-dessous font
-             foi (ils écrasent les réglages du groupe côté chatango.com) :
-             a=bandeaux, c=fond, k/l/m/q=accents et liseré, n=texte, p=corps,
-             surl:0/showhdr:0 = pas de barre d'URL dans le widget (notre
-             fenêtre XP sert de titre). La clé "styles" doit toujours exister,
-             sinon le script ne s'initialise pas.
-             LANGUE : celle du NAVIGATEUR du visiteur (fr supporté). -->
-        <script id="cid0020000448573011632" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 100%;height: 420px;">{"handle":"satine-chat","arch":"js","styles":{"a":"FF2EA6","b":100,"c":"FFFFFF","d":"111111","k":"FF2EA6","l":"FF2EA6","m":"FF2EA6","n":"111111","p":"11","q":"000000","r":100,"surl":0,"showhdr":0,"fwtickm":1}}</script>
+      <div class="xp-body">
+        <!--
+          PHASE 2 : remplacer ce faux chat par l'embed Chatango :
+          <iframe src="https://xxxxx.chatango.com/..." ...> (groupe à créer)
+          + image de fond custom dans les réglages de style Chatango.
+        -->
+        <div class="chat-log" id="chat-log"></div>
+        <div class="chat-input-row">
+          <input id="chat-input" placeholder="dis un truc gentil…" maxlength="140">
+          <button class="btn-red" id="chat-send">ENVOYER</button>
+        </div>
+        <p style="font-size:11px;color:#666;margin-top:6px">
+          [démo locale : le vrai chat Chatango sera branché ici, avec fond custom aux couleurs de Satine]
+        </p>
       </div>
     </div>
   </section>
@@ -234,19 +184,12 @@
   <section id="art">
     <div class="section-bar" data-rv><h2>Fan arts</h2></div>
     <div class="art-grid collapsible" id="art-grid" style="margin-top:12px">
-      <div class="art-piece art-video" data-rv style="--tilt:-2deg">
-        <div class="ph">
-          <video src="assets/img/fanart/shiraw-web.mp4" poster="assets/img/fanart/shiraw-poster.webp"
-                 autoplay muted loop playsinline preload="metadata"></video>
-        </div>
-        <p class="cap">by <a href="https://www.instagram.com/shir4w/" target="_blank" rel="noopener">Shiraw</a></p>
-      </div>
       <div class="art-piece" data-rv style="--tilt:-3deg"><div class="ph">🎨</div><p class="cap">fan-art #1 (placeholder)</p></div>
       <div class="art-piece" data-rv style="--tilt:2deg"><div class="ph">🖼️</div><p class="cap">fan-art #2 (placeholder)</p></div>
       <div class="art-piece" data-rv style="--tilt:-1deg"><div class="ph">✏️</div><p class="cap">fan-art #3 (placeholder)</p></div>
       <div class="art-piece" data-rv style="--tilt:3deg"><div class="ph">🖌️</div><p class="cap">fan-art #4 (placeholder)</p></div>
       <div class="art-piece" data-rv style="--tilt:-2deg"><div class="ph">📺</div><p class="cap">fan-art #5 (placeholder)</p></div>
-      <div class="art-piece extra" data-rv style="--tilt:1deg"><div class="ph">💖</div><p class="cap">fan-art #6 (placeholder)</p></div>
+      <div class="art-piece" data-rv style="--tilt:1deg"><div class="ph">💖</div><p class="cap">fan-art #6 (placeholder)</p></div>
       <div class="art-piece extra" data-rv style="--tilt:-3deg"><div class="ph">⭐</div><p class="cap">fan-art #7 (placeholder)</p></div>
       <div class="art-piece extra" data-rv style="--tilt:2deg"><div class="ph">🎤</div><p class="cap">fan-art #8 (placeholder)</p></div>
       <div class="art-piece extra" data-rv style="--tilt:-1deg"><div class="ph">🧷</div><p class="cap">fan-art #9 (placeholder)</p></div>
@@ -282,7 +225,7 @@
     /* --- piste rythmique : anomalisa.mp3 joué en silence, en parallèle du
        clip (même morceau), analysé en WebAudio pour faire pomper les
        enceintes sur les vraies basses --- */
-    var beat = new Audio('assets/audio/anomalisa.mp3');
+    var beat = new Audio('{{ 'anomalisa.mp3' | asset_url }}');
     beat.preload = 'auto';
     var actx = null, analyser = null, bassData = null, bassDisp = 0;
 
@@ -412,5 +355,3 @@
     });
   });
 </script>
-</body>
-</html>
