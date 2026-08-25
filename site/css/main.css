@@ -2014,9 +2014,10 @@ section#art {
   #kappa-boss { display: none; }
 }
 /* Safari iOS uniquement (-webkit-touch-callout n'existe que là) : l'encoche
-   de la caméra découpe le haut du boss, on le remonte de quelques pixels */
+   caméra + la zone de barre d'état décalent le haut du viewport, on remonte
+   le boss d'autant (valeur constatée sur iPhone, ajuster ici au besoin) */
 @supports (-webkit-touch-callout: none) {
-  #kappa-boss { top: -12px; }
+  #kappa-boss { top: -40px; }
 }
 
 /* ==========================================================================
@@ -2469,18 +2470,19 @@ section#art {
   .tour-table .soldout { font-size: 11px; padding: 1px 4px; }
   .btn-tix { font-size: 11px; padding: 2px 7px; }
 
-  /* --- easter eggs vidéo : pleine largeur, hauteur au ratio, CALÉS EN BAS
-     de l'écran (les personnages se tiennent au bord inférieur) --- */
+  /* --- easter eggs vidéo : calés en bas de l'écran, dimensionnés par la
+     HAUTEUR (le débordement latéral est volontaire, centré) --- */
   .chroma-egg {
-    inset: auto 0 0 auto;
+    inset: auto auto 0 50%;
     top: auto;
-    bottom: 0;
-    left: 0;
-    transform: none;
-    width: 100%;
-    height: auto;
+    transform: translateX(-50%);
+    width: auto;
     object-fit: initial;
   }
+  /* Miku : plus grande que la pleine largeur, quitte à rogner les côtés */
+  #miku-dance { height: 48vh; }
+  /* Freddy : toute la hauteur de l'écran */
+  #freddy-scream { height: 100vh; height: 100dvh; }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
