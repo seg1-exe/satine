@@ -2455,14 +2455,24 @@ section#art {
   .price-burst.pb-tr b, .price-burst.pb-bl b { font-size: 22px; }
   .merch-bento { --hz-top: 36px; --hz-bot: 36px; padding: var(--hz-top) 0 var(--hz-bot); }
 
-  /* --- tableau tournée : tailles desktop (30px) impossibles dans ~320px,
-     on redescend tout pour que les 3 colonnes tiennent sans coupure --- */
-  .tour-wrap { padding: 10px; }
-  .tour-typo { margin-bottom: 6px; }
-  .tour-table td { padding: 0 5px; font-size: 12px; }
-  .tour-table .d, .tour-table .v { font-size: 17px; }
-  .tour-table .soldout { font-size: 10px; padding: 1px 5px; }
-  .btn-tix { font-size: 10px; padding: 3px 7px; }
+  /* --- tableau tournée : resserré, textes plus gros que le 1er réglage,
+     calibré pour que les 3 colonnes tiennent dans ~320px sans coupure --- */
+  .tour-wrap { padding: 8px; }
+  .tour-typo { margin-bottom: 4px; }
+  .tour-table td { padding: 0 4px; font-size: 12px; line-height: 1.2; }
+  .tour-table .d, .tour-table .v { font-size: 21px; }
+  .tour-table .soldout { font-size: 11px; padding: 1px 5px; }
+  .btn-tix { font-size: 11px; padding: 3px 8px; }
+
+  /* --- easter eggs vidéo : pleine largeur, hauteur au ratio, centrés --- */
+  .chroma-egg {
+    inset: auto 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: auto;
+    object-fit: initial;
+  }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
