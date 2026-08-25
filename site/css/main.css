@@ -2001,13 +2001,13 @@ section#art {
   z-index: 90; /* au-dessus de tout sauf rien : c'est un jumpscare gentil */
   pointer-events: none;
   filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .6));
-  animation: boss-in .45s cubic-bezier(.25, 1.2, .4, 1) both;
+  animation: boss-in .45s ease-out both; /* sans rebond */
 }
 @keyframes boss-in {
   from { transform: translate(-50%, -103%); }
   to { transform: translate(-50%, 0); }
 }
-#kappa-boss.out { animation: boss-out .5s cubic-bezier(.6, -0.2, .8, .5) both; }
+#kappa-boss.out { animation: boss-out .5s ease-in both; /* sans élan arrière */ }
 @keyframes boss-out {
   from { transform: translate(-50%, 0); }
   to { transform: translate(-50%, -103%); }
@@ -2479,7 +2479,7 @@ section#art {
   /* Miku : plus grande que la pleine largeur, quitte à rogner les côtés */
   #miku-dance { height: 48vh; }
   /* Freddy : toute la hauteur de l'écran */
-  #freddy-scream { height: 86vh; height: 86dvh; }
+  #freddy-scream { height: 100vh; height: 100dvh; }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
