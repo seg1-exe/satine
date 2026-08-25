@@ -78,6 +78,8 @@ a { color: var(--yellow); }
    ========================================================================== */
 
 #topbar {
+  /* viewport-fit=cover : sans cet inset le logo passerait sous l'encoche */
+  padding-top: calc(10px + env(safe-area-inset-top, 0px)) !important;
   background: #000 url('../assets/img/backgrouds/headerBG.png') no-repeat right center / cover;
   border-bottom: 2px solid #000;
   display: flex;
@@ -1258,7 +1260,7 @@ img.photo-frame {
 #player-dock {
   position: fixed;
   left: 12px;
-  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 50;
   display: flex;
   align-items: flex-end;
@@ -1455,7 +1457,7 @@ img.photo-frame {
 #clippy {
   position: fixed;
   right: 14px;
-  bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 49;
   width: 150px;
   user-select: none;
@@ -2013,12 +2015,9 @@ section#art {
 @media (prefers-reduced-motion: reduce) {
   #kappa-boss { display: none; }
 }
-/* Safari iOS uniquement (-webkit-touch-callout n'existe que là) : l'encoche
-   caméra + la zone de barre d'état décalent le haut du viewport, on remonte
-   le boss d'autant (valeur constatée sur iPhone, ajuster ici au besoin) */
-@supports (-webkit-touch-callout: none) {
-  #kappa-boss { top: -40px; }
-}
+/* Le boss atteint le VRAI haut de l'écran (encoche comprise) grâce à
+   viewport-fit=cover dans le <meta viewport> des pages — sans lui, iOS
+   confine la page sous la barre d'état et aucun top négatif n'y peut rien. */
 
 /* ==========================================================================
    SPARKLES (traînée de curseur)
@@ -2435,11 +2434,9 @@ section#art {
     margin-top: 10px;
   }
   .social-btn { height: 38px; padding: 5px 10px; }
-  /* les badges pleine largeur passent sous le bouton panier (fixe, en haut à
-     droite) : on le descend au niveau de la fenêtre merch, moins gênant */
-  /* en bas à GAUCHE : la TV Clippy occupe le coin droit (et dépasse 118px de
-     haut entre 560 et 820px), impossible de cohabiter de ce côté */
-  #cart-fab { top: auto; bottom: 136px; right: auto; left: 10px; width: 52px; height: 52px; }
+  /* en haut à droite, juste SOUS le header (à top:10 il couvrirait le
+     bouton burger) ; l'inset suit l'encoche via viewport-fit=cover */
+  #cart-fab { top: calc(52px + env(safe-area-inset-top, 0px)); right: 10px; width: 48px; height: 48px; }
   #merch { grid-column: 1 / -1; grid-row: 4; margin-top: 12px; }
 
   /* fan-arts : 2 par ligne */
@@ -2482,7 +2479,7 @@ section#art {
   /* Miku : plus grande que la pleine largeur, quitte à rogner les côtés */
   #miku-dance { height: 48vh; }
   /* Freddy : toute la hauteur de l'écran */
-  #freddy-scream { height: 100vh; height: 100dvh; }
+  #freddy-scream { height: 86vh; height: 86dvh; }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
