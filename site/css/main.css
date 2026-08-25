@@ -2013,6 +2013,11 @@ section#art {
 @media (prefers-reduced-motion: reduce) {
   #kappa-boss { display: none; }
 }
+/* Safari iOS uniquement (-webkit-touch-callout n'existe que là) : l'encoche
+   de la caméra découpe le haut du boss, on le remonte de quelques pixels */
+@supports (-webkit-touch-callout: none) {
+  #kappa-boss { top: -12px; }
+}
 
 /* ==========================================================================
    SPARKLES (traînée de curseur)
@@ -2455,20 +2460,23 @@ section#art {
   .price-burst.pb-tr b, .price-burst.pb-bl b { font-size: 22px; }
   .merch-bento { --hz-top: 36px; --hz-bot: 36px; padding: var(--hz-top) 0 var(--hz-bot); }
 
-  /* --- tableau tournée : resserré, textes plus gros que le 1er réglage,
-     calibré pour que les 3 colonnes tiennent dans ~320px sans coupure --- */
-  .tour-wrap { padding: 8px; }
-  .tour-typo { margin-bottom: 4px; }
-  .tour-table td { padding: 0 4px; font-size: 12px; line-height: 1.2; }
-  .tour-table .d, .tour-table .v { font-size: 21px; }
-  .tour-table .soldout { font-size: 11px; padding: 1px 5px; }
-  .btn-tix { font-size: 11px; padding: 3px 8px; }
+  /* --- tableau tournée : au plus serré, textes au max de ce qui tient
+     dans ~320px avec « Luxembourg » + bouton sur une ligne --- */
+  .tour-wrap { padding: 6px; }
+  .tour-typo { margin-bottom: 2px; }
+  .tour-table td { padding: 0 3px; font-size: 12px; line-height: 1.05; }
+  .tour-table .d, .tour-table .v { font-size: 24px; }
+  .tour-table .soldout { font-size: 11px; padding: 1px 4px; }
+  .btn-tix { font-size: 11px; padding: 2px 7px; }
 
-  /* --- easter eggs vidéo : pleine largeur, hauteur au ratio, centrés --- */
+  /* --- easter eggs vidéo : pleine largeur, hauteur au ratio, CALÉS EN BAS
+     de l'écran (les personnages se tiennent au bord inférieur) --- */
   .chroma-egg {
-    inset: auto 0;
-    top: 50%;
-    transform: translateY(-50%);
+    inset: auto 0 0 auto;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    transform: none;
     width: 100%;
     height: auto;
     object-fit: initial;
