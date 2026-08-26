@@ -2017,6 +2017,16 @@ section#art {
   from { transform: translate(-50%, 0); }
   to { transform: translate(-50%, -100vh); transform: translate(-50%, -100dvh); }
 }
+/* variantes mobile (ancrage haut, voir le bloc MOBILE) : -103% de la vidéo
+   suffit à la sortir de l'écran quand elle est accrochée en haut */
+@keyframes boss-in-m {
+  from { transform: translate(-50%, -103%); }
+  to { transform: translate(-50%, 0); }
+}
+@keyframes boss-out-m {
+  from { transform: translate(-50%, 0); }
+  to { transform: translate(-50%, -103%); }
+}
 @media (prefers-reduced-motion: reduce) {
   #kappa-boss { display: none; }
 }
@@ -2509,8 +2519,10 @@ section#art {
   #cart-fab { top: calc(104px + env(safe-area-inset-top, 0px)); right: 10px; width: 48px; height: 48px; }
   #merch { grid-column: 1 / -1; grid-row: 3; margin-top: 12px; }
 
-  /* fan-arts : 2 par ligne */
+  /* fan-arts : 2 par ligne ; la grille étant paire, on montre la 4e tuile
+     dès le départ (2 rangées pleines), VOIR PLUS déplie tout le reste */
   .art-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .art-grid:not(.expanded) .art-piece.extra:nth-child(4) { display: revert; }
 
   /* lightbox fan-arts : marges réduites, croix ramenée dans l'écran */
   #art-lightbox { padding: 16px; }
@@ -2555,6 +2567,11 @@ section#art {
   #miku-dance { height: 48vh; }
   /* Freddy : toute la hauteur de l'écran */
   #freddy-scream { height: 100vh; height: 100dvh; }
+  /* Kappa : la vidéo (moins haute que l'écran en portrait) se cale en HAUT
+     de l'écran — l'ancrage bas du desktop la laisserait traîner en bas.
+     Keyframes dédiées : le trajet -103% suffit depuis un ancrage haut. */
+  #kappa-boss { top: 0; bottom: auto; animation-name: boss-in-m; }
+  #kappa-boss.out { animation-name: boss-out-m; }
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
@@ -2649,4 +2666,5 @@ input:not([type='button']):not([type='submit']), textarea { cursor: var(--cur-te
 a, button { cursor: var(--cur-link); }
 .soldout { cursor: var(--cur-unavailable); }
 /* l'easter egg se mérite : le curseur « ? » de Miku souffle qu'il y a un secret */
-.friend-kappa { cursor: var(--cur-help); }
+/* les vignettes à easter egg (double-clic) affichent le curseur « ? » */
+.friend-kappa, .friend-egg { cursor: var(--cur-help); }

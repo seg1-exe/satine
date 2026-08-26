@@ -570,20 +570,32 @@
         setTimeout(function () { boss.remove(); active = false; }, 500);
       }
 
-      boss.addEventListener('canplay', function () {
-        if (boss.parentNode) return; /* canplay peut refirer */
-        document.body.appendChild(boss);
-        boss.play().catch(function () {});
+      function show() {
+        if (boss.parentNode) return; /* les événements peuvent refirer */
+        document.body.appendChild(boss); /* le slide-in CSS part d'ici */
         /* slide-out à la fin de la vidéo (filet : durée + 2 s) */
-        var ms = (isFinite(boss.duration) ? boss.duration + 2 : 12) * 1000;
+        var ms = (isFinite(boss.duration) && boss.duration ? boss.duration + 2 : 12) * 1000;
         var fallback = setTimeout(done, ms);
         boss.addEventListener('ended', function () {
           clearTimeout(fallback);
           done();
         }, { once: true });
-      });
+      }
+
+      /* on n'attache qu'une fois que des frames sortent vraiment : le
+         slide-in ne démarre jamais sur une vidéo encore vide */
+      boss.addEventListener('playing', show);
       boss.addEventListener('error', function () { active = false; });
+      /* play() DANS la pile du geste utilisateur : iOS (surtout en mode
+         économie d'énergie) peut refuser un play() différé, et ne charge
+         rien avant — c'est aussi ce qui remplace l'attente de canplay,
+         qu'iOS n'émet pas toujours pour une vidéo détachée */
       boss.load();
+      boss.play().catch(function () {
+        /* lecture refusée (très vieux iOS ?) : on montre quand même la
+           vidéo dès qu'elle a des données, image fixe plutôt que rien */
+        boss.addEventListener('loadeddata', show, { once: true });
+      });
     });
   }
 
