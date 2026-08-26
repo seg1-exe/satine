@@ -402,7 +402,12 @@
     var glyphs = ['✦', '✧', '⭐', '·', '♥'];
     var colors = ['#ff2ea6', '#ffe600', '#49ff6a', '#7ff', '#fff'];
     var last = 0;
-    document.addEventListener('mousemove', function (e) {
+    /* pointermove filtré sur la souris : au doigt, un glissement sème des
+       étoiles figées sous le pouce (les setTimeout de nettoyage sont gelés
+       pendant le scroll iOS) — et une traînée de curseur n'a pas de sens
+       sans curseur. */
+    document.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
       var now = Date.now();
       if (now - last < 70) return;
       last = now;

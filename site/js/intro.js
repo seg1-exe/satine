@@ -78,25 +78,36 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 3);
     var COLORS = ['255,255,255', '130,240,235', '170,150,255', '120,180,255', '255,190,235'];
 
-    function seed() {
+    var seededW = 0, seededH = 0;
+
+    function resizeBuffer() {
       var w = canvas.clientWidth, h = canvas.clientHeight;
-      if (!w || !h) return; /* jamais de canvas 300x150 par défaut étiré */
+      if (!w || !h) return false; /* jamais de canvas 300x150 par défaut étiré */
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return true;
+    }
+
+    function makeStar(w, yMin, yMax) {
+      return {
+        x: Math.random() * w,
+        y: yMin + Math.random() * (yMax - yMin),
+        r: Math.random() < .08 ? 2.2 + Math.random() * 2.6 : .6 + Math.random() * 1.3,
+        c: COLORS[(Math.random() * COLORS.length) | 0],
+        ph: Math.random() * Math.PI * 2,
+        sp: .6 + Math.random() * 1.9,
+        rot: Math.random() * Math.PI / 2
+      };
+    }
+
+    function seed() {
+      if (!resizeBuffer()) return;
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      seededW = w; seededH = h;
       stars = [];
       var n = Math.round(w * h / 5200);
-      for (var i = 0; i < n; i++) {
-        stars.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: Math.random() < .08 ? 2.2 + Math.random() * 2.6 : .6 + Math.random() * 1.3,
-          c: COLORS[(Math.random() * COLORS.length) | 0],
-          ph: Math.random() * Math.PI * 2,
-          sp: .6 + Math.random() * 1.9,
-          rot: Math.random() * Math.PI / 2
-        });
-      }
+      for (var i = 0; i < n; i++) stars.push(makeStar(w, 0, h));
     }
 
     /* grosse étoile : vraie forme à 4 branches (deux quadratiques par
@@ -140,7 +151,26 @@
     else {
       (function loop(t) { draw(t); requestAnimationFrame(loop); })(0);
     }
-    function reseed() { seed(); if (reducedMotion()) draw(0); }
+    /* Sur mobile, la barre d'URL fait varier la HAUTEUR du viewport à chaque
+       glissement de doigt : re-générer le ciel ferait sauter toutes les
+       étoiles. Si la largeur n'a pas bougé, on garde les étoiles en place et
+       on ne fait que redimensionner le buffer (en complétant la bande du bas
+       si la fenêtre a grandi). Le reseed complet ne reste que pour un vrai
+       changement de largeur (rotation, fenêtre desktop). */
+    function reseed() {
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      if (w === seededW && h !== seededH) {
+        if (!resizeBuffer()) return;
+        if (h > seededH) {
+          var extra = Math.round(w * (h - seededH) / 5200);
+          for (var i = 0; i < extra; i++) stars.push(makeStar(w, seededH, h));
+          seededH = h; /* on ne retire jamais : hors champ = invisible */
+        }
+      } else if (w !== seededW || h !== seededH) {
+        seed();
+      }
+      if (reducedMotion()) draw(0);
+    }
     window.addEventListener('resize', reseed);
     window.addEventListener('orientationchange', reseed);
   }
