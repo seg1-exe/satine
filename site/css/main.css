@@ -1994,7 +1994,10 @@ section#art {
 
 #kappa-boss {
   position: fixed;
-  top: 0;
+  /* ancré en BAS : le bas de la vidéo reste visible même quand elle est
+     plus haute que l'écran (4:3 en 100vw) — c'est le haut qui déborde */
+  top: auto;
+  bottom: 0;
   left: 50%;
   width: 100vw;
   height: auto;
@@ -2003,21 +2006,23 @@ section#art {
   filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .6));
   animation: boss-in .45s ease-out both; /* sans rebond */
 }
+/* départ : bord bas de la vidéo au bord haut de l'écran = entièrement
+   hors champ au-dessus ; elle glisse donc toujours depuis le haut */
 @keyframes boss-in {
-  from { transform: translate(-50%, -103%); }
+  from { transform: translate(-50%, -100vh); transform: translate(-50%, -100dvh); }
   to { transform: translate(-50%, 0); }
 }
 #kappa-boss.out { animation: boss-out .5s ease-in both; /* sans élan arrière */ }
 @keyframes boss-out {
   from { transform: translate(-50%, 0); }
-  to { transform: translate(-50%, -103%); }
+  to { transform: translate(-50%, -100vh); transform: translate(-50%, -100dvh); }
 }
 @media (prefers-reduced-motion: reduce) {
   #kappa-boss { display: none; }
 }
-/* Le boss atteint le VRAI haut de l'écran (encoche comprise) grâce à
+/* Le boss couvre le VRAI écran (encoche et barre du bas comprises) grâce à
    viewport-fit=cover dans le <meta viewport> des pages — sans lui, iOS
-   confine la page sous la barre d'état et aucun top négatif n'y peut rien. */
+   confine la page dans la zone « sûre ». */
 
 /* ==========================================================================
    SPARKLES (traînée de curseur)
@@ -2148,6 +2153,71 @@ section#art {
 .art-piece .cap a { color: var(--pink); font-weight: bold; }
 /* tuile vidéo : remplit la case carrée comme les images */
 .art-piece .ph video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.art-piece { cursor: var(--cur-link); }
+
+/* lightbox fan-arts : clic sur une tuile → grand format (son réactivé pour
+   les vidéos — le clic de l'utilisateur autorise la lecture audible) */
+#art-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: rgba(0, 0, 0, .82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+#art-lightbox .lb-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: min(92vw, 880px);
+  animation: lb-pop .22s ease-out both;
+}
+@keyframes lb-pop { from { opacity: 0; scale: .85; } to { opacity: 1; scale: 1; } }
+#art-lightbox video,
+#art-lightbox img {
+  max-width: 100%;
+  max-height: 76vh;
+  max-height: 76dvh;
+  border: 3px solid #fff;
+  outline: 2px solid #000;
+  background: #000;
+  box-shadow: 0 0 34px rgba(255, 46, 166, .55);
+}
+#art-lightbox .lb-ph {
+  font-size: 130px;
+  line-height: 1;
+  padding: 40px 60px;
+  background: repeating-conic-gradient(#ddd 0% 25%, #eee 25% 50%) 0 0/16px 16px;
+  border: 3px solid #fff;
+  outline: 2px solid #000;
+  box-shadow: 0 0 34px rgba(255, 46, 166, .55);
+}
+#art-lightbox .lb-cap {
+  color: #fff;
+  font-size: 14px;
+  text-shadow: 1px 1px 0 #000;
+}
+#art-lightbox .lb-cap a { color: var(--pink); font-weight: bold; }
+#art-lightbox .lb-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #000;
+  background: var(--red, #e0322c);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .5);
+  cursor: var(--cur-link);
+}
 
 /* ==========================================================================
    SECRET
@@ -2423,24 +2493,29 @@ section#art {
   .profile-left .photo-frame { border-width: 2px; outline-width: 2px; }
   .satine-title { grid-column: 2; grid-row: 1; font-size: 32px; }
   .satine-sub { grid-column: 2; grid-row: 2; margin: 0; font-size: 15px; }
-  /* réseaux : rangée pleine largeur juste sous l'identité. .profile-left étant
-     en display:contents, sans placement explicite le <ul> irait se caser tout
-     seul dans la grille. Icônes réduites pour ne pas repousser MERCH hors du
-     premier écran. */
+  /* réseaux : rangée pleine largeur SOUS la fenêtre merch (rang 4, le merch
+     prenant le rang 3). .profile-left étant en display:contents, sans
+     placement explicite le <ul> irait se caser tout seul dans la grille.
+     Icônes réduites pour ne pas allonger la page. */
   .socials {
     grid-column: 1 / -1;
-    grid-row: 3;
+    grid-row: 4;
     grid-template-columns: repeat(2, 1fr);
-    margin-top: 10px;
+    margin-top: 12px;
   }
   .social-btn { height: 38px; padding: 5px 10px; }
-  /* en haut à droite, juste SOUS le header (à top:10 il couvrirait le
-     bouton burger) ; l'inset suit l'encoche via viewport-fit=cover */
-  #cart-fab { top: calc(52px + env(safe-area-inset-top, 0px)); right: 10px; width: 48px; height: 48px; }
-  #merch { grid-column: 1 / -1; grid-row: 4; margin-top: 12px; }
+  /* à droite, descendu bien sous le header pour ne pas chevaucher le titre
+     ni la fenêtre merch ; l'inset suit l'encoche via viewport-fit=cover */
+  #cart-fab { top: calc(104px + env(safe-area-inset-top, 0px)); right: 10px; width: 48px; height: 48px; }
+  #merch { grid-column: 1 / -1; grid-row: 3; margin-top: 12px; }
 
   /* fan-arts : 2 par ligne */
   .art-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+  /* lightbox fan-arts : marges réduites, croix ramenée dans l'écran */
+  #art-lightbox { padding: 16px; }
+  #art-lightbox .lb-close { top: -10px; right: -6px; }
+  #art-lightbox .lb-ph { font-size: 90px; padding: 30px 40px; }
 
   /* modal produit : plus large et photo nettement plus grande.
      Largeur relative au conteneur (pas au viewport) : sinon la fenêtre

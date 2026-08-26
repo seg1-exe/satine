@@ -524,8 +524,13 @@
   /* -------------------------------------------- easter egg : boss kappa */
 
   /* Deux clics d'affilée (moins de 600 ms d'écart) sur la vignette KAPPA du
-     friends space : anomalisa-boss surgit du haut de l'écran, reste 1,5 s,
-     et repart. L'image (webp allégé) n'est chargée qu'au premier déclenchement. */
+     friends space : la vidéo kappa-boss (fond transparent, alpha natif)
+     surgit du haut de l'écran, se joue en entier, puis repart en slide-out.
+     Deux encodages du même kappa.mov (ProRes 4444) : HEVC+alpha (hvc1) que
+     seul WebKit lit, WebM VP9+alpha pour Chrome/Firefox. Le choix se fait
+     par sniff UA : canPlayType ne dit jamais si l'alpha sera rendu (Chrome
+     décode le HEVC mais l'affiche sur fond noir). iOS Chrome/Firefox sont
+     du WebKit déguisé (CriOS/FxiOS, pas « chrome ») → mp4, correct. */
   function initKappaBoss() {
     var card = null;
     document.querySelectorAll('.friend').forEach(function (f) {
@@ -533,6 +538,10 @@
       if (img && /kappa/i.test(img.getAttribute('src') || '')) card = f;
     });
     if (!card) return;
+
+    var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    var src = isSafari ? 'assets/img/friends/kappa-boss.mp4'
+                       : 'assets/img/friends/kappa-boss.webm';
 
     var lastClick = 0;
     var active = false;
@@ -544,19 +553,32 @@
       if (!dbl || active) return;
       active = true;
 
-      var boss = document.createElement('img');
-      boss.src = 'assets/img/anomalisa-boss.webp';
-      boss.alt = '';
+      var boss = document.createElement('video');
       boss.id = 'kappa-boss';
-      boss.addEventListener('load', function () {
+      boss.muted = true;
+      boss.setAttribute('playsinline', '');
+      boss.preload = 'auto';
+      boss.src = src;
+
+      function done() {
+        boss.classList.add('out');
+        setTimeout(function () { boss.remove(); active = false; }, 500);
+      }
+
+      boss.addEventListener('canplay', function () {
+        if (boss.parentNode) return; /* canplay peut refirer */
         document.body.appendChild(boss);
-        /* slide-in (CSS), pause 1,5 s, slide-out (CSS), nettoyage */
-        setTimeout(function () {
-          boss.classList.add('out');
-          setTimeout(function () { boss.remove(); active = false; }, 500);
-        }, 450 + 1500);
+        boss.play().catch(function () {});
+        /* slide-out à la fin de la vidéo (filet : durée + 2 s) */
+        var ms = (isFinite(boss.duration) ? boss.duration + 2 : 12) * 1000;
+        var fallback = setTimeout(done, ms);
+        boss.addEventListener('ended', function () {
+          clearTimeout(fallback);
+          done();
+        }, { once: true });
       });
       boss.addEventListener('error', function () { active = false; });
+      boss.load();
     });
   }
 
@@ -668,6 +690,89 @@
     initChromaEgg(/miku/i, 'assets/img/friends/miku-dance.mp4', 'miku-dance');
   }
 
+  /* ------------------------------------------------------- lightbox fan-arts */
+
+  /* Clic sur une tuile de #art-grid → grand format en overlay. Pour une
+     vidéo, on recrée un <video> NON muet : le clic utilisateur autorise la
+     lecture audible (la vignette de la grille, elle, reste muted). */
+  function initArtLightbox() {
+    var grid = document.getElementById('art-grid');
+    if (!grid) return;
+
+    function close() {
+      var lb = document.getElementById('art-lightbox');
+      if (!lb) return;
+      var v = lb.querySelector('video');
+      if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
+      lb.remove();
+      document.body.style.overflow = '';
+    }
+
+    function open(piece) {
+      close();
+      var lb = document.createElement('div');
+      lb.id = 'art-lightbox';
+      var box = document.createElement('div');
+      box.className = 'lb-box';
+
+      var srcVideo = piece.querySelector('video');
+      var srcImg = piece.querySelector('.ph img');
+      if (srcVideo) {
+        var v = document.createElement('video');
+        v.src = srcVideo.currentSrc || srcVideo.src;
+        if (srcVideo.poster) v.poster = srcVideo.poster;
+        v.autoplay = true;
+        v.loop = true;
+        v.controls = true;
+        v.setAttribute('playsinline', '');
+        v.muted = false;
+        v.volume = 1;
+        box.appendChild(v);
+      } else if (srcImg) {
+        var im = document.createElement('img');
+        im.src = srcImg.src;
+        im.alt = srcImg.alt || '';
+        box.appendChild(im);
+      } else {
+        var phSrc = piece.querySelector('.ph');
+        var ph = document.createElement('div');
+        ph.className = 'lb-ph';
+        ph.textContent = phSrc ? phSrc.textContent.trim() : '';
+        box.appendChild(ph);
+      }
+
+      var cap = piece.querySelector('.cap');
+      if (cap) {
+        var c = document.createElement('p');
+        c.className = 'lb-cap';
+        c.innerHTML = cap.innerHTML;
+        box.appendChild(c);
+      }
+
+      var x = document.createElement('button');
+      x.className = 'lb-close';
+      x.type = 'button';
+      x.setAttribute('aria-label', 'Fermer');
+      x.textContent = '✕';
+      x.addEventListener('click', close);
+      box.appendChild(x);
+
+      lb.appendChild(box);
+      lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+      document.body.appendChild(lb);
+      document.body.style.overflow = 'hidden';
+    }
+
+    grid.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return; /* liens (crédits) intacts */
+      var piece = e.target.closest('.art-piece');
+      if (piece) open(piece);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+  }
+
   /* ------------------------------------------------------- burger menu */
 
   function initBurger() {
@@ -701,6 +806,7 @@
     initReveal();
     initKappaBoss();
     initVideoEggs();
+    initArtLightbox();
     /* prefers-reduced-motion : les vidéos décoratives ne tournent pas */
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.querySelectorAll('video[autoplay]').forEach(function (v) {

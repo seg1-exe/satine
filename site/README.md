@@ -17,7 +17,10 @@ npx http-server site -p 8137 -c-1
 - `index.html` — LE one-pager. Sections ancrées par la nav :
   `#top` (profil + fenêtre merch bento) · `#tournee` (4 dates + voir plus) ·
   `#clip` (embed YouTube dans cadre CRT) · `#chat` (faux chat, futur Chatango) ·
-  `#art` (6 fan-arts + voir plus)
+  `#art` (9 fan-arts max, 3 affichés + voir plus ; clic sur une tuile →
+  lightbox grand format, `initArtLightbox` dans shared.js — pour une vidéo le
+  `<video>` est recréé NON muet : le clic utilisateur autorise le son, la
+  vignette de la grille reste `muted`)
 - `intro.html` — **porte d'entrée** : ciel étoilé, titre SATINE, flèche
   « Entrer ». Voir la section dédiée plus bas.
 - `secret.html` — page verrouillée par mot de passe
@@ -216,7 +219,12 @@ recacheront dans leurs visuels finaux. Saisie via la page Secret OU la barre
 - Les 8 pubs des rails (`ADS_LEFT` / `ADS_RIGHT` dans `js/shared.js`) — y
   recacher les 3 fragments du mot de passe
 - Bio « About me », interests, fan-arts (les friends sont en place :
-  TLT / Miku / Freddy / Kappa, vignettes optimisées dans `assets/img/friends/`)
+  TLT / Miku / Freddy / Kappa, vignettes optimisées dans `assets/img/friends/`.
+  Double-clic Kappa → vidéo `kappa-boss` à fond transparent, double encodage
+  alpha natif : `kappa-boss.mp4` HEVC/hvc1 pour WebKit, `kappa-boss.webm`
+  VP9 pour Chrome/Firefox — choix par sniff UA dans `initKappaBoss`. Le
+  master ProRes `kappa.mov` (898 Mo) est rangé à la racine du repo, hors
+  de `site/`)
 - Morceaux du player (`PLAYLIST` dans `js/player.js`) — mp3 placeholder générés
 - Rushs BTS (`secret.html`) — la tournée, elle, est en place : tableau des
   dates dans la DA de l'affiche (`.tour-wrap`, dates réelles de l'affiche) +
