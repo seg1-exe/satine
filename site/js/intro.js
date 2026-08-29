@@ -327,5 +327,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('gate')) initGate();
     else if (document.documentElement.classList.contains('intro-reveal')) initReveal();
+    /* page sans porte mais avec ciel (ex. page mot de passe Shopify) :
+       seulement les étoiles, pas de flèche ni d'avalanche */
+    else if (document.getElementById('stars')) initStars(document.getElementById('stars'));
   });
 })();

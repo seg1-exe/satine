@@ -1,3 +1,7 @@
+/* résolution des assets sur le CDN Shopify — __ASSET_BASE est posé
+   par layout/theme.liquid (et intro.liquid). */
+function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
+
 /* ==========================================================================
    SATINE — page secrète
    Le code est composé de 3 fragments cachés dans les pubs (placeholders

@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{ page_title | default: shop.name }} ★ MySAT'S BLOG</title>
   <meta name="description" content="Le blog officiel de SATINE : chanteuse, productrice. Merch, tournée, clip et secrets.">
+  {% if template == 'page.secret' %}<meta name="robots" content="noindex">{% endif %}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,16 +16,33 @@
     /* base CDN des assets du thème, consommée par ASSET() dans les JS */
     window.__ASSET_BASE = "{{ 'main.css' | asset_url | split: 'main.css' | first }}";
 
-    /* apparition des sections au scroll : posé avant le premier paint */
+    /* apparition des sections au scroll : la classe doit être posée avant le
+       premier paint, sinon la page s'affiche entière puis se cache. Sans JS
+       elle n'est jamais posée et tout reste visible (voir initReveal). */
     document.documentElement.className += ' rv-ready';
+
+    /* PORTE D'ENTRÉE (voir intro.html) — doit rester en tête du <head> et
+       synchrone : au retour de la porte, la classe .intro-reveal pose la
+       bouche fermée AVANT le premier paint, sinon on verrait le site.
+       Sans sessionStorage (navigation privée stricte) on sert le site
+       directement : jamais de boucle de redirection. */
   </script>
   {% if template == 'index' %}{% unless request.design_mode %}
   <script>
-    /* PORTE D'ENTRÉE (voir templates/page.entrer.liquid). Une seule fois par
-       visiteur (localStorage). request.design_mode : jamais dans l'éditeur
-       de thème, sinon le marchand serait redirigé à chaque aperçu. */
+    /* PORTE D'ENTRÉE (voir templates/page.entrer.liquid). request.design_mode :
+       jamais dans l'éditeur de thème, sinon le marchand serait redirigé à
+       chaque aperçu. */
     (function () {
+      /* URL de la porte, à changer d'un seul endroit lors du passage en thème
+         Shopify : ce script devient un snippet du <head> de theme.liquid et
+         GATE_URL devient '/pages/entrer'. */
       var GATE_URL = '/pages/entrer';
+
+      /* La porte ne se joue qu'UNE fois par visiteur : le passage est
+         mémorisé en localStorage (persistant, survit à la fermeture du
+         navigateur). S'y ajoutent : la navigation interne (retour de
+         secret.html, bouton Précédent), qui n'est pas une arrivée sur le
+         site, et ?nointro=1. */
       function internalNav() {
         var e = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
         var type = e ? e.type
@@ -33,10 +51,12 @@
         if (type === 'back_forward') return true;
         return document.referrer.indexOf(location.origin + '/') === 0;
       }
+
       var s;
       try { s = window.sessionStorage; } catch (e) { return; }
       if (!s) return;
       try {
+        /* jeton à usage unique posé par intro.html juste avant de naviguer */
         if (s.getItem('satine-reveal')) {
           s.removeItem('satine-reveal');
           document.documentElement.className += ' intro-reveal';
@@ -51,9 +71,11 @@
   </script>
   {% endunless %}{% endif %}
   <script src="{{ 'shared.js' | asset_url }}" defer></script>
-  <script src="{{ 'player.js' | asset_url }}" defer></script>
-  <script src="{{ 'chat.js' | asset_url }}" defer></script>
   <script src="{{ 'intro.js' | asset_url }}" defer></script>
+  {% if template == 'page.secret' %}
+  <script src="{{ 'player-cd.js' | asset_url }}" defer></script>
+  <script src="{{ 'secret.js' | asset_url }}" defer></script>
+  {% endif %}
   {{ content_for_header }}
 </head>
 <body data-page="{% if template == 'page.secret' %}secret{% else %}home{% endif %}">

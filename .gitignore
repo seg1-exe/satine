@@ -1,0 +1,8 @@
+# artefact de build : régénéré par tools/build-shopify.py, 30 Mo par version
+satine-theme.zip
+
+# poussière macOS
+.DS_Store
+
+# dépendances locales éventuelles
+node_modules/

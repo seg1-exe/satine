@@ -1,11 +1,14 @@
-{% comment %} Home one-pager SATINE — contenu de site/index.html ; le chrome (header/nav/rails/player/clippy) est construit par shared.js {% endcomment %}
+{% comment %} Home one-pager SATINE — généré depuis site/index.html par tools/build-shopify.py ; le chrome (header/nav/rails/clippy) est construit par shared.js {% endcomment %}
 <div id="page-main">
 
   <!-- ==================== PROFIL + MERCH ==================== -->
   <div class="profile-grid" id="top">
     <div class="profile-left">
       <h1 class="satine-title" data-rv>SATINE</h1>
-      <img class="photo-frame" src="{{ 'pfp.webp' | asset_url }}" alt="Photo de SATINE" data-rv>
+      <!-- wrapper : le reflet « verre » est un ::after, impossible sur un <img> -->
+      <span class="photo-glass" data-rv>
+        <img class="photo-frame" src="{{ 'pfp.webp' | asset_url }}" alt="Photo de SATINE">
+      </span>
 
       <!-- Badges pleine largeur de la colonne, façon boutons de site des
            années 2000. Tous les logos sont désormais des logos-mots (fournis
@@ -37,7 +40,7 @@
           <span class="price-burst pb-bl"><b>35€</b></span>
           <div class="bento-item bento-barrettes">
             <span class="item-tag">Barrettes</span>
-            <img class="product-click" src="{{ 'barretes.webp' | asset_url }}" alt="Pack de 3 barrettes « !! »" onclick="SatineModal.open('barrettes')">
+            <img class="product-click" src="{{ 'barretes.webp' | asset_url }}" alt="Pack 3 barrettes" onclick="SatineModal.open('barrettes')">
           </div>
           <div class="bento-item bento-poster product-click" onclick="SatineModal.open('poster')">
             <span class="item-tag">Poster</span>
@@ -56,8 +59,8 @@
       <div class="section-bar"><h2>About me :</h2></div>
       <div class="leo-box" style="margin-top:10px">
         <div class="inner">
-          je suis SATINE la celebre chanteuse qui fait de la musiuqe. je fais des sons qui font
-          bzzzt et parfois piou piou.
+          je suis SATINE la celebre chanteuse qui fait de la musique. Bienvenue
+          sur mon site officiel :p
         </div>
       </div>
 
@@ -92,19 +95,6 @@
             <button id="hs-theme" title="Plein écran"></button>
           </div>
         </section>
-      <div class="bgroup g-interests" data-rv data-rv-each=".interests tr">
-      <div class="section-bar"><h2>My interests :</h2></div>
-      <div class="leo-box" style="margin-top:10px">
-        <table class="interests">
-          <tr><td class="k">一般</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">Music</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">映画</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">テレビ</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">Books</td><td class="v">bla bla bla blabla bla</td></tr>
-          <tr><td class="k">英雄</td><td class="v">bla bla bla blabla bla</td></tr>
-        </table>
-      </div>
-      </div>
 
         <!-- ==================== LE CLIP ==================== -->
     </div>
@@ -125,7 +115,7 @@
           <tr><td class="d">01/09</td><td class="v">Cologne</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108036663" target="_blank" rel="noopener">BILLETS</a></td></tr>
           <tr><td class="d">02/09</td><td class="v">Paris</td><td><span class="soldout">SOLD OUT</span></td></tr>
           <tr><td class="d">04/09</td><td class="v">Madrid</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr><td class="d">05/09</td><td class="v">Madrid</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108052631" target="_blank" rel="noopener">BILLETS</a></td></tr>
+          <tr><td class="d">06/09</td><td class="v">Madrid</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108052631" target="_blank" rel="noopener">BILLETS</a></td></tr>
           <tr><td class="d">07/09</td><td class="v">Barcelona</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108036708" target="_blank" rel="noopener">BILLETS</a></td></tr>
           <tr><td class="d">09/09</td><td class="v">Lisbon</td><td><span class="soldout">SOLD OUT</span></td></tr>
           <tr><td class="d">11/09</td><td class="v">Luxembourg</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108036750" target="_blank" rel="noopener">BILLETS</a></td></tr>
@@ -142,9 +132,9 @@
       <div class="section-bar"><h2>My friends space :</h2></div>
       <div class="friends-grid" style="margin-top:10px">
         <div class="friend"><p class="name">TLT</p><div class="ph"><img src="{{ 'the-living-tombstone.webp' | asset_url }}" alt="The Living Tombstone" loading="lazy"></div></div>
-        <div class="friend"><p class="name">MIKU</p><div class="ph"><img src="{{ 'miku.webp' | asset_url }}" alt="Hatsune Miku" loading="lazy"></div></div>
-        <div class="friend"><p class="name">FREDDY</p><div class="ph"><img src="{{ 'freddy.webp' | asset_url }}" alt="Freddy Fazbear" loading="lazy"></div></div>
-        <div class="friend"><p class="name">KAPPA</p><div class="ph"><img src="{{ 'kappa.webp' | asset_url }}" alt="Kappa" loading="lazy"></div></div>
+        <div class="friend friend-egg"><p class="name">MIKU</p><div class="ph"><img src="{{ 'miku.webp' | asset_url }}" alt="Hatsune Miku" loading="lazy"></div></div>
+        <div class="friend friend-egg"><p class="name">FREDDY</p><div class="ph"><img src="{{ 'freddy.webp' | asset_url }}" alt="Freddy Fazbear" loading="lazy"></div></div>
+        <div class="friend friend-kappa"><p class="name">KAPPA</p><div class="ph"><img src="{{ 'kappa.webp' | asset_url }}" alt="Kappa" loading="lazy"></div></div>
       </div>
       </div>
     </div>
@@ -157,23 +147,20 @@
     <div class="xp-window">
       <div class="xp-titlebar">
         <span class="xp-ico">💬</span>
-        <span class="xp-title">satine_chat.exe - 42 connecté·es</span>
+        <span class="xp-title">satine-chat.chatango.com</span>
         <span class="xp-btns"><span>—</span><span class="xp-max">□</span><span class="xp-close">✕</span></span>
       </div>
-      <div class="xp-body">
-        <!--
-          PHASE 2 : remplacer ce faux chat par l'embed Chatango :
-          <iframe src="https://xxxxx.chatango.com/..." ...> (groupe à créer)
-          + image de fond custom dans les réglages de style Chatango.
-        -->
-        <div class="chat-log" id="chat-log"></div>
-        <div class="chat-input-row">
-          <input id="chat-input" placeholder="dis un truc gentil…" maxlength="140">
-          <button class="btn-red" id="chat-send">ENVOYER</button>
-        </div>
-        <p style="font-size:11px;color:#666;margin-top:6px">
-          [démo locale : le vrai chat Chatango sera branché ici, avec fond custom aux couleurs de Satine]
-        </p>
+      <div class="xp-body chat-embed">
+        <!-- Chatango, groupe satine-chat. Les styles INLINE ci-dessous font
+             foi (ils écrasent les réglages du groupe côté chatango.com) :
+             a=bandeaux, c=fond, k/l/m/q=accents et liseré, n=texte, p=corps,
+             surl:0/showhdr:0 = pas de barre d'URL dans le widget (notre
+             fenêtre XP sert de titre). fwtickm:0 OBLIGATOIRE : à 1, le widget
+             se transforme sur mobile en ticker docké en bas de l'écran au
+             lieu de la fenêtre de chat. La clé "styles" doit toujours
+             exister, sinon le script ne s'initialise pas.
+             LANGUE : celle du NAVIGATEUR du visiteur (fr supporté). -->
+        <script id="cid0020000448573011632" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 100%;height: 420px;">{"handle":"satine-chat","arch":"js","styles":{"a":"FF2EA6","b":100,"c":"FFFFFF","d":"111111","k":"FF2EA6","l":"FF2EA6","m":"FF2EA6","n":"111111","p":"11","q":"000000","r":100,"surl":0,"showhdr":0,"fwtickm":0}}</script>
       </div>
     </div>
   </section>
@@ -184,18 +171,21 @@
   <section id="art">
     <div class="section-bar" data-rv><h2>Fan arts</h2></div>
     <div class="art-grid collapsible" id="art-grid" style="margin-top:12px">
+      <div class="art-piece art-video" data-rv style="--tilt:-2deg">
+        <div class="ph">
+          <video src="{{ 'shiraw-web.mp4' | asset_url }}" poster="{{ 'shiraw-poster.webp' | asset_url }}"
+                 autoplay muted loop playsinline preload="metadata"></video>
+        </div>
+        <p class="cap">by <a href="https://www.instagram.com/shir4w/" target="_blank" rel="noopener">Shiraw</a></p>
+      </div>
       <div class="art-piece" data-rv style="--tilt:-3deg"><div class="ph">🎨</div><p class="cap">fan-art #1 (placeholder)</p></div>
       <div class="art-piece" data-rv style="--tilt:2deg"><div class="ph">🖼️</div><p class="cap">fan-art #2 (placeholder)</p></div>
-      <div class="art-piece" data-rv style="--tilt:-1deg"><div class="ph">✏️</div><p class="cap">fan-art #3 (placeholder)</p></div>
-      <div class="art-piece" data-rv style="--tilt:3deg"><div class="ph">🖌️</div><p class="cap">fan-art #4 (placeholder)</p></div>
-      <div class="art-piece" data-rv style="--tilt:-2deg"><div class="ph">📺</div><p class="cap">fan-art #5 (placeholder)</p></div>
-      <div class="art-piece" data-rv style="--tilt:1deg"><div class="ph">💖</div><p class="cap">fan-art #6 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:-1deg"><div class="ph">✏️</div><p class="cap">fan-art #3 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:3deg"><div class="ph">🖌️</div><p class="cap">fan-art #4 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:-2deg"><div class="ph">📺</div><p class="cap">fan-art #5 (placeholder)</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:1deg"><div class="ph">💖</div><p class="cap">fan-art #6 (placeholder)</p></div>
       <div class="art-piece extra" data-rv style="--tilt:-3deg"><div class="ph">⭐</div><p class="cap">fan-art #7 (placeholder)</p></div>
       <div class="art-piece extra" data-rv style="--tilt:2deg"><div class="ph">🎤</div><p class="cap">fan-art #8 (placeholder)</p></div>
-      <div class="art-piece extra" data-rv style="--tilt:-1deg"><div class="ph">🧷</div><p class="cap">fan-art #9 (placeholder)</p></div>
-      <div class="art-piece extra" data-rv style="--tilt:2deg"><div class="ph">📼</div><p class="cap">fan-art #10 (placeholder)</p></div>
-      <div class="art-piece extra" data-rv style="--tilt:-2deg"><div class="ph">🩷</div><p class="cap">fan-art #11 (placeholder)</p></div>
-      <div class="art-piece extra" data-rv style="--tilt:3deg"><div class="ph">🐈</div><p class="cap">fan-art #12 (placeholder)</p></div>
     </div>
     <button class="btn-red see-more" data-target="art-grid" data-rv>VOIR PLUS ▼</button>
   </section>

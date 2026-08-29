@@ -18,6 +18,17 @@
     { id: 'secret',  label: 'Secret',  anchor: 'secret.html' }
   ];
 
+  /* pages légales du footer : les /policies/… sont générées par Shopify
+     (Paramètres → Politiques) — en local Vercel ces liens n'existent pas
+     encore, c'est attendu */
+  var FOOTER_LINKS = [
+    { label: 'Mentions légales', href: '/policies/legal-notice' },
+    { label: 'CGV', href: '/policies/terms-of-service' },
+    { label: 'Confidentialité', href: '/policies/privacy-policy' },
+    { label: 'Retours', href: '/policies/refund-policy' },
+    { label: 'Livraison', href: '/policies/shipping-policy' }
+  ];
+
   /* ------------------------------------------------------------------
      PUBS placeholders. data-frag = fragment du code secret caché dedans.
      Les visuels finaux des graphistes remplaceront le HTML de chaque slot.
@@ -137,6 +148,17 @@
             burgerLinks +
           '</div>' +
           '<main id="main-col"></main>' +
+          /* footer DANS la colonne centrale : même largeur que le site,
+             les rails de pubs continuent de chaque côté */
+          '<footer id="site-footer">' +
+            '<nav class="foot-links" aria-label="Pages légales">' +
+              FOOTER_LINKS.map(function (l) {
+                return '<a href="' + l.href + '">' + l.label + '</a>';
+              }).join('<span class="foot-star">★</span>') +
+            '</nav>' +
+            '<p class="foot-credit">© SAT’S BLOG — website by ' +
+              '<a href="https://whitemonkey.tech/" target="_blank" rel="noopener">whitemonkey*</a></p>' +
+          '</footer>' +
         '</div>' +
         '<aside class="rail" id="rail-right">' + ADS_RIGHT.join('') + '</aside>' +
       '</div>' +

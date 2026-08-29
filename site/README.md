@@ -132,6 +132,22 @@ Sans JS, `rv-ready` n'est jamais posée et tout reste visible. Idem si
 l'IntersectionObserver manque ou si `prefers-reduced-motion` est demandé :
 `initReveal()` retire la classe.
 
+### Thème Shopify
+
+Le thème complet est GÉNÉRÉ depuis `site/` par `tools/build-shopify.py`
+(à relancer après toute évolution du site) :
+
+```bash
+python3 tools/build-shopify.py
+```
+
+Il régénère `shopify-theme/` (assets à plat + transformations CSS/JS/liquid,
+correspondances dans `asset-map.json`) et `satine-theme.zip` prêt à uploader,
+et liste les assets de `site/assets/` non référencés. Les gabarits de
+compatibilité (404, product…), `config/` et `locales/` ne sont pas touchés.
+Installation : Boutique en ligne → Thèmes → Ajouter → Importer le zip, puis
+créer deux Pages de handles `entrer` et `secret` avec leurs templates.
+
 ### Portage Shopify de la porte
 
 Oui, elle tient sur Shopify — mais pas comme un fichier HTML posé à la racine :
@@ -226,7 +242,21 @@ recacheront dans leurs visuels finaux. Saisie via la page Secret OU la barre
   master ProRes `kappa.mov` (898 Mo) est rangé à la racine du repo, hors
   de `site/`)
 - Morceaux du player (`PLAYLIST` dans `js/player.js`) — mp3 placeholder générés
-- Rushs BTS (`secret.html`) — la tournée, elle, est en place : tableau des
+- Page secrète = **blog intime de Satine** (`secret.html`) : un
+  `<article class="blog-post">` par entrée (du plus récent au plus ancien),
+  gabarit documenté en commentaire dans la page. Textes actuels =
+  placeholders à réécrire par Satine. Médias par post :
+  · maquettes : `<div class="cdp-slot">` → player « CD Player » Windows 9x
+    (`js/player-cd.js`, playlist `TRACKS` ou `data-tracks` par slot,
+    un seul joue à la fois)
+  · vidéos : bloc `.camera-frame` (dos de Canon `camera.webp` détouré,
+    écran mesuré en % → responsive par aspect-ratio ; renseigner le src de
+    la `<video>`, retirer `hidden`, classe `has-video` sur `.cam-screen`
+    pour couper la neige)
+  · photos : `.post-photos` avec des `.polaroid`
+  Le skin WMP « Cyberchannel » reconstruit (`js/player-cyber.js` +
+  `assets/img/cyber/`) est au placard, prêt à servir.
+- La tournée, elle, est en place : tableau des
   dates dans la DA de l'affiche (`.tour-wrap`, dates réelles de l'affiche) +
   l'affiche officielle en dessous
 - Les 7 emplacements de pub restants — le 8e est servi : `PUB_SATINE`
