@@ -257,16 +257,17 @@ img.photo-frame {
 }
 .ad-slot:last-of-type { flex: 1; }
 
-/* --- zone de contenu : damier grunge fourni par les graphistes --- */
+/* --- zone de contenu : damier grunge fourni par les graphistes.
+   mainBG.webp est un « ping-pong » pré-assemblé (l'image + son miroir
+   vertical, générés depuis masters/mainBG.png) : le repeat-y alterne donc
+   naturellement endroit/envers, le dégradé fait des allers-retours et
+   aucune couture n'est visible, quelle que soit la longueur de la page.
+   Une seule version du fond pour toutes les pages et tous les écrans. --- */
 #main-col {
   flex: 1;
   background: var(--teal-2) url('mainBG.webp') top center / 100% auto repeat-y;
   padding: 24px 26px 60px;
   position: relative;
-}
-/* la page secrète (le blog) est bien plus longue : fond dédié, plus haut */
-body[data-page="secret"] #main-col {
-  background-image: url('secretBG.webp');
 }
 
 /* ==========================================================================
@@ -3172,13 +3173,7 @@ section#art {
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
-  /* fond dédié mobile (ratio 9,7 = colonne de la home en 375px, donc sans
-     répétition). La page secrète garde secretBG : son override par
-     data-page est plus spécifique que cette règle. */
-  #main-col {
-    padding: 14px 12px 40px;
-    background-image: url('mobileBG.webp');
-  }
+  #main-col { padding: 14px 12px 40px; }
   #clippy { width: 104px; }
   #clippy .bubble { width: min(260px, calc(100vw - 40px)); font-size: 12px; }
   #cart-drawer { width: calc(100vw - 24px); right: calc(-100vw - 24px); }
