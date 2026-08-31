@@ -6,3 +6,9 @@ satine-theme.zip
 
 # dépendances locales éventuelles
 node_modules/
+
+# sources brutes (fanarts/maquettes/photos déposés) et masters lourds —
+# les versions optimisées vivent dans site/assets/
+data/
+masters/
+

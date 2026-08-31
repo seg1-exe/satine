@@ -264,6 +264,10 @@ img.photo-frame {
   padding: 24px 26px 60px;
   position: relative;
 }
+/* la page secrète (le blog) est bien plus longue : fond dédié, plus haut */
+body[data-page="secret"] #main-col {
+  background-image: url('secretBG.webp');
+}
 
 /* ==========================================================================
    TITRE / PROFIL
@@ -2161,8 +2165,21 @@ section#art {
 }
 .art-piece .cap { font-size: 12px; }
 .art-piece .cap a { color: var(--pink); font-weight: bold; }
-/* tuile vidéo : remplit la case carrée comme les images */
-.art-piece .ph video { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* tuiles image/vidéo : remplissent la case carrée. En absolu : en flux,
+   la hauteur intrinsèque de l'image étirerait l'aspect-ratio de .ph
+   (aspect-ratio n'est qu'une taille préférée, le contenu gagne) */
+.art-piece .ph { position: relative; overflow: hidden; }
+.art-piece .ph img,
+.art-piece .ph video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* pixel-art (swift) : pas de lissage */
+.art-piece .ph img.px { image-rendering: pixelated; }
 .art-piece { cursor: var(--cur-link); }
 
 /* lightbox fan-arts : clic sur une tuile → grand format (son réactivé pour
@@ -2212,6 +2229,7 @@ section#art {
   text-shadow: 1px 1px 0 #000;
 }
 #art-lightbox .lb-cap a { color: var(--pink); font-weight: bold; }
+#art-lightbox img.px { image-rendering: pixelated; }
 #art-lightbox .lb-close {
   position: absolute;
   top: -14px;
@@ -3154,7 +3172,13 @@ section#art {
 
   /* --- divers --- */
   .friends-grid { grid-template-columns: repeat(2, 1fr); }
-  #main-col { padding: 14px 12px 40px; }
+  /* fond dédié mobile (ratio 9,7 = colonne de la home en 375px, donc sans
+     répétition). La page secrète garde secretBG : son override par
+     data-page est plus spécifique que cette règle. */
+  #main-col {
+    padding: 14px 12px 40px;
+    background-image: url('mobileBG.webp');
+  }
   #clippy { width: 104px; }
   #clippy .bubble { width: min(260px, calc(100vw - 40px)); font-size: 12px; }
   #cart-drawer { width: calc(100vw - 24px); right: calc(-100vw - 24px); }

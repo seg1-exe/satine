@@ -19,10 +19,14 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
 
   var ARTIST = 'Satine';
 
-  /* playlist par défaut — à compléter au fil des maquettes */
+  /* playlist par défaut — titres = noms des fichiers d'origine */
   var TRACKS = [
-    { title: 'maquette_01', src: '' + ASSET('anomalisa.mp3') + '', art: '' + ASSET('pfp.webp') + '' },
-    { title: 'maquette_02', src: '' + ASSET('anomalisa.mp3') + '', art: '' + ASSET('pfp.webp') + '' }
+    { title: 'comment tu t\'appelles', src: '' + ASSET('comment-tu-tappelles.mp3') + '', art: '' + ASSET('pfp.webp') + '' },
+    { title: '10 étages', src: '' + ASSET('10-etages.mp3') + '', art: '' + ASSET('pfp.webp') + '' },
+    { title: 'pause V4', src: '' + ASSET('pause-v4.mp3') + '', art: '' + ASSET('pfp.webp') + '' },
+    { title: 'JAMAIS 2', src: '' + ASSET('jamais-2.mp3') + '', art: '' + ASSET('pfp.webp') + '' },
+    { title: 'dékonnecté MSTRD1', src: '' + ASSET('dekonnecte-mstrd1.mp3') + '', art: '' + ASSET('pfp.webp') + '' },
+    { title: 'sur le banc V3', src: '' + ASSET('sur-le-banc-v3.mp3') + '', art: '' + ASSET('pfp.webp') + '' }
   ];
 
   /* le player en train de jouer (pour couper les autres) */

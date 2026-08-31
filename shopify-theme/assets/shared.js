@@ -775,6 +775,7 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
         var im = document.createElement('img');
         im.src = srcImg.src;
         im.alt = srcImg.alt || '';
+        im.className = srcImg.className; /* garde .px (pixel-art) */
         box.appendChild(im);
       } else {
         var phSrc = piece.querySelector('.ph');

@@ -15,10 +15,14 @@
 
   var ARTIST = 'Satine';
 
-  /* playlist par défaut — à compléter au fil des maquettes */
+  /* playlist par défaut — titres = noms des fichiers d'origine */
   var TRACKS = [
-    { title: 'maquette_01', src: 'assets/audio/anomalisa.mp3', art: 'assets/img/pfp.webp' },
-    { title: 'maquette_02', src: 'assets/audio/anomalisa.mp3', art: 'assets/img/pfp.webp' }
+    { title: 'comment tu t\'appelles', src: 'assets/audio/maquettes/comment-tu-tappelles.mp3', art: 'assets/img/pfp.webp' },
+    { title: '10 étages', src: 'assets/audio/maquettes/10-etages.mp3', art: 'assets/img/pfp.webp' },
+    { title: 'pause V4', src: 'assets/audio/maquettes/pause-v4.mp3', art: 'assets/img/pfp.webp' },
+    { title: 'JAMAIS 2', src: 'assets/audio/maquettes/jamais-2.mp3', art: 'assets/img/pfp.webp' },
+    { title: 'dékonnecté MSTRD1', src: 'assets/audio/maquettes/dekonnecte-mstrd1.mp3', art: 'assets/img/pfp.webp' },
+    { title: 'sur le banc V3', src: 'assets/audio/maquettes/sur-le-banc-v3.mp3', art: 'assets/img/pfp.webp' }
   ];
 
   /* le player en train de jouer (pour couper les autres) */
