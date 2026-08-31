@@ -161,7 +161,7 @@ img.photo-frame {
    ========================================================================== */
 
 #navbar {
-  background: #0b2d0b url('navBG.png') no-repeat center / cover;
+  background: #0b2d0b url('navBG.webp') no-repeat center / cover;
   padding: 9px 26px;
   display: flex;
   align-items: center;
@@ -260,7 +260,7 @@ img.photo-frame {
 /* --- zone de contenu : damier grunge fourni par les graphistes --- */
 #main-col {
   flex: 1;
-  background: var(--teal-2) url('mainBG.png') top center / 100% auto repeat-y;
+  background: var(--teal-2) url('mainBG.webp') top center / 100% auto repeat-y;
   padding: 24px 26px 60px;
   position: relative;
 }
@@ -926,7 +926,7 @@ body[data-page="secret"] #main-col {
   content: "";
   position: absolute;
   inset: 0;
-  background: url('backgroundHeadSection.png') center / cover no-repeat;
+  background: url('backgroundHeadSection.webp') center / cover no-repeat;
   filter: hue-rotate(-100deg) saturate(1.05);
   z-index: 0;
 }
@@ -955,7 +955,7 @@ body[data-page="secret"] #main-col {
   content: "";
   position: absolute;
   inset: 0;
-  background: url('backgroundMainSection.png') center / cover no-repeat;
+  background: url('backgroundMainSection.webp') center / cover no-repeat;
   filter: grayscale(.8) brightness(1.1);
   opacity: .32;
   z-index: 0;
@@ -3050,7 +3050,7 @@ section#art {
   display: block;
   width: min(320px, 82vw);
   padding: 13px 10px;
-  background: #0b2d0b url('navBG.png') center / cover no-repeat;
+  background: #0b2d0b url('navBG.webp') center / cover no-repeat;
   border: 2px solid #000;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, .5);
   color: #fff;

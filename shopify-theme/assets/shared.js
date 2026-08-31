@@ -182,7 +182,7 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
         '<div class="bubble" id="clippy-bubble" hidden>' +
           '<span class="close-clippy" id="clippy-close">✕</span>' +
           '<span id="clippy-text"></span></div>' +
-        '<img src="' + ASSET('clippy-tv.png') + '" alt="Assistant TV de Satine" id="clippy-img">' +
+        '<img src="' + ASSET('clippy-tv.webp') + '" alt="Assistant TV de Satine" id="clippy-img">' +
       '</div>' +
       '<div id="modal-overlay" hidden><div class="xp-window product-modal">' +
         '<div class="xp-titlebar"><span class="xp-ico">🛍️</span>' +
