@@ -97,7 +97,7 @@
               <img class="hs-thumb" id="hs-thumb" src="{{ 'thumb-default.png' | asset_url }}" alt="">
             </div>
             <button class="hs-mini hs-eq" title="Égaliseur (décoratif, comme à l'époque)"></button>
-            <button class="hs-mini hs-pl" title="Playlist (décoratif)"></button>
+            <button class="hs-mini hs-pl" title="Clip suivant"></button>
             <button id="hs-theme" title="Plein écran"></button>
           </div>
         </section>
@@ -114,17 +114,17 @@
         <img class="tour-typo" src="{{ 'maintypo.webp' | asset_url }}" alt="European Tour — satine opening for The Living Tombstone" width="1200" height="613">
         <div class="table-scroll">
         <table class="tour-table" id="tour-table">
-          <tr><td class="d">26/08</td><td class="v">London</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108108895" target="_blank" rel="noopener">BILLETS</a></td></tr>
-          <tr><td class="d">28/08</td><td class="v">Hamburg</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108036628" target="_blank" rel="noopener">BILLETS</a></td></tr>
-          <tr><td class="d">29/08</td><td class="v">Utrecht</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr><td class="d">30/08</td><td class="v">Utrecht</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr><td class="d">01/09</td><td class="v">Cologne</td><td><a class="btn-tix" href="https://www.bandsintown.com/t/108036663" target="_blank" rel="noopener">BILLETS</a></td></tr>
-          <tr><td class="d">02/09</td><td class="v">Paris</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr><td class="d">04/09</td><td class="v">Madrid</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr><td class="d">06/09</td><td class="v">Madrid</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108052631" target="_blank" rel="noopener">BILLETS</a></td></tr>
-          <tr><td class="d">07/09</td><td class="v">Barcelona</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108036708" target="_blank" rel="noopener">BILLETS</a></td></tr>
-          <tr><td class="d">09/09</td><td class="v">Lisbon</td><td><span class="soldout">SOLD OUT</span></td></tr>
-          <tr><td class="d">11/09</td><td class="v">Luxembourg</td><td><a class="btn-tix" href="https://www.bandsintown.com/e/108036750" target="_blank" rel="noopener">BILLETS</a></td></tr>
+          <tr><td class="d">26/08</td><td class="v">London</td></tr>
+          <tr><td class="d">28/08</td><td class="v">Hamburg</td></tr>
+          <tr><td class="d">29/08</td><td class="v">Utrecht</td></tr>
+          <tr><td class="d">30/08</td><td class="v">Utrecht</td></tr>
+          <tr><td class="d">01/09</td><td class="v">Cologne</td></tr>
+          <tr><td class="d">02/09</td><td class="v">Paris</td></tr>
+          <tr><td class="d">04/09</td><td class="v">Madrid</td></tr>
+          <tr><td class="d">06/09</td><td class="v">Madrid</td></tr>
+          <tr><td class="d">07/09</td><td class="v">Barcelona</td></tr>
+          <tr><td class="d">09/09</td><td class="v">Lisbon</td></tr>
+          <tr><td class="d">11/09</td><td class="v">Luxembourg</td></tr>
         </table>
         </div>
       </div>
@@ -190,8 +190,8 @@
       <div class="art-piece extra" data-rv style="--tilt:3deg"><div class="ph"><img src="{{ 'demoon.webp' | asset_url }}" alt="Fan-art de Satine par demoon" loading="lazy"></div><p class="cap">by demoon</p></div>
       <div class="art-piece extra" data-rv style="--tilt:-2deg"><div class="ph"><img class="px" src="{{ 'swift.webp' | asset_url }}" alt="Fan-art pixel-art de Satine par swift" loading="lazy"></div><p class="cap">by swift</p></div>
       <div class="art-piece extra" data-rv style="--tilt:1deg"><div class="ph"><img src="{{ 'nemu-2.webp' | asset_url }}" alt="Deuxième fan-art de Satine par nemu" loading="lazy"></div><p class="cap">by <a href="https://www.instagram.com/nemu_etoile/" target="_blank" rel="noopener">nemu</a> (encore !!)</p></div>
-      <div class="art-piece extra" data-rv style="--tilt:-3deg"><div class="ph"><img src="{{ 'jevils.webp' | asset_url }}" alt="Fan-art de Satine" loading="lazy"></div><p class="cap">« g vaincu jevil's »</p></div>
-      <div class="art-piece extra" data-rv style="--tilt:2deg"><div class="ph"><img src="{{ 'sans-titre.webp' | asset_url }}" alt="Fan-art de Satine" loading="lazy"></div><p class="cap">sans titre</p></div>
+      <div class="art-piece extra" data-rv style="--tilt:-3deg"><div class="ph"><img src="{{ 'jevils.webp' | asset_url }}" alt="Fan-art de Satine par nemu" loading="lazy"></div><p class="cap">« g vaincu jevil's » by <a href="https://www.instagram.com/nemu_etoile/" target="_blank" rel="noopener">nemu</a></p></div>
+      <div class="art-piece extra" data-rv style="--tilt:2deg"><div class="ph"><img src="{{ 'sans-titre.webp' | asset_url }}" alt="Fan-art de Satine" loading="lazy"></div><p class="cap">by EMS</p></div>
     </div>
     <button class="btn-red see-more" data-target="art-grid" data-rv>VOIR PLUS ▼</button>
   </section>
@@ -218,10 +218,16 @@
     var hs = document.querySelector('.headspace');
     var playing = false, currentTime = 0, duration = 0;
 
-    /* --- piste rythmique : anomalisa.mp3 joué en silence, en parallèle du
-       clip (même morceau), analysé en WebAudio pour faire pomper les
-       enceintes sur les vraies basses --- */
-    var beat = new Audio('{{ 'anomalisa.mp3' | asset_url }}');
+    /* les clips du visualizer — le bouton playlist du skin passe au suivant.
+       `beat` = le même morceau en mp3, joué en silence et analysé en
+       WebAudio pour faire pomper les enceintes sur les vraies basses */
+    var CLIPS = [
+      { id: 'pLmsvejt9RU', beat: '{{ 'anomalisa.mp3' | asset_url }}' },
+      { id: 'UtLWKXKb5zY', beat: '{{ '2aliens.mp3' | asset_url }}' }
+    ];
+    var clipIdx = 0;
+
+    var beat = new Audio(CLIPS[0].beat);
     beat.preload = 'auto';
     var actx = null, analyser = null, bassData = null, bassDisp = 0;
 
@@ -337,7 +343,23 @@
       cmd('seekTo', [Math.min(duration || 1e9, currentTime + 10), true]);
     });
     document.getElementById('hs-vis').addEventListener('click', function () {
-      window.open('https://www.youtube.com/watch?v=pLmsvejt9RU', '_blank');
+      window.open('https://www.youtube.com/watch?v=' + CLIPS[clipIdx].id, '_blank');
+    });
+    /* bouton playlist du skin : clip suivant */
+    document.querySelector('.hs-pl').addEventListener('click', function () {
+      clipIdx = (clipIdx + 1) % CLIPS.length;
+      playing = false;
+      currentTime = 0;
+      duration = 0;
+      stopBeat();
+      beat.src = CLIPS[clipIdx].beat;
+      beat.load();
+      fill.style.width = '0%';
+      progress.style.setProperty('--frac', 0);
+      pauseBtn.hidden = true;
+      hs.classList.remove('playing');
+      /* recharge l'iframe ; le handshake widget repart sur son 'load' */
+      frame.src = 'https://www.youtube.com/embed/' + CLIPS[clipIdx].id + '?enablejsapi=1';
     });
     document.getElementById('hs-theme').addEventListener('click', function () {
       var v = document.querySelector('.hs-video');

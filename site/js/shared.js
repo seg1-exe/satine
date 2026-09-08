@@ -45,29 +45,82 @@
   var ADS_RIGHT = [adSlot('D1'), adSlot('D2'), adSlot('D3'), adSlot('D4')];
 
   /* Les vraies pubs prennent des emplacements AU HASARD (et distincts) à
-     chaque chargement, comme une régie qui tourne :
-     - PUB_SATINE, webp animé (le gif source de 30 Mo reste dans pubs/)
-     - l'affiche de tournée, cliquable → tableau des dates (#tournee ; depuis
-       secret.html on repasse par index.html, comme la nav) */
+     chaque chargement, comme une régie qui tourne — avec des PRIORITÉS :
+     `pin: 'top'` épingle en HAUT des rails (1er emplacement de chaque côté),
+     `pin: 'bottom'` tout en BAS (dernier emplacement d'un côté au hasard),
+     le reste se répartit au hasard sur les emplacements restants (il y a
+     plus de pubs que de places : à chaque visite, un tirage en laisse
+     au repos). Liens : `href` (ancre — depuis secret.html on repasse par
+     index.html, comme la nav) ou `modal` (fiche produit). pub-password est
+     l'énigme du code secret (César +1), elle ne mène nulle part : c'est
+     le jeu. */
   (function () {
-    var tourHref = (document.body.getAttribute('data-page') === 'secret' ? 'index.html' : '') + '#tournee';
-    var ads = [
-      '<div class="ad ad-live"><img src="assets/img/pubs/pub-satine.webp" ' +
-        'alt="Publicité SATINE" loading="lazy" decoding="async"></div>',
-      '<div class="ad ad-live"><a href="' + tourHref + '" title="Toutes les dates de la tournée">' +
-        '<img src="assets/img/pubs/pub-tour.webp" alt="European Tour — voir les dates" ' +
-        'loading="lazy" decoding="async"></a></div>'
+    var prefix = document.body.getAttribute('data-page') === 'secret' ? 'index.html' : '';
+    var ADS = [
+      { img: 'assets/img/pubs/rendu360.webp', pin: 'top', alt: 'La barrette SATINE sous toutes les coutures', modal: 'barrettes' },
+      { img: 'assets/img/pubs/pub-poster.webp', pin: 'top', alt: 'Do you love my post-internet poster ?', modal: 'poster' },
+      { img: 'assets/img/pubs/pub-satine.mp4', pin: 'bottom', alt: 'Publicité SATINE' },
+      { img: 'assets/img/pubs/pub-tour.mp4', alt: 'European Tour — voir les dates', href: prefix + '#tournee', title: 'Toutes les dates de la tournée' },
+      { img: 'assets/img/pubs/full-barette.webp', alt: 'Barrettes SATINE — call now', modal: 'barrettes' },
+      { img: 'assets/img/pubs/pub-barettes.webp', alt: 'Shop — les barrettes SATINE', modal: 'barrettes' },
+      { img: 'assets/img/pubs/satine-cat.webp', alt: 'Les barrettes SATINE, approuvées par les chats', modal: 'barrettes' },
+      { img: 'assets/img/pubs/alien-fashion.webp', alt: 'Alien fashion ? — le merch SATINE', href: prefix + '#merch', title: 'Voir le merch' },
+      { img: 'assets/img/pubs/pub-password.webp', alt: 'MF NPU EF QBTTF FTU: EFLPOOFDUF' }
     ];
-    var total = ADS_LEFT.length + ADS_RIGHT.length;
-    var slots = [];
-    while (slots.length < ads.length) {
-      var n = (Math.random() * total) | 0;
-      if (slots.indexOf(n) === -1) slots.push(n);
+
+    function adHtml(a) {
+      /* les pubs animées sont des <video> h264 : les webp animés
+         glitchaient sous le zoom fractionnaire de la page (rastérisation
+         Chromium), la vidéo est composée par le GPU et reste nette */
+      var img = /\.mp4$/.test(a.img)
+        ? '<video src="' + a.img + '" autoplay muted loop playsinline ' +
+          'preload="metadata" aria-label="' + a.alt + '"></video>'
+        : '<img src="' + a.img + '" alt="' + a.alt + '" loading="lazy" decoding="async">';
+      if (a.href) {
+        return '<div class="ad ad-live"><a href="' + a.href + '" title="' + (a.title || a.alt) + '">' + img + '</a></div>';
+      }
+      if (a.modal) {
+        return '<div class="ad ad-live"><a href="#" onclick="SatineModal.open(\'' + a.modal + '\');return false" title="Voir le produit">' + img + '</a></div>';
+      }
+      return '<div class="ad ad-live">' + img + '</div>';
     }
-    ads.forEach(function (ad, i) {
-      var n = slots[i];
-      if (n < ADS_LEFT.length) ADS_LEFT[n] = ad;
-      else ADS_RIGHT[n - ADS_LEFT.length] = ad;
+
+    function shuffle(arr) {
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = (Math.random() * (i + 1)) | 0;
+        var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+      }
+      return arr;
+    }
+
+    /* emplacements en index global : 0-3 = rail gauche, 4-7 = rail droit */
+    var L = ADS_LEFT.length;
+    function place(slot, ad) {
+      if (slot < L) ADS_LEFT[slot] = adHtml(ad);
+      else ADS_RIGHT[slot - L] = adHtml(ad);
+    }
+
+    var tops = shuffle([0, L]);                    /* haut de chaque rail */
+    var bottoms = shuffle([L - 1, L + ADS_RIGHT.length - 1]); /* bas des rails */
+    var used = [];
+
+    ADS.filter(function (a) { return a.pin === 'top'; }).forEach(function (a) {
+      var s = tops.shift();
+      if (s !== undefined) { place(s, a); used.push(s); }
+    });
+    ADS.filter(function (a) { return a.pin === 'bottom'; }).forEach(function (a) {
+      var s = bottoms.shift();
+      if (s !== undefined) { place(s, a); used.push(s); }
+    });
+
+    var free = [];
+    for (var s = 0; s < L + ADS_RIGHT.length; s++) {
+      if (used.indexOf(s) === -1) free.push(s);
+    }
+    shuffle(free);
+    shuffle(ADS.filter(function (a) { return !a.pin; })).forEach(function (a) {
+      var slot = free.shift();
+      if (slot !== undefined) place(slot, a);
     });
   })();
 
@@ -108,6 +161,17 @@
   function build() {
     var page = document.body.getAttribute('data-page') || 'home';
     var pageMain = document.getElementById('page-main');
+
+    /* pages rendues par Shopify sans notre gabarit (les /policies/… n'ont
+       pas de template dans un thème vintage) : on emballe le contenu
+       existant du <body> pour qu'il atterrisse dans la colonne centrale
+       comme n'importe quelle page */
+    if (!pageMain) {
+      pageMain = document.createElement('div');
+      pageMain.id = 'page-main';
+      while (document.body.firstChild) pageMain.appendChild(document.body.firstChild);
+      document.body.appendChild(pageMain);
+    }
 
     /* sur secret.html, les ancres doivent repasser par index.html */
     var prefix = page === 'secret' ? 'index.html' : '';
@@ -202,6 +266,48 @@
 
     document.body.insertAdjacentHTML('afterbegin', chrome);
     document.getElementById('main-col').appendChild(pageMain);
+  }
+
+  /* ------------------------------------------------- fond ping-pong
+     L'image de fond est posée UNE fois par tuile, et une tuile sur deux est
+     retournée en CSS (scaleY(-1)) : le dégradé descend puis remonte, sans
+     couture ni image retravaillée. Le nombre de tuiles suit la hauteur
+     réelle de la colonne (ResizeObserver : contenu déplié, page secrète
+     déverrouillée, resize…). */
+  function initBgTiles() {
+    var col = document.getElementById('main-col');
+    if (!col) return;
+    var host = document.createElement('div');
+    host.id = 'bg-pp';
+    host.setAttribute('aria-hidden', 'true');
+    col.insertBefore(host, col.firstChild);
+
+    var ratio = 0; /* hauteur/largeur, lu sur l'image elle-même */
+    function layout() {
+      if (!ratio) return;
+      var w = col.clientWidth, h = col.offsetHeight;
+      if (!w || !h) return;
+      var tileH = w * ratio;
+      var n = Math.max(1, Math.ceil(h / tileH));
+      if (n === host.childElementCount &&
+          Math.abs((parseFloat(host.dataset.th) || 0) - tileH) < 0.5) return;
+      host.dataset.th = tileH;
+      host.innerHTML = '';
+      for (var i = 0; i < n; i++) {
+        var t = document.createElement('div');
+        t.className = 'bg-tile' + (i % 2 ? ' flip' : '');
+        t.style.height = tileH + 'px';
+        host.appendChild(t);
+      }
+    }
+    var img = new Image();
+    img.onload = function () {
+      ratio = img.naturalHeight / img.naturalWidth;
+      layout();
+    };
+    img.src = 'assets/img/backgrouds/mainBG.webp';
+    if (window.ResizeObserver) new ResizeObserver(layout).observe(col);
+    window.addEventListener('resize', layout);
   }
 
   /* ------------------------------------------------------------ clippy */
@@ -838,6 +944,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     build();
+    initBgTiles();
     initClippy();
     initCart();
     initModal();

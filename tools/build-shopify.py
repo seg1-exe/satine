@@ -154,7 +154,7 @@ def build_layouts(mapping):
   <title>{{{{ page_title | default: shop.name }}}} ★ MySAT'S BLOG</title>
   <meta name="description" content="Le blog officiel de SATINE : chanteuse, productrice. Merch, tournée, clip et secrets.">
   {{% if template == 'page.secret' %}}<meta name="robots" content="noindex">{{% endif %}}
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+  <link rel="icon" type="image/png" href="{{{{ 'favicon-64.png' | asset_url }}}}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=VT323&family=Comic+Relief:wght@400;700&family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -197,7 +197,7 @@ def build_layouts(mapping):
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{{{ shop.name }}}} ★ entrer</title>
   <meta name="robots" content="noindex">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>">
+  <link rel="icon" type="image/png" href="{{{{ 'favicon-64.png' | asset_url }}}}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=VT323&family=Comic+Relief:wght@400;700&family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -225,7 +225,7 @@ def build_layouts(mapping):
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{ shop.name }} ★ coming soon</title>
   <meta name="robots" content="noindex">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚪</text></svg>">
+  <link rel="icon" type="image/png" href="{{{{ 'favicon-64.png' | asset_url }}}}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=VT323&family=Comic+Relief:wght@400;700&family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">

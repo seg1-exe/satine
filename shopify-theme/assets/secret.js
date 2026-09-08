@@ -13,15 +13,19 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
 (function () {
   'use strict';
 
-  var K = '=UURUNURO50TLVER'; /* indice : miroir */
+  /* indice : miroir. Deux graphies acceptées : la pub au chiffre de César
+     (+1) donne DEKONNECTE, l'ancienne piste en 3 fragments DEKONNECTEE. */
+  var KS = ['==QRUNURO50TLVER', '=UURUNURO50TLVER'];
 
   function isValid(raw) {
-    /* insensible à la casse et aux accents (Dekonnectée / DEKONNECTEE / dekonnectee…) */
+    /* insensible à la casse et aux accents (Dekonnectée / DEKONNECTE / dekonnecte…) */
     var norm = (raw || '').trim().toUpperCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       .replace(/[\s-]/g, '');
-    try { return btoa(norm) === K.split('').reverse().join(''); }
-    catch (e) { return false; }
+    try {
+      var b = btoa(norm);
+      return KS.some(function (k) { return b === k.split('').reverse().join(''); });
+    } catch (e) { return false; }
   }
 
   function unlock() {

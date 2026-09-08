@@ -236,8 +236,9 @@ img.photo-frame {
 .rail .ad { flex-shrink: 0; }
 /* les vraies pubs gardent la bordure noire du gabarit .ad, seule la hauteur
    minimum saute (c'est le visuel qui dicte la sienne) */
-.rail .ad-live { min-height: 0; }
-.rail .ad-live img { width: 100%; height: auto; display: block; }
+.rail .ad-live { min-height: 0; border: 0; } /* les visuels arrivent finis, sans cadre */
+.rail .ad-live img,
+.rail .ad-live video { width: 100%; height: auto; display: block; }
 .rail .ad-live a { display: block; }
 .rail .ad:last-of-type { flex: 1; min-height: 170px; }
 
@@ -258,17 +259,30 @@ img.photo-frame {
 .ad-slot:last-of-type { flex: 1; }
 
 /* --- zone de contenu : damier grunge fourni par les graphistes.
-   mainBG.webp est un « ping-pong » pré-assemblé (l'image + son miroir
-   vertical, générés depuis masters/mainBG.png) : le repeat-y alterne donc
-   naturellement endroit/envers, le dégradé fait des allers-retours et
-   aucune couture n'est visible, quelle que soit la longueur de la page.
-   Une seule version du fond pour toutes les pages et tous les écrans. --- */
+   Le fond « ping-pong » est fait en CSS, avec l'image TELLE QUELLE : des
+   tuiles empilées derrière le contenu (#bg-pp, construit par initBgTiles
+   dans shared.js), une sur deux retournée par scaleY(-1) — le dégradé
+   descend puis remonte, sans couture, quelle que soit la longueur de la
+   page. Une seule image pour toutes les pages et tous les écrans. --- */
 #main-col {
   flex: 1;
-  background: var(--teal-2) url('../assets/img/backgrouds/mainBG.webp') top center / 100% auto repeat-y;
+  background: var(--teal-2);
   padding: 24px 26px 60px;
   position: relative;
 }
+#bg-pp {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+#bg-pp .bg-tile {
+  background: url('../assets/img/backgrouds/mainBG.webp') top center / 100% auto no-repeat;
+}
+#bg-pp .bg-tile.flip { transform: scaleY(-1); }
+/* le contenu passe devant les tuiles (les deux sont positionnés, l'ordre
+   DOM départage) */
+#page-main { position: relative; z-index: 1; }
 
 /* ==========================================================================
    TITRE / PROFIL
@@ -2852,6 +2866,41 @@ section#art {
 }
 .foot-credit a { color: #cfe8ff; }
 .foot-credit a:hover { color: #fff; }
+
+/* ==========================================================================
+   PAGES LÉGALES SHOPIFY (/policies/…) — markup généré par Shopify
+   (.shopify-policy__*), rapatrié dans la colonne centrale par shared.js.
+   Fenêtre blanche du site, sans effet sur Vercel.
+   ========================================================================== */
+
+.shopify-policy__container {
+  max-width: 760px !important;
+  margin: 26px auto 10px !important;
+  padding: 16px 20px 20px !important;
+  background: #fff;
+  border: 2px solid #000;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, .4);
+  color: #111;
+}
+.shopify-policy__title h1 {
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px dashed #ffb3dc;
+  font-family: var(--font-alt, Helvetica, sans-serif);
+  font-weight: bold;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  color: #111;
+  text-align: left;
+}
+.shopify-policy__body {
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.shopify-policy__body a { color: var(--pink, #ff2ea6); }
+
+/* lien « retour » des gabarits de compatibilité : rose, pas jaune */
+.leo-box .inner a { color: var(--pink, #ff2ea6); }
 
 /* ==========================================================================
    BANDEAU COOKIES SHOPIFY (app embed « Confidentialité des clients »)
