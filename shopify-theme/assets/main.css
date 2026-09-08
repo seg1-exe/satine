@@ -3049,6 +3049,40 @@ section#art {
     color: rgba(0, 0, 0, .4);
     background: rgba(255, 255, 255, .3);
   }
+  /* vraies pubs intercalées (remplies par shared.js) : DEUX par
+     emplacement, côte à côte et à la MÊME hauteur — chaque visuel garde
+     ses proportions, c'est sa largeur qui s'ajuste (rangée centrée) */
+  .ad-duo {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: stretch;
+    height: min(62vw, 320px);
+    margin: 20px 0 4px;
+    /* neutralise l'habillage placeholder de .ad-inline */
+    background: none;
+    border: 0;
+    min-height: 0;
+    padding: 0;
+  }
+  .ad-duo .ad {
+    flex: 0 1 auto;
+    min-width: 0;
+    height: 100%;
+    border: 0;
+    background: none;
+    min-height: 0;
+    padding: 0;
+  }
+  .ad-duo a { display: block; height: 100%; }
+  .ad-duo img,
+  .ad-duo video {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+  }
 }
 
 /* ==========================================================================

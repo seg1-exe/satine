@@ -126,6 +126,41 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
       var slot = free.shift();
       if (slot !== undefined) place(slot, a);
     });
+
+    /* --- pubs intercalées (MOBILE : les rails n'existent pas, seuls ces
+       emplacements du flux sont visibles — cachés en desktop). Moins de
+       place, donc sélection dédiée : rendu360 + pub-poster occupent les
+       premiers emplacements (côtés au hasard), pub-password est TOUJOURS
+       présente (c'est la clé du jeu), le reste complète au hasard.
+       full-barette et pub-satine sont exclues : trop hautes. --- */
+    document.addEventListener('DOMContentLoaded', function () {
+      var slots = document.querySelectorAll('.ad-slot.ad-inline');
+      if (!slots.length) return;
+      var eligible = ADS.filter(function (a) {
+        return a.img.indexOf('full-barette') === -1 && a.img.indexOf('pub-satine') === -1;
+      });
+      var pins = shuffle(eligible.filter(function (a) { return a.pin === 'top'; }));
+      var pw = eligible.filter(function (a) { return a.img.indexOf('pub-password') !== -1; });
+      var rest = shuffle(eligible.filter(function (a) {
+        return a.pin !== 'top' && a.img.indexOf('pub-password') === -1;
+      }));
+      /* DEUX pubs par emplacement : les épinglées forment le duo du haut,
+         puis password (toujours retenue) + le reste, dans la limite des
+         places — les pubs en trop se reposent jusqu'à la prochaine visite */
+      var tail = Math.max(0, slots.length * 2 - pins.length - pw.length);
+      var picks = pins.concat(shuffle(pw.concat(rest.slice(0, tail))));
+      slots.forEach(function (slot, i) {
+        var pair = picks.slice(i * 2, i * 2 + 2);
+        if (!pair.length) { slot.remove(); return; }
+        var duo = document.createElement('div');
+        duo.className = 'ad-duo ad-inline';
+        duo.setAttribute('data-rv', '');
+        /* pas de lazy ici : en attendant de charger, l'image ferait 0px de
+           large (width:auto) et ne croiserait jamais le viewport */
+        duo.innerHTML = pair.map(adHtml).join('').replace(/loading="lazy"/g, 'loading="eager"');
+        slot.replaceWith(duo);
+      });
+    });
   })();
 
   /* `goto` : pendant que ce message est affiché, la bulle est cliquable et
