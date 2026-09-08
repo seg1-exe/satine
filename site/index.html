@@ -247,8 +247,10 @@
     <div class="art-grid collapsible" id="art-grid" style="margin-top:12px">
       <div class="art-piece art-video" data-rv style="--tilt:-2deg">
         <div class="ph">
+          <!-- pas d'autoplay : initLazyVideos (shared.js) la lance quand
+               elle approche du viewport, le poster tient l'affiche avant -->
           <video src="assets/img/fanart/shiraw-web.mp4" poster="assets/img/fanart/shiraw-poster.webp"
-                 autoplay muted loop playsinline preload="metadata"></video>
+                 muted loop playsinline preload="none"></video>
         </div>
         <p class="cap">by <a href="https://www.instagram.com/shir4w/" target="_blank" rel="noopener">Shiraw</a></p>
       </div>
@@ -295,8 +297,12 @@
     ];
     var clipIdx = 0;
 
-    var beat = new Audio(CLIPS[0].beat);
-    beat.preload = 'auto';
+    /* le src n'est posé qu'à la première lecture : même en preload
+       "metadata", WebKit télécharge tout le mp3 dès qu'il le connaît */
+    var beat = new Audio();
+    beat.preload = 'none';
+    var beatSrc = CLIPS[0].beat;
+    var beatLoaded = '';
     var actx = null, analyser = null, bassData = null, bassDisp = 0;
 
     function ensureBeatGraph() {
@@ -317,6 +323,10 @@
 
     function startBeat() {
       ensureBeatGraph();
+      if (beatLoaded !== beatSrc) {
+        beat.src = beatSrc;
+        beatLoaded = beatSrc;
+      }
       beat.play().then(function () {
         if (analyser) hs.classList.add('live');
       }).catch(function () {
@@ -420,8 +430,7 @@
       currentTime = 0;
       duration = 0;
       stopBeat();
-      beat.src = CLIPS[clipIdx].beat;
-      beat.load();
+      beatSrc = CLIPS[clipIdx].beat; /* chargé à la prochaine lecture */
       fill.style.width = '0%';
       progress.style.setProperty('--frac', 0);
       pauseBtn.hidden = true;

@@ -57,25 +57,29 @@
   (function () {
     var prefix = document.body.getAttribute('data-page') === 'secret' ? 'index.html' : '';
     var ADS = [
-      { img: 'assets/img/pubs/rendu360.webp', pin: 'top', alt: 'La barrette SATINE sous toutes les coutures', modal: 'barrettes' },
-      { img: 'assets/img/pubs/pub-poster.webp', pin: 'top', alt: 'Do you love my post-internet poster ?', modal: 'poster' },
-      { img: 'assets/img/pubs/pub-satine.mp4', pin: 'bottom', alt: 'Publicité SATINE' },
-      { img: 'assets/img/pubs/pub-tour.mp4', alt: 'European Tour — voir les dates', href: prefix + '#tournee', title: 'Toutes les dates de la tournée' },
-      { img: 'assets/img/pubs/full-barette.webp', alt: 'Barrettes SATINE — call now', modal: 'barrettes' },
-      { img: 'assets/img/pubs/pub-barettes.webp', alt: 'Shop — les barrettes SATINE', modal: 'barrettes' },
-      { img: 'assets/img/pubs/satine-cat.webp', alt: 'Les barrettes SATINE, approuvées par les chats', modal: 'barrettes' },
-      { img: 'assets/img/pubs/alien-fashion.webp', alt: 'Alien fashion ? — le merch SATINE', href: prefix + '#merch', title: 'Voir le merch' },
-      { img: 'assets/img/pubs/pub-password.webp', alt: 'MF NPU EF QBTTF FTU: EFLPOOFDUF' }
+      { img: 'assets/img/pubs/rendu360.webp', w: 480, h: 640, pin: 'top', alt: 'La barrette SATINE sous toutes les coutures', modal: 'barrettes' },
+      { img: 'assets/img/pubs/pub-poster.webp', w: 660, h: 758, pin: 'top', alt: 'Do you love my post-internet poster ?', modal: 'poster' },
+      { img: 'assets/img/pubs/pub-satine.mp4', w: 380, h: 1658, pin: 'bottom', alt: 'Publicité SATINE' },
+      { img: 'assets/img/pubs/pub-tour.mp4', w: 660, h: 990, alt: 'European Tour — voir les dates', href: prefix + '#tournee', title: 'Toutes les dates de la tournée' },
+      { img: 'assets/img/pubs/full-barette.webp', w: 660, h: 1497, alt: 'Barrettes SATINE — call now', modal: 'barrettes' },
+      { img: 'assets/img/pubs/pub-barettes.webp', w: 660, h: 880, alt: 'Shop — les barrettes SATINE', modal: 'barrettes' },
+      { img: 'assets/img/pubs/satine-cat.webp', w: 660, h: 496, alt: 'Les barrettes SATINE, approuvées par les chats', modal: 'barrettes' },
+      { img: 'assets/img/pubs/alien-fashion.webp', w: 660, h: 880, alt: 'Alien fashion ? — le merch SATINE', href: prefix + '#merch', title: 'Voir le merch' },
+      { img: 'assets/img/pubs/pub-password.webp', w: 660, h: 660, alt: 'MF NPU EF QBTTF FTU: EFLPOOFDUF' }
     ];
 
     function adHtml(a) {
       /* les pubs animées sont des <video> h264 : les webp animés
          glitchaient sous le zoom fractionnaire de la page (rastérisation
          Chromium), la vidéo est composée par le GPU et reste nette */
+      /* width/height : réserve la place AVANT chargement — sans elles la
+         page se tasse, l'IntersectionObserver croit tout visible et charge
+         les vidéos du bas pour rien */
+      var dims = a.w ? ' width="' + a.w + '" height="' + a.h + '"' : '';
       var img = /\.mp4$/.test(a.img)
-        ? '<video src="' + a.img + '" autoplay muted loop playsinline ' +
-          'preload="metadata" aria-label="' + a.alt + '"></video>'
-        : '<img src="' + a.img + '" alt="' + a.alt + '" loading="lazy" decoding="async">';
+        ? '<video src="' + a.img + '"' + dims + ' muted loop playsinline ' +
+          'preload="none" aria-label="' + a.alt + '"></video>'
+        : '<img src="' + a.img + '"' + dims + ' alt="' + a.alt + '" loading="lazy" decoding="async">';
       if (a.href) {
         return '<div class="ad ad-live"><a href="' + a.href + '" title="' + (a.title || a.alt) + '">' + img + '</a></div>';
       }
@@ -129,7 +133,7 @@
        premiers emplacements (côtés au hasard), pub-password est TOUJOURS
        présente (c'est la clé du jeu), le reste complète au hasard.
        full-barette et pub-satine sont exclues : trop hautes. --- */
-    document.addEventListener('DOMContentLoaded', function () {
+    function fillDuos() {
       var slots = document.querySelectorAll('.ad-slot.ad-inline');
       if (!slots.length) return;
       var eligible = ADS.filter(function (a) {
@@ -156,6 +160,21 @@
         duo.innerHTML = pair.map(adHtml).join('').replace(/loading="lazy"/g, 'loading="eager"');
         slot.replaceWith(duo);
       });
+      if (window.SatineLazyVideos) window.SatineLazyVideos();
+    }
+
+    /* on ne remplit les duos QUE si le viewport est mobile : en desktop ils
+       sont cachés mais leurs images/vidéos se téléchargeraient quand même
+       (display:none n'empêche pas le fetch) */
+    document.addEventListener('DOMContentLoaded', function () {
+      var mq = window.matchMedia('(max-width: 1100px)');
+      if (mq.matches) { fillDuos(); return; }
+      var onChange = function (e) {
+        if (!e.matches) return;
+        mq.removeEventListener ? mq.removeEventListener('change', onChange) : mq.removeListener(onChange);
+        fillDuos();
+      };
+      mq.addEventListener ? mq.addEventListener('change', onChange) : mq.addListener(onChange);
     });
   })();
 
@@ -302,6 +321,38 @@
     document.body.insertAdjacentHTML('afterbegin', chrome);
     document.getElementById('main-col').appendChild(pageMain);
   }
+
+  /* ------------------------------------------- vidéos à démarrage paresseux
+     Les vidéos décoratives (pubs, tuile fan-art) sont en preload="none" et
+     sans autoplay : elles ne se téléchargent et ne se lancent qu'à
+     l'approche du viewport, et se mettent en pause en le quittant.
+     Exposée en global (SatineLazyVideos) pour être rappelée quand la régie
+     ajoute des vidéos après coup (duos mobiles) ; observer deux fois le
+     même élément est sans effet. */
+  var lazyVidIO = null;
+  function initLazyVideos() {
+    var vids = document.querySelectorAll('.ad-live video, .art-piece video');
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      /* pas d'animation : on montre juste la première image */
+      vids.forEach(function (v) { v.preload = 'metadata'; });
+      return;
+    }
+    if (!('IntersectionObserver' in window)) {
+      vids.forEach(function (v) { v.play().catch(function () {}); });
+      return;
+    }
+    if (!lazyVidIO) {
+      lazyVidIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) en.target.play().catch(function () {});
+          else en.target.pause();
+        });
+      }, { rootMargin: '300px' });
+    }
+    vids.forEach(function (v) { lazyVidIO.observe(v); });
+  }
+  window.SatineLazyVideos = initLazyVideos;
 
   /* ------------------------------------------------- fond ping-pong
      L'image de fond est posée UNE fois par tuile, et une tuile sur deux est
@@ -980,6 +1031,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     build();
     initBgTiles();
+    initLazyVideos();
     initClippy();
     initCart();
     initModal();
