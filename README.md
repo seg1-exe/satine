@@ -67,7 +67,7 @@ changent d'emplacement à chaque visite, c'est normal — c'est la régie.
   git add . && git commit -m "nouvelles pubs" && git push
   ```
 - **Shopify** : Boutique en ligne → Thèmes → Ajouter un thème → Importer
-  `satine-theme.zip` (à la racine du projet), puis Publier le nouveau.
+  `satine-theme.zip` (à la racine du projet), puis Publier le nouveau et supprimer l'ancien (bien vérifier les dates d'import pour éviter un soucis).
 
 ## Specs à donner aux graphistes
 

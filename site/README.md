@@ -145,8 +145,14 @@ Il régénère `shopify-theme/` (assets à plat + transformations CSS/JS/liquid,
 correspondances dans `asset-map.json`) et `satine-theme.zip` prêt à uploader,
 et liste les assets de `site/assets/` non référencés. Les gabarits de
 compatibilité (404, product…), `config/` et `locales/` ne sont pas touchés.
-Installation : Boutique en ligne → Thèmes → Ajouter → Importer le zip, puis
-créer deux Pages de handles `entrer` et `secret` avec leurs templates.
+
+**Uploader le thème** — le zip est à la racine du repo :
+`/Users/rutabagarre/Documents/velar/satine/satine-theme.zip`
+Dans l'admin Shopify : **Boutique en ligne → Thèmes → Ajouter un thème →
+Importer un fichier zip** → choisir `satine-theme.zip` → puis **Publier**
+(⋯ sur le thème importé). À refaire après chaque régénération : Shopify ne
+se met pas à jour tout seul. À la première installation seulement : créer
+deux Pages de handles `entrer` et `secret` avec leurs templates.
 
 ### Portage Shopify de la porte
 
