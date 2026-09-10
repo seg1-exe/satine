@@ -304,10 +304,25 @@
        premier moment où les rails existent. Puis le load (polices et visuels
        chargés), et ensuite l'observateur suit la colonne centrale : elle
        grandit quand la page secrète se déverrouille, qu'un « voir plus » se
-       déplie, ou simplement quand les photos du blog arrivent. */
-    document.addEventListener('satine:ready', fillRails);
+       déplie, ou simplement quand les photos du blog arrivent.
+       Filet temporel en plus de l'observateur : un ResizeObserver est lié au
+       cycle de rendu, donc il ne tire PAS dans un onglet resté en arrière-plan
+       — la page secrète ouverte dans un second onglet gardait alors les rails
+       calibrés sur la porte verrouillée. Ces rappels-là passent par des
+       timers, qui tournent même sans peinture. fillRails est idempotent (il
+       sort tout de suite si la hauteur n'a pas bougé), ils ne coûtent rien. */
+    document.addEventListener('satine:ready', function () {
+      fillRails();
+      [400, 1200, 3000, 6000].forEach(function (ms) { setTimeout(fillRails, ms); });
+    });
     document.addEventListener('DOMContentLoaded', fillRails);
     window.addEventListener('load', fillRails);
+    /* le déverrouillage de la page secrète double la hauteur d'un coup */
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('#code-submit')) {
+        [60, 300, 900, 2000].forEach(function (ms) { setTimeout(fillRails, ms); });
+      }
+    }, true);
 
     /* --- pubs intercalées (MOBILE : les rails n'existent pas, seuls ces
        emplacements du flux sont visibles — cachés en desktop). Moins de
