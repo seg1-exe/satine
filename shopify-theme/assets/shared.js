@@ -129,17 +129,6 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
        hauteur : le dernier visuel dépasse volontairement, et `.rail`
        (overflow: hidden) le rogne — c'est ce dépassement qui garantit
        qu'aucune bande de fond ne reste visible en bas. --- */
-    /* hauteurs qu'occuperait l'énigme dans cette séquence */
-    function repeatSpots(seq, w, gap) {
-      var y = 0, out = [];
-      for (var i = 0; i < seq.length; i++) {
-        var h = adH(seq[i], w);
-        if (isRepeat(seq[i])) out.push([y, y + h]);
-        y += h + gap;
-      }
-      return out;
-    }
-
     /* [y0, y1] croise-t-il l'un des intervalles interdits ? */
     function overlaps(y0, y1, banned) {
       for (var i = 0; i < banned.length; i++) {
@@ -148,17 +137,88 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
       return false;
     }
 
-    function buildColumn(rail, target, top, bottom, quota, seen, banned) {
-      var cs = getComputedStyle(rail);
-      var gap = parseFloat(cs.rowGap || cs.gap) || 0;
-      var w = rail.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      var avail = target - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-      if (!(w > 0) || !(avail > 0)) return quota;
-
+    /* --- Une colonne se REMPLIT, elle ne se refait jamais. Chaque appel
+       ne fait qu'ajouter ce qui manque en bas : les pubs déjà posées ne
+       bougent plus et leurs <video> ne sont pas recréées. C'est ce qui
+       évite le clignotement du début — la hauteur de la page change
+       plusieurs fois pendant le chargement (polices, photos du blog,
+       déverrouillage), et reconstruire à chaque fois donnait un premier
+       tirage aussitôt remplacé par un autre. --- */
+    function extend(col, avail, banned) {
       var repeat = null;
+      ADS.forEach(function (a) { if (isRepeat(a)) repeat = a; });
+
+      var reserve = col.bottom ? adH(col.bottom, col.w) + col.gap : 0;
+      var added = [];
+
+      /* +12 : la hauteur prévue par adH() est un calcul flottant que le
+         rendu arrondit, et quelques pixels de fond réapparaissaient */
+      while (col.used + reserve < avail + 12) {
+        var prev = col.seq.length ? col.seq[col.seq.length - 1] : null;
+        var canRepeat = repeat && col.quota > 0 && !(prev && isRepeat(prev)) &&
+          !overlaps(col.used, col.used + adH(repeat, col.w), banned);
+
+        if (!col.pool.length) {
+          /* Stock épuisé. Sur une page longue (la page secrète dépliée fait
+             plus du double de l'accueil) les visuels disponibles ne couvrent
+             pas la hauteur : une colonne sans répétition plafonne vers
+             4100px. Plutôt que de laisser une bande de fond nu, on repart
+             pour un tour — en écartant les trois dernières posées, pour
+             qu'une pub ne réapparaisse jamais dans le même coup d'œil. */
+          var recent = col.seq.slice(-3).map(function (a) { return a.img; });
+          col.pool = shuffle(ADS.filter(function (a) {
+            return !isRepeat(a) && a.pin !== 'bottom' && a !== col.top &&
+                   recent.indexOf(a.img) === -1;
+          }));
+        }
+
+        /* L'énigme revient une pub sur deux tant qu'il reste du quota. Si la
+           place restante ne suffit plus à caser ce qu'il doit encore passer —
+           la règle du face-à-face lui fait sauter des tours — on cesse
+           d'attendre son rang et on la pose au premier créneau libre. */
+        var presse = canRepeat &&
+          (avail - col.used) < col.quota * (adH(repeat, col.w) + col.gap) * 3;
+        var pick = (canRepeat && (col.seq.length % 2 === 1 || presse || !col.pool.length))
+          ? repeat : col.pool.shift();
+        if (!pick) {
+          if (!canRepeat) break;
+          pick = repeat;
+        }
+        if (isRepeat(pick)) col.quota--;
+        col.seq.push(pick);
+        col.used += adH(pick, col.w) + col.gap;
+        added.push(pick);
+      }
+      return added;
+    }
+
+    /* hauteurs occupées par l'énigme dans une colonne */
+    function spotsOf(col) {
+      var y = 0, out = [];
+      for (var i = 0; i < col.seq.length; i++) {
+        var h = adH(col.seq[i], col.w);
+        if (isRepeat(col.seq[i])) out.push([y, y + h]);
+        y += h + col.gap;
+      }
+      return out;
+    }
+
+    function newColumn(rail, top, bottom, quota, seen) {
+      var cs = getComputedStyle(rail);
+      var col = {
+        rail: rail,
+        top: top,
+        bottom: bottom,
+        quota: quota,
+        seq: [],
+        used: 0,
+        gap: parseFloat(cs.rowGap || cs.gap) || 0,
+        w: rail.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),
+        padding: parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)
+      };
       var fresh = [], again = [];
       ADS.forEach(function (a) {
-        if (isRepeat(a)) { repeat = a; return; }
+        if (isRepeat(a)) return;
         /* une épinglée sert d'abord son épingle, mais rien n'interdit
            qu'elle repasse UNE fois dans l'autre colonne — sauf celle du bas,
            trop haute pour tenir ailleurs sans tout déséquilibrer */
@@ -166,88 +226,38 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
         (seen.indexOf(a.img) === -1 ? fresh : again).push(a);
       });
       /* ce que l'autre colonne n'a pas encore montré passe devant : sur les
-         deux rails réunis, chaque pub sort au moins une fois tant qu'il y a
-         la place */
-      var pool = shuffle(fresh).concat(shuffle(again));
-
-      var seq = [];
-      var used = 0;
-      var spots = [];                      /* où l'énigme est tombée dans cette colonne */
-      function push(a) {
-        var h = adH(a, w);
-        if (isRepeat(a)) spots.push([used, used + h]);
-        seq.push(a); used += h + gap; seen.push(a.img);
-      }
-
-      if (top) push(top);
-      var reserve = bottom ? adH(bottom, w) + gap : 0;
-
-      /* +12 : la hauteur prévue par adH() est un calcul flottant que le
-         rendu arrondit, et quelques pixels de fond réapparaissaient */
-      while (used + reserve < avail + 12) {
-        var prev = seq.length ? seq[seq.length - 1] : null;
-        var canRepeat = repeat && quota > 0 && !(prev && isRepeat(prev)) &&
-          !overlaps(used, used + adH(repeat, w), banned);
-        /* l'énigme revient environ toutes les 3 pubs, et prend le relais
-           dès que le tirage sans doublon est épuisé */
-        var pick = (canRepeat && (seq.length % 2 === 1 || !pool.length)) ? repeat : pool.shift();
-        if (!pick) {
-          if (canRepeat) {
-            pick = repeat;
-          } else {
-            /* Stock épuisé. Sur une page longue (la page secrète dépliée
-               fait plus du double de l'accueil) les visuels disponibles ne
-               couvrent pas la hauteur : une colonne sans répétition plafonne
-               vers 4100px. Plutôt que de laisser une bande de fond nu, on
-               repart pour un tour — en écartant les trois dernières posées,
-               pour qu'une pub ne réapparaisse jamais dans le même coup d'œil. */
-            var recent = seq.slice(-3).map(function (a) { return a.img; });
-            pool = shuffle(ADS.filter(function (a) {
-              return !isRepeat(a) && a.pin !== 'bottom' && a !== top &&
-                     recent.indexOf(a.img) === -1;
-            }));
-            pick = pool.shift();
-            if (!pick) break;
-          }
-        }
-        if (isRepeat(pick)) quota--;
-        push(pick);
-      }
-      /* Rattrapage : la règle du face-à-face peut avoir fait sauter des
-         tours. On cherche alors après coup une place qui satisfait TOUT —
-         voisins différents, et aucune énigme à la hauteur d'une énigme
-         d'en face une fois la colonne redécalée. */
-      while (quota > 0) {
-        var slots = [];
-        for (var i = 0; i <= seq.length; i++) { slots.push(i); }
-        shuffle(slots);
-        var placed = false;
-        for (var si = 0; si < slots.length; si++) {
-          var at = slots[si];
-          if (at > 0 && isRepeat(seq[at - 1])) continue;
-          if (at < seq.length && isRepeat(seq[at])) continue;
-          var test = seq.slice(0, at).concat([repeat], seq.slice(at));
-          var ok = repeatSpots(test, w, gap).every(function (sp) {
-            return !overlaps(sp[0], sp[1], banned);
-          });
-          if (!ok) continue;
-          seq = test; quota--; placed = true;
-          break;
-        }
-        if (!placed) break;
-      }
-      spots = repeatSpots(seq, w, gap);
-
-      if (bottom) seq.push(bottom);
-
-      rail.innerHTML = seq.map(adHtml).join('');
-      return { quota: quota, spots: spots };
+         deux rails réunis, chaque pub sort au moins une fois */
+      col.pool = shuffle(fresh).concat(shuffle(again));
+      if (top) { col.seq.push(top); col.used += adH(top, col.w) + col.gap; }
+      return col;
     }
 
-    /* hauteur déjà servie, pour ne pas tout retirer au sort si le `load`
-       ne change rien à la page */
-    var lastTarget = 0;
+    /* les nouvelles pubs s'insèrent AVANT l'épinglée du bas, qui reste
+       dernière — et sans toucher au HTML déjà en place */
+    function render(col, added) {
+      if (!added.length) return;
+      var html = added.map(adHtml).join('');
+      var anchor = col.rail.querySelector('.ad[data-pin="bottom"]');
+      if (anchor) anchor.insertAdjacentHTML('beforebegin', html);
+      else col.rail.insertAdjacentHTML('beforeend', html);
+    }
 
+    /* adH() prévoit les hauteurs en flottants, le rendu les arrondit :
+       sur une quinzaine de blocs l'écart cumulé laissait quelques dizaines
+       de pixels de fond en bas. On recale donc le compteur de la colonne sur
+       ce que le DOM affiche vraiment avant de décider s'il reste à combler. */
+    function recale(col) {
+      var reel = 0, k = col.rail.children;
+      for (var i = 0; i < k.length; i++) {
+        var m = k[i].querySelector('img, video');
+        reel += (m || k[i]).offsetHeight + col.gap;
+      }
+      if (col.bottom) reel -= adH(col.bottom, col.w) + col.gap;
+      col.used = reel;
+    }
+
+    var cols = null;
+    var lastTarget = 0;
     var watching = false;
 
     /* Se brancher sur la colonne centrale dès qu'elle existe. À poser ici et
@@ -278,28 +288,70 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
          première. Le `min-height: 100vh` de la grille fait le plancher. */
       var target = Math.max(center.offsetHeight, window.innerHeight);
       if (!(target > 0)) return;
-      /* rien de neuf : on garde le tirage en place plutôt que d'en refaire
-         un autre sous les yeux du visiteur */
-      if (lastTarget && Math.abs(target - lastTarget) < 40) return;
-      lastTarget = target;
+      var neuf = false;
       rails.forEach(function (r) { r.style.height = target + 'px'; });
+      /* la page a raccourci, ou n'a pas bougé : le trop-plein est rogné par
+         l'overflow du rail, il n'y a rien à ajouter */
+      if (cols && target <= lastTarget) return;
+      lastTarget = target;
 
-      var top = null, bottom = null;
-      ADS.forEach(function (a) {
-        if (a.pin === 'top') top = a;
-        if (a.pin === 'bottom') bottom = a;
+      if (!cols) {
+        var top = null, bottom = null;
+        ADS.forEach(function (a) {
+          if (a.pin === 'top') top = a;
+          if (a.pin === 'bottom') bottom = a;
+        });
+        /* l'épinglée du haut et celle du bas atterrissent chacune dans une
+           colonne tirée au sort — pas forcément la même */
+        var side = (Math.random() * 2) | 0;
+        var seen = [];
+        var half = Math.ceil(REPEAT_TOTAL / 2);
+        cols = [];
+        cols[side] = newColumn(rails[side], top, null, half, seen);
+        cols[1 - side] = newColumn(rails[1 - side], null, bottom, REPEAT_TOTAL - half, seen);
+        neuf = true;
+        /* l'épinglée du bas est posée tout de suite : elle sert d'ancre, les
+           ajouts suivants viendront s'insérer au-dessus d'elle */
+        cols.forEach(function (c) {
+          if (c.top) c.rail.insertAdjacentHTML('beforeend', adHtml(c.top));
+          if (c.bottom) c.rail.insertAdjacentHTML('beforeend', adHtml(c.bottom));
+        });
+      }
+
+      var first = cols[0], second = cols[1];
+      /* chaque colonne évite les hauteurs où l'énigme est DÉJÀ posée en face.
+         La contrainte joue dans les deux sens : les colonnes s'étendent tour
+         à tour, et une pub posée ne peut plus reculer — si seule la seconde
+         regardait la première, un ajout tardif à gauche pouvait retomber pile
+         en face d'une énigme déjà à droite. */
+      render(first, extend(first, target - first.padding, spotsOf(second)));
+
+      /* Au tout premier passage, la seconde colonne apprend ce que la
+         première vient de montrer et fait passer le reste devant : sur les
+         deux rails réunis, chaque pub sort au moins une fois. Les deux pools
+         étant tirés en même temps, sans cela ils s'ignoraient et une pub
+         pouvait n'apparaître nulle part. */
+      if (neuf) {
+        var vues = first.seq.map(function (a) { return a.img; });
+        var inedit = [], revu = [];
+        second.pool.forEach(function (a) {
+          (vues.indexOf(a.img) === -1 ? inedit : revu).push(a);
+        });
+        second.pool = shuffle(inedit).concat(shuffle(revu));
+      }
+      render(second, extend(second, target - second.padding, spotsOf(first)));
+
+      /* Le quota d'énigmes qu'une colonne n'a pas pu placer — la règle du
+         face-à-face lui a fait sauter des tours — bascule sur l'autre AVANT
+         la seconde passe : après, il serait trop tard pour ce chargement. */
+      if (first.quota > 0 && second.quota === 0) { second.quota = first.quota; first.quota = 0; }
+      else if (second.quota > 0 && first.quota === 0) { first.quota = second.quota; second.quota = 0; }
+
+      /* seconde passe, sur les hauteurs réellement rendues cette fois */
+      [first, second].forEach(function (c) {
+        recale(c);
+        render(c, extend(c, target - c.padding, spotsOf(c === first ? second : first)));
       });
-      /* l'épinglée du haut et celle du bas atterrissent chacune dans une
-         colonne tirée au sort — pas forcément la même */
-      var side = (Math.random() * 2) | 0;
-      var half = Math.ceil(REPEAT_TOTAL / 2);
-      /* la première colonne prend la moitié du quota, la seconde le reste :
-         si l'une n'a pas la place, l'autre rattrape */
-      var seen = [];
-      var first = buildColumn(rails[side], target, top, null, half, seen, []);
-      /* la seconde colonne évite les hauteurs déjà prises par l'énigme */
-      buildColumn(rails[1 - side], target, null, bottom,
-                  REPEAT_TOTAL - half + first.quota, seen, first.spots);
 
       if (window.SatineLazyVideos) window.SatineLazyVideos();
     }
@@ -313,8 +365,8 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
        cycle de rendu, donc il ne tire PAS dans un onglet resté en arrière-plan
        — la page secrète ouverte dans un second onglet gardait alors les rails
        calibrés sur la porte verrouillée. Ces rappels-là passent par des
-       timers, qui tournent même sans peinture. fillRails est idempotent (il
-       sort tout de suite si la hauteur n'a pas bougé), ils ne coûtent rien. */
+       timers, qui tournent même sans peinture. Comme le remplissage ne fait
+       qu'ajouter, ces passes sont invisibles quand il n'y a rien à ajouter. */
     document.addEventListener('satine:ready', function () {
       fillRails();
       [400, 1200, 3000, 6000].forEach(function (ms) { setTimeout(fillRails, ms); });
