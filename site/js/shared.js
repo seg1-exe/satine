@@ -28,45 +28,56 @@
     { label: 'Retours', href: '/policies/refund-policy' },
     { label: 'Livraison', href: '/policies/shipping-policy' }
   ];
-
   /* ------------------------------------------------------------------
-     PUBS placeholders. data-frag = fragment du code secret caché dedans.
-     Les visuels finaux des graphistes remplaceront le HTML de chaque slot.
-     ------------------------------------------------------------------ */
-  /* Emplacements de pubs vides en attendant les visuels des graphistes.
-     Affichage : pleine largeur du rail (~217px au layout max de 1400px).
-     Livrer les assets en ×2 (~440px de large), hauteur libre.
-     NOTE : les 3 fragments du code secret (DEKO / NNECT / ÉE) devront être
-     re-cachés dans les visuels finaux. */
-  function adSlot(n) {
-    return '<div class="ad-slot"><span>PUB ' + n + '<br>~440px de large<br>hauteur libre</span></div>';
-  }
-  var ADS_LEFT = [adSlot('G1'), adSlot('G2'), adSlot('G3'), adSlot('G4')];
-  var ADS_RIGHT = [adSlot('D1'), adSlot('D2'), adSlot('D3'), adSlot('D4')];
+     RÉGIE PUBS — les rails de gauche et de droite.
 
-  /* Les vraies pubs prennent des emplacements AU HASARD (et distincts) à
-     chaque chargement, comme une régie qui tourne — avec des PRIORITÉS :
-     `pin: 'top'` épingle en HAUT des rails (1er emplacement de chaque côté),
-     `pin: 'bottom'` tout en BAS (dernier emplacement d'un côté au hasard),
-     le reste se répartit au hasard sur les emplacements restants (il y a
-     plus de pubs que de places : à chaque visite, un tirage en laisse
-     au repos). Liens : `href` (ancre — depuis secret.html on repasse par
-     index.html, comme la nav) ou `modal` (fiche produit). pub-password est
-     l'énigme du code secret (César +1), elle ne mène nulle part : c'est
-     le jeu. */
+     Règles du remplissage (fillRails, plus bas) :
+     · les rails descendent JUSQU'EN BAS de la page, sans trou ;
+     · dans une même colonne, une pub n'apparaît qu'UNE fois — la seule
+       exception est l'énigme du code secret, qu'on veut voir passer
+       souvent (REPEAT_TOTAL occurrences réparties sur les deux rails) ;
+     · deux voisines ne sont jamais la même image.
+     La même pub peut en revanche se retrouver une fois à gauche ET une
+     fois à droite : les colonnes se tirent indépendamment.
+
+     Livrer les visuels en ×3 (~660px de large), hauteur libre.
+     ------------------------------------------------------------------ */
+  /* les rails partent vides : leur contenu dépend de la hauteur de la
+     page, qu'on ne connaît qu'une fois le DOM en place */
+  var ADS_LEFT = [];
+  var ADS_RIGHT = [];
+
+  /* PRIORITÉS : `pin: 'bottom'` épingle en bas d'un rail — une pub épinglée
+     ne sert QUE via son épingle, elle ne repasse pas dans le tirage. (Le
+     pendant `pin: 'top'` existe toujours dans le moteur, il n'est
+     simplement plus utilisé.) Le reste se répartit au hasard.
+     Liens : `href` (ancre — depuis secret.html on repasse par index.html,
+     comme la nav) ou `modal` (fiche produit). paintsatine2 est l'énigme du
+     code secret (César +1, lisible en bas de la fenêtre Paint), elle ne
+     mène nulle part : c'est le jeu. */
   (function () {
     var prefix = document.body.getAttribute('data-page') === 'secret' ? 'index.html' : '';
     var ADS = [
-      { img: 'assets/img/pubs/rendu360.webp', w: 480, h: 640, pin: 'top', alt: 'La barrette SATINE sous toutes les coutures', modal: 'barrettes' },
-      { img: 'assets/img/pubs/pub-poster.webp', w: 660, h: 758, pin: 'top', alt: 'Do you love my post-internet poster ?', modal: 'poster' },
-      { img: 'assets/img/pubs/pub-satine.mp4', w: 380, h: 1658, pin: 'bottom', alt: 'Publicité SATINE' },
-      { img: 'assets/img/pubs/pub-tour.mp4', w: 660, h: 990, alt: 'European Tour — voir les dates', href: prefix + '#tournee', title: 'Toutes les dates de la tournée' },
-      { img: 'assets/img/pubs/full-barette.webp', w: 660, h: 1497, alt: 'Barrettes SATINE — call now', modal: 'barrettes' },
-      { img: 'assets/img/pubs/pub-barettes.webp', w: 660, h: 880, alt: 'Shop — les barrettes SATINE', modal: 'barrettes' },
-      { img: 'assets/img/pubs/satine-cat.webp', w: 660, h: 496, alt: 'Les barrettes SATINE, approuvées par les chats', modal: 'barrettes' },
-      { img: 'assets/img/pubs/alien-fashion.webp', w: 660, h: 880, alt: 'Alien fashion ? — le merch SATINE', href: prefix + '#merch', title: 'Voir le merch' },
-      { img: 'assets/img/pubs/pub-password.webp', w: 660, h: 660, alt: 'MF NPU EF QBTTF FTU: EFLPOOFDUF' }
+      { img: 'assets/img/pubs/rendu360.webp', w: 480, h: 640, alt: 'La barrette SATINE sous toutes les coutures', modal: 'barrettes' },
+      { img: 'assets/img/pubs/pub-satine.mp4', poster: 'assets/img/pubs/posters/poster-pub-satine.webp', w: 380, h: 1658, pin: 'bottom', alt: 'Publicité SATINE' },
+      { img: 'assets/img/pubs/pub-tour.mp4', poster: 'assets/img/pubs/posters/poster-pub-tour.webp', w: 660, h: 990, alt: 'European Tour — voir les dates', href: prefix + '#tournee', title: 'Toutes les dates de la tournée' },
+      { img: 'assets/img/pubs/satine5.mp4', poster: 'assets/img/pubs/posters/poster-satine5.webp', w: 560, h: 752, alt: 'SHOP ! Les barrettes SATINE, édition limitée — 25€', modal: 'barrettes' },
+      { img: 'assets/img/pubs/satine-9.mp4', poster: 'assets/img/pubs/posters/poster-satine-9.webp', w: 660, h: 880, alt: 'Poster SATINE à vendre — 10€', modal: 'poster' },
+      { img: 'assets/img/pubs/pubschats.mp4', poster: 'assets/img/pubs/posters/poster-pubschats.webp', w: 660, h: 496, alt: 'Les barrettes SATINE, approuvées par les chats — 25€', modal: 'barrettes' },
+      { img: 'assets/img/pubs/satine2.mp4', poster: 'assets/img/pubs/posters/poster-satine2.webp', w: 660, h: 1496, alt: 'CALL NOW — SATINE limited edition, explore all items', href: prefix + '#merch', title: 'Voir le merch' },
+      { img: 'assets/img/pubs/satine-10.mp4', poster: 'assets/img/pubs/posters/poster-satine-10.webp', w: 660, h: 1174, alt: 'ANOMALISA — les barrettes SATINE', modal: 'barrettes' },
+      { img: 'assets/img/pubs/satine-3-2.mp4', poster: 'assets/img/pubs/posters/poster-satine-3-2.webp', w: 660, h: 1174, alt: 'satine — press PLAY', href: prefix + '#clip', title: 'Voir le clip' },
+      { img: 'assets/img/pubs/satine-windows.mp4', poster: 'assets/img/pubs/posters/poster-satine-windows.webp', w: 660, h: 772, alt: 'Poster SATINE — 10€', modal: 'poster' },
+      { img: 'assets/img/pubs/paintsatine2.mp4', poster: 'assets/img/pubs/posters/poster-paintsatine2.webp', w: 660, h: 984, alt: 'MF NPU EF QBTTF FTU: EFLPOOFDUF' }
     ];
+
+    /* l'énigme : seule pub autorisée à se répéter dans une colonne — et
+       jamais à la même hauteur que sa jumelle d'en face (deux fenêtres Paint
+       côte à côte, ça sent le copier-coller au lieu de la régie) */
+    var REPEAT_SRC = 'paintsatine2';
+    var REPEAT_TOTAL = 3;
+
+    function isRepeat(a) { return a.img.indexOf(REPEAT_SRC) !== -1; }
 
     function adHtml(a) {
       /* les pubs animées sont des <video> h264 : les webp animés
@@ -76,17 +87,27 @@
          page se tasse, l'IntersectionObserver croit tout visible et charge
          les vidéos du bas pour rien */
       var dims = a.w ? ' width="' + a.w + '" height="' + a.h + '"' : '';
+      /* poster : première image du clip, ~15 Ko. Sans lui l'emplacement
+         reste VIDE le temps que la vidéo arrive (preload="none" ne
+         télécharge rien avant que l'observateur ne lance la lecture) —
+         c'est ce trou, pas le débit, qui donnait l'impression que les pubs
+         mettaient une éternité à charger. */
+      /* Le chemin est écrit en toutes lettres dans ADS : le build Shopify
+         aplatit les assets et ne réécrit que les chaînes littérales, un
+         chemin recomposé à l'exécution ne serait pas traduit vers le CDN. */
+      var poster = a.poster ? ' poster="' + a.poster + '"' : '';
       var img = /\.mp4$/.test(a.img)
-        ? '<video src="' + a.img + '"' + dims + ' muted loop playsinline ' +
-          'preload="none" aria-label="' + a.alt + '"></video>'
+        ? '<video src="' + a.img + '"' + dims + poster + ' muted loop ' +
+          'playsinline preload="none" aria-label="' + a.alt + '"></video>'
         : '<img src="' + a.img + '"' + dims + ' alt="' + a.alt + '" loading="lazy" decoding="async">';
+      var pin = a.pin ? ' data-pin="' + a.pin + '"' : '';
       if (a.href) {
-        return '<div class="ad ad-live"><a href="' + a.href + '" title="' + (a.title || a.alt) + '">' + img + '</a></div>';
+        return '<div class="ad ad-live"' + pin + '><a href="' + a.href + '" title="' + (a.title || a.alt) + '">' + img + '</a></div>';
       }
       if (a.modal) {
-        return '<div class="ad ad-live"><a href="#" onclick="SatineModal.open(\'' + a.modal + '\');return false" title="Voir le produit">' + img + '</a></div>';
+        return '<div class="ad ad-live"' + pin + '><a href="#" onclick="SatineModal.open(\'' + a.modal + '\');return false" title="Voir le produit">' + img + '</a></div>';
       }
-      return '<div class="ad ad-live">' + img + '</div>';
+      return '<div class="ad ad-live"' + pin + '>' + img + '</div>';
     }
 
     function shuffle(arr) {
@@ -97,58 +118,226 @@
       return arr;
     }
 
-    /* emplacements en index global : 0-3 = rail gauche, 4-7 = rail droit */
-    var L = ADS_LEFT.length;
-    function place(slot, ad) {
-      if (slot < L) ADS_LEFT[slot] = adHtml(ad);
-      else ADS_RIGHT[slot - L] = adHtml(ad);
+    /* hauteur qu'occupera la pub dans une colonne large de `w` px */
+    function adH(a, w) { return a.w ? w * a.h / a.w : 200; }
+
+    /* --- Remplissage d'UNE colonne. On empile jusqu'à couvrir toute la
+       hauteur : le dernier visuel dépasse volontairement, et `.rail`
+       (overflow: hidden) le rogne — c'est ce dépassement qui garantit
+       qu'aucune bande de fond ne reste visible en bas. --- */
+    /* hauteurs qu'occuperait l'énigme dans cette séquence */
+    function repeatSpots(seq, w, gap) {
+      var y = 0, out = [];
+      for (var i = 0; i < seq.length; i++) {
+        var h = adH(seq[i], w);
+        if (isRepeat(seq[i])) out.push([y, y + h]);
+        y += h + gap;
+      }
+      return out;
     }
 
-    var tops = shuffle([0, L]);                    /* haut de chaque rail */
-    var bottoms = shuffle([L - 1, L + ADS_RIGHT.length - 1]); /* bas des rails */
-    var used = [];
-
-    ADS.filter(function (a) { return a.pin === 'top'; }).forEach(function (a) {
-      var s = tops.shift();
-      if (s !== undefined) { place(s, a); used.push(s); }
-    });
-    ADS.filter(function (a) { return a.pin === 'bottom'; }).forEach(function (a) {
-      var s = bottoms.shift();
-      if (s !== undefined) { place(s, a); used.push(s); }
-    });
-
-    var free = [];
-    for (var s = 0; s < L + ADS_RIGHT.length; s++) {
-      if (used.indexOf(s) === -1) free.push(s);
+    /* [y0, y1] croise-t-il l'un des intervalles interdits ? */
+    function overlaps(y0, y1, banned) {
+      for (var i = 0; i < banned.length; i++) {
+        if (y0 < banned[i][1] && y1 > banned[i][0]) return true;
+      }
+      return false;
     }
-    shuffle(free);
-    shuffle(ADS.filter(function (a) { return !a.pin; })).forEach(function (a) {
-      var slot = free.shift();
-      if (slot !== undefined) place(slot, a);
-    });
+
+    function buildColumn(rail, target, top, bottom, quota, seen, banned) {
+      var cs = getComputedStyle(rail);
+      var gap = parseFloat(cs.rowGap || cs.gap) || 0;
+      var w = rail.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var avail = target - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      if (!(w > 0) || !(avail > 0)) return quota;
+
+      var repeat = null;
+      var fresh = [], again = [];
+      ADS.forEach(function (a) {
+        if (isRepeat(a)) { repeat = a; return; }
+        /* une épinglée sert d'abord son épingle, mais rien n'interdit
+           qu'elle repasse UNE fois dans l'autre colonne — sauf celle du bas,
+           trop haute pour tenir ailleurs sans tout déséquilibrer */
+        if (a.pin === 'bottom' || a === top) return;
+        (seen.indexOf(a.img) === -1 ? fresh : again).push(a);
+      });
+      /* ce que l'autre colonne n'a pas encore montré passe devant : sur les
+         deux rails réunis, chaque pub sort au moins une fois tant qu'il y a
+         la place */
+      var pool = shuffle(fresh).concat(shuffle(again));
+
+      var seq = [];
+      var used = 0;
+      var spots = [];                      /* où l'énigme est tombée dans cette colonne */
+      function push(a) {
+        var h = adH(a, w);
+        if (isRepeat(a)) spots.push([used, used + h]);
+        seq.push(a); used += h + gap; seen.push(a.img);
+      }
+
+      if (top) push(top);
+      var reserve = bottom ? adH(bottom, w) + gap : 0;
+
+      /* +12 : la hauteur prévue par adH() est un calcul flottant que le
+         rendu arrondit, et quelques pixels de fond réapparaissaient */
+      while (used + reserve < avail + 12) {
+        var prev = seq.length ? seq[seq.length - 1] : null;
+        var canRepeat = repeat && quota > 0 && !(prev && isRepeat(prev)) &&
+          !overlaps(used, used + adH(repeat, w), banned);
+        /* l'énigme revient environ toutes les 3 pubs, et prend le relais
+           dès que le tirage sans doublon est épuisé */
+        var pick = (canRepeat && (seq.length % 2 === 1 || !pool.length)) ? repeat : pool.shift();
+        if (!pick) {
+          if (canRepeat) {
+            pick = repeat;
+          } else {
+            /* Stock épuisé. Sur une page longue (la page secrète dépliée
+               fait plus du double de l'accueil) les visuels disponibles ne
+               couvrent pas la hauteur : une colonne sans répétition plafonne
+               vers 4100px. Plutôt que de laisser une bande de fond nu, on
+               repart pour un tour — en écartant les trois dernières posées,
+               pour qu'une pub ne réapparaisse jamais dans le même coup d'œil. */
+            var recent = seq.slice(-3).map(function (a) { return a.img; });
+            pool = shuffle(ADS.filter(function (a) {
+              return !isRepeat(a) && a.pin !== 'bottom' && a !== top &&
+                     recent.indexOf(a.img) === -1;
+            }));
+            pick = pool.shift();
+            if (!pick) break;
+          }
+        }
+        if (isRepeat(pick)) quota--;
+        push(pick);
+      }
+      /* Rattrapage : la règle du face-à-face peut avoir fait sauter des
+         tours. On cherche alors après coup une place qui satisfait TOUT —
+         voisins différents, et aucune énigme à la hauteur d'une énigme
+         d'en face une fois la colonne redécalée. */
+      while (quota > 0) {
+        var slots = [];
+        for (var i = 0; i <= seq.length; i++) { slots.push(i); }
+        shuffle(slots);
+        var placed = false;
+        for (var si = 0; si < slots.length; si++) {
+          var at = slots[si];
+          if (at > 0 && isRepeat(seq[at - 1])) continue;
+          if (at < seq.length && isRepeat(seq[at])) continue;
+          var test = seq.slice(0, at).concat([repeat], seq.slice(at));
+          var ok = repeatSpots(test, w, gap).every(function (sp) {
+            return !overlaps(sp[0], sp[1], banned);
+          });
+          if (!ok) continue;
+          seq = test; quota--; placed = true;
+          break;
+        }
+        if (!placed) break;
+      }
+      spots = repeatSpots(seq, w, gap);
+
+      if (bottom) seq.push(bottom);
+
+      rail.innerHTML = seq.map(adHtml).join('');
+      return { quota: quota, spots: spots };
+    }
+
+    /* hauteur déjà servie, pour ne pas tout retirer au sort si le `load`
+       ne change rien à la page */
+    var lastTarget = 0;
+
+    var watching = false;
+
+    /* Se brancher sur la colonne centrale dès qu'elle existe. À poser ici et
+       pas sur DOMContentLoaded : le chrome (#layout, #center-col) est injecté
+       par un écouteur DOMContentLoaded enregistré APRÈS celui-ci, donc au
+       premier passage la colonne n'existe pas encore. */
+    function watchCenter(center) {
+      if (watching || !('ResizeObserver' in window)) return;
+      watching = true;
+      var t = null;
+      new ResizeObserver(function () {
+        clearTimeout(t);
+        t = setTimeout(fillRails, 250);
+      }).observe(center);
+    }
+
+    function fillRails() {
+      if (window.matchMedia('(max-width: 1100px)').matches) return;
+      var rails = [document.getElementById('rail-left'), document.getElementById('rail-right')];
+      var center = document.getElementById('center-col');
+      if (!rails[0] || !rails[1] || !center) return;
+      watchCenter(center);
+
+      /* On mesure la COLONNE CENTRALE, jamais les rails : #layout est une
+         grille `align-items: stretch`, donc un rail plein s'auto-allonge
+         (son contenu pousse la grille, qui repousse le rail…) et la seconde
+         colonne se retrouvait calibrée sur une page déjà agrandie par la
+         première. Le `min-height: 100vh` de la grille fait le plancher. */
+      var target = Math.max(center.offsetHeight, window.innerHeight);
+      if (!(target > 0)) return;
+      /* rien de neuf : on garde le tirage en place plutôt que d'en refaire
+         un autre sous les yeux du visiteur */
+      if (lastTarget && Math.abs(target - lastTarget) < 40) return;
+      lastTarget = target;
+      rails.forEach(function (r) { r.style.height = target + 'px'; });
+
+      var top = null, bottom = null;
+      ADS.forEach(function (a) {
+        if (a.pin === 'top') top = a;
+        if (a.pin === 'bottom') bottom = a;
+      });
+      /* l'épinglée du haut et celle du bas atterrissent chacune dans une
+         colonne tirée au sort — pas forcément la même */
+      var side = (Math.random() * 2) | 0;
+      var half = Math.ceil(REPEAT_TOTAL / 2);
+      /* la première colonne prend la moitié du quota, la seconde le reste :
+         si l'une n'a pas la place, l'autre rattrape */
+      var seen = [];
+      var first = buildColumn(rails[side], target, top, null, half, seen, []);
+      /* la seconde colonne évite les hauteurs déjà prises par l'énigme */
+      buildColumn(rails[1 - side], target, null, bottom,
+                  REPEAT_TOTAL - half + first.quota, seen, first.spots);
+
+      if (window.SatineLazyVideos) window.SatineLazyVideos();
+    }
+
+    /* `satine:ready` est émis une fois le chrome construit — c'est le
+       premier moment où les rails existent. Puis le load (polices et visuels
+       chargés), et ensuite l'observateur suit la colonne centrale : elle
+       grandit quand la page secrète se déverrouille, qu'un « voir plus » se
+       déplie, ou simplement quand les photos du blog arrivent. */
+    document.addEventListener('satine:ready', fillRails);
+    document.addEventListener('DOMContentLoaded', fillRails);
+    window.addEventListener('load', fillRails);
 
     /* --- pubs intercalées (MOBILE : les rails n'existent pas, seuls ces
        emplacements du flux sont visibles — cachés en desktop). Moins de
-       place, donc sélection dédiée : rendu360 + pub-poster occupent les
-       premiers emplacements (côtés au hasard), pub-password est TOUJOURS
-       présente (c'est la clé du jeu), le reste complète au hasard.
-       full-barette et pub-satine sont exclues : trop hautes. --- */
+       place, donc sélection dédiée : une éventuelle épinglée du haut ouvre
+       le bal, paintsatine2 est TOUJOURS présente (elle porte l'énigme du
+       code secret, c'est la clé du jeu), le reste complète au hasard.
+       satine2 et pub-satine sont exclues : trop hautes. --- */
     function fillDuos() {
       var slots = document.querySelectorAll('.ad-slot.ad-inline');
       if (!slots.length) return;
       var eligible = ADS.filter(function (a) {
-        return a.img.indexOf('full-barette') === -1 && a.img.indexOf('pub-satine') === -1;
+        /* le slash est indispensable : 'satine2.mp4' est aussi une
+           sous-chaîne de 'paintsatine2.mp4', qui doit rester sur mobile */
+        return a.img.indexOf('/satine2.mp4') === -1 && a.img.indexOf('pub-satine') === -1;
       });
-      var pins = shuffle(eligible.filter(function (a) { return a.pin === 'top'; }));
-      var pw = eligible.filter(function (a) { return a.img.indexOf('pub-password') !== -1; });
-      var rest = shuffle(eligible.filter(function (a) {
-        return a.pin !== 'top' && a.img.indexOf('pub-password') === -1;
-      }));
-      /* DEUX pubs par emplacement : les épinglées forment le duo du haut,
-         puis password (toujours retenue) + le reste, dans la limite des
-         places — les pubs en trop se reposent jusqu'à la prochaine visite */
-      var tail = Math.max(0, slots.length * 2 - pins.length - pw.length);
-      var picks = pins.concat(shuffle(pw.concat(rest.slice(0, tail))));
+      /* GARANTIES mobile — il n'y a que six places, un tirage malchanceux
+         pouvait n'afficher que des ancres : on impose l'énigme (la clé du
+         jeu), au moins une fiche poster et au moins une fiche barrettes.
+         Le reste complète au hasard, les pubs en trop se reposent jusqu'à
+         la prochaine visite. */
+      function one(list) { return list.length ? shuffle(list.slice())[0] : null; }
+      var must = [];
+      [one(eligible.filter(isRepeat)),
+       one(eligible.filter(function (a) { return a.modal === 'poster'; })),
+       one(eligible.filter(function (a) { return a.modal === 'barrettes'; }))
+      ].forEach(function (a) { if (a && must.indexOf(a) === -1) must.push(a); });
+
+      var rest = shuffle(eligible.filter(function (a) { return must.indexOf(a) === -1; }));
+      /* DEUX pubs par emplacement */
+      var picks = shuffle(must).concat(rest).slice(0, slots.length * 2);
       slots.forEach(function (slot, i) {
         var pair = picks.slice(i * 2, i * 2 + 2);
         if (!pair.length) { slot.remove(); return; }
@@ -348,7 +537,9 @@
           if (en.isIntersecting) en.target.play().catch(function () {});
           else en.target.pause();
         });
-      }, { rootMargin: '300px' });
+        /* large marge : à 300px (moins d'un demi-écran) la vidéo ne
+           commençait à charger qu'une fois quasiment à l'écran */
+      }, { rootMargin: '1200px' });
     }
     vids.forEach(function (v) { lazyVidIO.observe(v); });
   }

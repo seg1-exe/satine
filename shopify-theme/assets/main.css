@@ -218,11 +218,17 @@ img.photo-frame {
   gap: 12px;
   padding: 10px 8px;
   background: #0a0a0a;
+  /* le remplissage empile jusqu'à dépasser la hauteur du rail : ce
+     dépassement est ce qui garantit qu'aucune bande de fond ne reste
+     visible en bas, et c'est ici qu'on le rogne. Effet de bord utile :
+     un flex item en overflow hidden n'allonge plus la page. */
+  overflow: hidden;
 }
 /* fonds FIXES (ancrés au viewport) : les pubs scrollent par-dessus.
-   Taille = hauteur du viewport, et décalage horizontal pour amener les
-   personnages (Steve à ~27% de son image, Miku à ~75% de la sienne)
-   dans la tranche visible de chaque colonne. */
+   Taille = hauteur du viewport, et décalage horizontal pour cadrer la
+   tranche visible de chaque colonne (les décalages datent des versions
+   avec personnages — Steve à ~27%, Miku à ~75% —, ils ne servent plus
+   qu'au cadrage du paysage). */
 #rail-left {
   background: #0a0a0a url('bgLeft.webp') no-repeat fixed;
   background-size: auto 100%;
@@ -240,7 +246,8 @@ img.photo-frame {
 .rail .ad-live img,
 .rail .ad-live video { width: 100%; height: auto; display: block; }
 .rail .ad-live a { display: block; }
-.rail .ad:last-of-type { flex: 1; min-height: 170px; }
+/* plus d'étirement du dernier bloc : le rail est plein par construction,
+   `flex: 1` ne ferait qu'ajouter du vide sous le visuel */
 
 /* emplacements de pub vides (les visuels des graphistes prendront la place) */
 .ad-slot {
@@ -2823,7 +2830,12 @@ section#art {
   transition: transform .15s;
 }
 .polaroid:hover { transform: rotate(0) scale(1.03); }
-.polaroid img { width: 100%; display: block; background: #eee; }
+/* height: auto indispensable depuis que les <img> portent leurs width et
+   height : sans lui la hauteur intrinsèque (jusqu'à 1200px) écraserait le
+   ratio. Ces attributs réservent la place avant chargement — sans eux la
+   page s'allongeait au fil des photos et les rails, déjà dimensionnés,
+   s'arrêtaient à mi-chemin. */
+.polaroid img { width: 100%; height: auto; display: block; background: #eee; }
 .polaroid figcaption {
   padding-top: 6px;
   text-align: center;
