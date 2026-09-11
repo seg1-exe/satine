@@ -545,7 +545,11 @@
         '<div class="cart-actions">' +
           '<div class="cart-total" id="cart-total"></div>' +
           '<button class="btn-red" id="cart-checkout">COMMANDER ♡</button>' +
-          '<p class="note">checkout Shopify branché en phase 2 : pour l’instant c’est du décor !</p>' +
+          /* Sur la boutique, COMMANDER part vraiment au paiement : aucune
+             note. Ailleurs (Render, fichier local) le panier est une
+             démonstration, et il vaut mieux le dire que laisser croire à un
+             achat possible — le texte est posé par initCart(). */
+          '<p class="note" id="cart-note" hidden></p>' +
         '</div>' +
       '</div></div>' +
       '<div id="clippy">' +
@@ -1036,6 +1040,11 @@
   function initCart() {
     renderCart();
     initPrices();
+    var note = document.getElementById('cart-note');
+    if (note && !LIVE) {
+      note.textContent = 'version de démonstration : le paiement se fait sur la boutique';
+      note.hidden = false;
+    }
     document.getElementById('cart-fab').addEventListener('click', function () {
       document.getElementById('cart-drawer').classList.toggle('open');
     });
