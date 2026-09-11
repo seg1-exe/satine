@@ -70,6 +70,46 @@
     })();
   </script>
   {% endunless %}{% endif %}
+  <script>
+    /* LA BOUTIQUE, lue dans Shopify au rendu — titres, prix, variantes et
+       disponibilité. shared.js s'en sert s'il la trouve, et retombe sur ses
+       valeurs de démonstration sinon (c'est ce qui permet au site statique
+       de continuer à tourner hors Shopify).
+       `| json` fait tout l'échappement : ne jamais concaténer à la main une
+       chaîne venant du back-office, une apostrophe dans un titre suffirait
+       à casser le script. */
+    {%- assign slot_ids = 'barrettes,poster' | split: ',' -%}
+    {%- assign slot_handles = 'pack-3-barrettes,poster-anomalisa' | split: ',' -%}
+    window.SATINE_SHOP = { products: {
+    {%- assign sep = '' -%}
+    {%- for h in slot_handles -%}
+      {%- assign p = all_products[h] -%}
+      {%- if p.id -%}
+        {{ sep }}{{ slot_ids[forloop.index0] | json }}: {
+          "handle": {{ p.handle | json }},
+          "title": {{ p.title | json }},
+          "description": {{ p.description | strip_html | strip | json }},
+          "available": {{ p.available | json }},
+          "variants": [
+          {%- assign vsep = '' -%}
+          {%- for v in p.variants -%}
+            {{ vsep }}{
+              "id": {{ v.id }},
+              "title": {{ v.title | json }},
+              "price": {{ v.price }},
+              "available": {{ v.available | json }}
+            }
+            {%- assign vsep = ',' -%}
+          {%- endfor -%}
+          ]
+        }
+        {%- assign sep = ',' -%}
+      {%- endif -%}
+    {%- endfor -%}
+    } };
+    /* le panier courant, pour que le tiroir soit juste dès le premier paint */
+    window.SATINE_CART = {{ cart | json }};
+  </script>
   <script src="{{ 'shared.js' | asset_url }}" defer></script>
   <script src="{{ 'intro.js' | asset_url }}" defer></script>
   {% if template == 'page.secret' %}

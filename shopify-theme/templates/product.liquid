@@ -1,9 +1,23 @@
-{% comment %} gabarit de compatibilité — le site est un one-pager, tout vit sur la home {% endcomment %}
-<div id="page-main">
-  <div class="leo-box" style="margin-top:40px">
-    <div class="inner">
-      <p style="font-size:18px"><b>{{ product.title }} — la boutique arrive bientôt !!</b></p>
-      <p style="margin-top:10px"><a href="/">← retour sur MySAT'S BLOG</a></p>
-    </div>
-  </div>
-</div>
+{% layout none %}<!doctype html>
+{% comment %}
+  Le site est un one-pager : le merch se voit et s'achète depuis la home,
+  dans la fenêtre bento et son tiroir. Les URL natives de Shopify
+  (/products/…, /collections/…, /cart, /search) ne doivent donc jamais
+  s'afficher — elles montreraient une page nue, hors DA, avec les produits
+  présentés autrement que voulu.
+
+  On renvoie sur la home. `layout none` évite de charger tout le chrome du
+  thème pour une page qu'on quitte aussitôt, et le meta refresh prend le
+  relais si le visiteur n'exécute pas de JS. Le noindex évite que ces URL
+  remontent dans Google et court-circuitent l'entrée du site.
+{% endcomment %}
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="refresh" content="0; url=/">
+  <title>{{ shop.name }}</title>
+  <script>location.replace('/');</script>
+</head>
+<body style="background:#000"><a href="/" style="color:#fff">← MySAT'S BLOG</a></body>
+</html>

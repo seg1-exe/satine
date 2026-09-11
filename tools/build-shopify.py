@@ -43,6 +43,68 @@ JS_FILES = ['js/shared.js', 'js/intro.js', 'js/secret.js', 'js/player-cd.js']
 
 ASSET_RE = re.compile(r"assets/[A-Za-z0-9_\-./]+?\.[A-Za-z0-9]+")
 
+# ---------------------------------------------------------------- boutique
+# Correspondance entre les emplacements du site (les clés de CATALOG dans
+# shared.js, aussi utilisées par les pubs via `modal: '…'`) et les HANDLES
+# des produits dans Shopify. Le handle est ce qu'on lit dans l'URL du
+# produit côté admin, ou dans « Modifier le référencement ».
+#
+# C'est la SEULE chose à changer ici quand un produit est renommé ou
+# remplacé : le reste (titre, prix, variantes, disponibilité) est lu dans
+# Shopify au moment du rendu, plus rien n'est écrit en dur.
+#
+# Si un handle ne correspond à aucun produit, l'emplacement retombe sur les
+# valeurs de démonstration de shared.js au lieu de casser la page.
+SHOP_SLOTS = [
+    ('barrettes', 'pack-3-barrettes'),
+    ('poster', 'poster-anomalisa'),
+]
+
+
+def shop_payload():
+    """Le <script> qui expose la boutique au JS du site.
+
+    Émis en Liquid : Shopify le rend à chaque requête, donc un changement de
+    prix ou une rupture de stock dans l'admin est répercuté sans régénérer le
+    thème. Les virgules du JSON sont gérées par un drapeau plutôt que par
+    `forloop.last` : un handle introuvable est sauté, et `last` produirait
+    alors une virgule orpheline qui casserait tout le script."""
+    ids = ','.join(k for k, _ in SHOP_SLOTS)
+    handles = ','.join(h for _, h in SHOP_SLOTS)
+    return """    {%- assign slot_ids = '""" + ids + """' | split: ',' -%}
+    {%- assign slot_handles = '""" + handles + """' | split: ',' -%}
+    window.SATINE_SHOP = { products: {
+    {%- assign sep = '' -%}
+    {%- for h in slot_handles -%}
+      {%- assign p = all_products[h] -%}
+      {%- if p.id -%}
+        {{ sep }}{{ slot_ids[forloop.index0] | json }}: {
+          "handle": {{ p.handle | json }},
+          "title": {{ p.title | json }},
+          "description": {{ p.description | strip_html | strip | json }},
+          "available": {{ p.available | json }},
+          "variants": [
+          {%- assign vsep = '' -%}
+          {%- for v in p.variants -%}
+            {{ vsep }}{
+              "id": {{ v.id }},
+              "title": {{ v.title | json }},
+              "price": {{ v.price }},
+              "available": {{ v.available | json }}
+            }
+            {%- assign vsep = ',' -%}
+          {%- endfor -%}
+          ]
+        }
+        {%- assign sep = ',' -%}
+      {%- endif -%}
+    {%- endfor -%}
+    } };
+    /* le panier courant, pour que le tiroir soit juste dès le premier paint */
+    window.SATINE_CART = {{ cart | json }};"""
+
+
+
 # liens internes site → Shopify (ordre important : *.html avant les ancres)
 LINKS = [
     ('secret.html', '/pages/secret'),
@@ -174,6 +236,16 @@ def build_layouts(mapping):
 {gate}
   </script>
   {{% endunless %}}{{% endif %}}
+  <script>
+    /* LA BOUTIQUE, lue dans Shopify au rendu — titres, prix, variantes et
+       disponibilité. shared.js s'en sert s'il la trouve, et retombe sur ses
+       valeurs de démonstration sinon (c'est ce qui permet au site statique
+       de continuer à tourner hors Shopify).
+       `| json` fait tout l'échappement : ne jamais concaténer à la main une
+       chaîne venant du back-office, une apostrophe dans un titre suffirait
+       à casser le script. */
+{shop_payload()}
+  </script>
   <script src="{{{{ 'shared.js' | asset_url }}}}" defer></script>
   <script src="{{{{ 'intro.js' | asset_url }}}}" defer></script>
   {{% if template == 'page.secret' %}}

@@ -1698,6 +1698,24 @@ section { margin-top: 30px; }
 }
 .product-modal h3 { font-size: 19px; flex-shrink: 0; }
 .product-modal p { font-size: 13px; color: #444; flex-shrink: 1; min-height: 2.6em; overflow-y: auto; }
+/* sélecteur de déclinaison — n'apparaît que sur les produits qui en ont
+   plusieurs dans Shopify (voir renderVariants dans shared.js) */
+.variant-row {
+  display: block;
+  margin: 10px 0 4px;
+  font-family: var(--font-ui, inherit);
+  font-size: 14px;
+}
+.variant-row select {
+  font: inherit;
+  margin-left: 6px;
+  padding: 3px 6px;
+  border: 2px inset #dfdfdf;
+  background: #fff;
+  cursor: var(--cur-link, pointer);
+}
+.variant-row select option:disabled { color: #999; }
+
 .modal-buy-row { flex-shrink: 0; }
 
 .modal-buy-row {

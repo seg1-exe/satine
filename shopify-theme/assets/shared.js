@@ -566,6 +566,8 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
           '<div id="modal-visual"></div>' +
           '<h3 id="modal-name"></h3>' +
           '<p id="modal-desc"></p>' +
+          /* rempli seulement si le produit a plusieurs déclinaisons */
+          '<div id="modal-variants" hidden></div>' +
           '<div class="modal-buy-row">' +
             '<div class="qty-row">' +
               '<button id="qty-minus" title="Moins">−</button>' +
@@ -743,45 +745,200 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
     }
   };
 
-  function getCart() {
+  /* ==================================================================
+     LA BOUTIQUE — deux modes, une seule interface.
+
+     · SUR SHOPIFY : `window.SATINE_SHOP` est posé par theme.liquid avec les
+       vrais produits (titre, prix, variantes, stock), et le panier passe par
+       l'API AJAX native (/cart/add.js, /cart/change.js, /cart.js). Le
+       checkout est celui de Shopify.
+     · AILLEURS (Render, Vercel, fichier local) : rien de tout ça n'existe,
+       on retombe sur le CATALOG ci-dessus et un panier localStorage. C'est
+       ce qui permet de continuer à travailler la DA du site sans boutique
+       sous la main — le bouton COMMANDER y reste du décor, et le dit.
+
+     Le reste du code (modale, tiroir) ne connaît que `product()`, `addToCart()`
+     et `cartLines()` : il ignore lequel des deux modes tourne.
+     ================================================================== */
+
+  var SHOP = (window.SATINE_SHOP && window.SATINE_SHOP.products) || null;
+  var LIVE = !!SHOP;
+  /* le panier Shopify, tel que renvoyé par /cart.js — pré-rempli par le
+     layout pour que le tiroir soit juste dès le premier paint */
+  var liveCart = (LIVE && window.SATINE_CART) || { items: [], total_price: 0, item_count: 0 };
+
+  function money(cents) {
+    /* les prix Shopify sont en centimes ; ceux du CATALOG de démo en euros */
+    var n = cents / 100;
+    return (n % 1 === 0 ? n : n.toFixed(2)) + '€';
+  }
+
+  /* la déclinaison retenue pour un produit : celle choisie dans la modale,
+     sinon la première disponible, sinon la première tout court */
+  var chosenVariant = {};
+
+  function variantOf(live, id) {
+    if (!live || !live.variants || !live.variants.length) return null;
+    var want = chosenVariant[id];
+    for (var i = 0; i < live.variants.length; i++) {
+      if (want && live.variants[i].id === want) return live.variants[i];
+    }
+    for (var j = 0; j < live.variants.length; j++) {
+      if (live.variants[j].available) return live.variants[j];
+    }
+    return live.variants[0];
+  }
+
+  /* Vue unifiée d'un produit. Les VISUELS restent ceux du site : ils sont
+     dessinés pour la fenêtre bento, les photos de catalogue Shopify
+     casseraient la DA. Tout le reste vient de la boutique quand elle est là. */
+  function product(id) {
+    var base = CATALOG[id];
+    var live = SHOP && SHOP[id];
+    if (!base && !live) return null;
+    var v = variantOf(live, id);
+    return {
+      id: id,
+      name: live ? live.title : base.name,
+      desc: (live && live.description) || (base && base.desc) || '',
+      visual: base ? base.visual : '',
+      price: v ? v.price / 100 : (base ? base.price : 0),
+      priceLabel: v ? money(v.price) : ((base ? base.price : 0) + '€'),
+      available: live ? live.available : true,
+      variants: (live && live.variants) || [],
+      variantId: v ? v.id : null
+    };
+  }
+
+  /* ------------------------------------------------------------ panier */
+
+  function demoCart() {
     try { return JSON.parse(localStorage.getItem('satine_cart')) || {}; }
     catch (e) { return {}; }
   }
-  function setCart(c) {
-    localStorage.setItem('satine_cart', JSON.stringify(c));
+  function saveDemoCart(c) {
+    try { localStorage.setItem('satine_cart', JSON.stringify(c)); } catch (e) {}
     renderCart();
   }
 
+  function shopifyPost(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (!r.ok) throw new Error(data.description || data.message || 'panier');
+        return data;
+      });
+    });
+  }
+
+  function refreshCart() {
+    return fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (c) { liveCart = c; renderCart(); });
+  }
+
+  /* Les lignes à afficher dans le tiroir, dans les deux modes.
+     En direct on montre TOUT le panier Shopify, y compris ce qui aurait été
+     ajouté ailleurs : le tiroir doit dire la vérité sur ce qui sera payé. */
+  function cartLines() {
+    if (LIVE) {
+      return (liveCart.items || []).map(function (it, i) {
+        return { key: String(i + 1), name: it.title, qty: it.quantity, total: money(it.line_price) };
+      });
+    }
+    var cart = demoCart(), out = [];
+    Object.keys(cart).forEach(function (id) {
+      var p = product(id);
+      if (!p || cart[id] < 1) return;
+      out.push({ key: id, name: p.name, qty: cart[id], total: money(p.price * cart[id] * 100) });
+    });
+    return out;
+  }
+
+  function cartTotal() {
+    if (LIVE) return money(liveCart.total_price || 0);
+    var t = 0, cart = demoCart();
+    Object.keys(cart).forEach(function (id) {
+      var p = product(id);
+      if (p) t += p.price * cart[id];
+    });
+    return money(t * 100);
+  }
+
+  function cartCount() {
+    if (LIVE) return liveCart.item_count || 0;
+    var n = 0, cart = demoCart();
+    Object.keys(cart).forEach(function (id) { n += cart[id]; });
+    return n;
+  }
+
   function renderCart() {
-    var cart = getCart();
     var body = document.getElementById('cart-body');
     var totalEl = document.getElementById('cart-total');
-    var count = 0, total = 0, html = '';
-
-    Object.keys(cart).forEach(function (id) {
-      var qty = cart[id];
-      var p = CATALOG[id];
-      if (!p || qty < 1) return;
-      count += qty;
-      total += qty * p.price;
-      html += '<div class="cart-line"><span>' + p.name + '</span>' +
-        '<span><button data-dec="' + id + '">−</button> ' + qty +
-        ' <button data-inc="' + id + '">+</button> · ' + (qty * p.price) + '€</span></div>';
+    if (!body || !totalEl) return;
+    var html = '';
+    cartLines().forEach(function (l) {
+      html += '<div class="cart-line"><span>' + esc(l.name) + '</span>' +
+        '<span><button data-dec="' + l.key + '">−</button> ' + l.qty +
+        ' <button data-inc="' + l.key + '">+</button> · ' + l.total + '</span></div>';
     });
-
     body.innerHTML = html || '<p style="text-align:center;color:#777;margin-top:30px">panier vide… 💔<br>va vite voir le merch !</p>';
-    totalEl.textContent = 'Total : ' + total + '€';
-    document.querySelector('#cart-fab .count').textContent = count;
+    totalEl.textContent = 'Total : ' + cartTotal();
+    document.querySelector('#cart-fab .count').textContent = cartCount();
+  }
+
+  /* les titres viennent du back-office : une apostrophe ou un chevron dans
+     un nom de produit ne doit pas pouvoir injecter du HTML dans le tiroir */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function cartError(msg) {
+    var body = document.getElementById('cart-body');
+    if (body) body.insertAdjacentHTML('afterbegin',
+      '<p class="cart-err" style="color:#c00;text-align:center">' + esc(msg) + '</p>');
   }
 
   window.SatineCart = {
     add: function (id, qty) {
-      var cart = getCart();
+      var p = product(id);
+      if (!p) return;
+      var drawer = document.getElementById('cart-drawer');
+      if (LIVE) {
+        if (!p.variantId) { cartError('Produit indisponible pour le moment.'); return; }
+        shopifyPost('/cart/add.js', { id: p.variantId, quantity: qty || 1 })
+          .then(refreshCart)
+          .then(function () { drawer.classList.add('open'); })
+          .catch(function (e) { drawer.classList.add('open'); cartError(e.message); });
+        return;
+      }
+      var cart = demoCart();
       cart[id] = (cart[id] || 0) + (qty || 1);
-      setCart(cart);
-      document.getElementById('cart-drawer').classList.add('open');
+      saveDemoCart(cart);
+      drawer.classList.add('open');
     }
   };
+
+  function bumpLine(key, delta) {
+    if (LIVE) {
+      var line = parseInt(key, 10);
+      var item = (liveCart.items || [])[line - 1];
+      if (!item) return;
+      shopifyPost('/cart/change.js', { line: line, quantity: Math.max(0, item.quantity + delta) })
+        .then(function (c) { liveCart = c; renderCart(); })
+        .catch(function (e) { cartError(e.message); });
+      return;
+    }
+    var cart = demoCart();
+    cart[key] = (cart[key] || 0) + delta;
+    if (cart[key] < 1) delete cart[key];
+    saveDemoCart(cart);
+  }
 
   /* ------------------------------------------------------ modal produit */
 
@@ -789,13 +946,14 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
 
   window.SatineModal = {
     open: function (id) {
-      var p = CATALOG[id];
+      var p = product(id);
       if (!p) return;
       modalProduct = id;
       document.getElementById('modal-title').textContent = p.name + ' - satine_shop.exe';
       document.getElementById('modal-visual').innerHTML = p.visual;
       document.getElementById('modal-name').textContent = p.name;
       document.getElementById('modal-desc').textContent = p.desc;
+      renderVariants(p);
       document.getElementById('modal-qty').value = 1;
       updateModalPrice();
       document.getElementById('modal-overlay').hidden = false;
@@ -808,11 +966,38 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
     }
   };
 
+  /* Le sélecteur n'apparaît que si le produit a vraiment plusieurs
+     déclinaisons dans Shopify — sur un produit simple, Shopify en crée une
+     seule, nommée « Default Title », qu'il ne faut surtout pas afficher. */
+  function renderVariants(p) {
+    var box = document.getElementById('modal-variants');
+    if (!box) return;
+    if (!p.variants || p.variants.length < 2) { box.hidden = true; box.innerHTML = ''; return; }
+    var html = '<label class="variant-row">Modèle : <select id="modal-variant">';
+    p.variants.forEach(function (v) {
+      html += '<option value="' + v.id + '"' +
+        (v.id === p.variantId ? ' selected' : '') +
+        (v.available ? '' : ' disabled') + '>' +
+        esc(v.title) + (v.available ? '' : ' — épuisé') + '</option>';
+    });
+    box.innerHTML = html + '</select></label>';
+    box.hidden = false;
+    document.getElementById('modal-variant').addEventListener('change', function () {
+      chosenVariant[modalProduct] = parseInt(this.value, 10);
+      updateModalPrice();
+    });
+  }
+
   function updateModalPrice() {
-    var p = CATALOG[modalProduct];
+    var p = product(modalProduct);
+    if (!p) return;
     var qty = Math.max(1, parseInt(document.getElementById('modal-qty').value, 10) || 1);
     document.getElementById('modal-qty').value = qty;
-    document.getElementById('modal-price').textContent = (p.price * qty) + '€';
+    document.getElementById('modal-price').textContent = money(p.price * qty * 100);
+    /* rupture de stock : on le dit, plutôt que de laisser ajouter pour rien */
+    var btn = document.getElementById('modal-add');
+    btn.disabled = !p.available;
+    btn.textContent = p.available ? 'AJOUTER AU PANIER ♡' : 'ÉPUISÉ';
   }
 
   function initModal() {
@@ -861,15 +1046,19 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
       var inc = e.target.getAttribute('data-inc');
       var dec = e.target.getAttribute('data-dec');
       if (!inc && !dec) return;
-      var cart = getCart();
-      var id = inc || dec;
-      cart[id] = (cart[id] || 0) + (inc ? 1 : -1);
-      if (cart[id] < 1) delete cart[id];
-      setCart(cart);
+      bumpLine(inc || dec, inc ? 1 : -1);
     });
     document.getElementById('cart-checkout').addEventListener('click', function () {
-      alert('Le paiement arrive avec l’intégration Shopify (phase 2), patience ♡');
+      if (LIVE) { window.location.href = '/checkout'; return; }
+      alert('Le paiement se fait sur la boutique Shopify — ici on est sur la version de démonstration du site ♡');
     });
+    /* le panier Shopify vit aussi hors du site (onglet resté ouvert, retour
+       du checkout) : on se resynchronise en revenant sur la page */
+    if (LIVE) {
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) refreshCart();
+      });
+    }
   }
 
   /* ---------------------------------------------------------- sparkles */
