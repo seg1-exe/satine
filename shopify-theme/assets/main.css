@@ -1697,7 +1697,18 @@ section { margin-top: 30px; }
   object-fit: contain;
 }
 .product-modal h3 { font-size: 19px; flex-shrink: 0; }
-.product-modal p { font-size: 13px; color: #444; flex-shrink: 1; min-height: 2.6em; overflow-y: auto; }
+/* La description vient de Shopify et peut être longue (mention
+   d'expédition, etc.). À 2.6em elle se réduisait à deux lignes et le reste
+   partait dans un scroll qu'on ne voit pas : on lui laisse de quoi tenir en
+   entier, le scroll ne servant que de filet sur un très petit écran. */
+.product-modal p {
+  font-size: 14px;
+  line-height: 1.45;
+  color: #444;
+  flex-shrink: 1;
+  min-height: 6.2em;
+  overflow-y: auto;
+}
 /* sélecteur de déclinaison — n'apparaît que sur les produits qui en ont
    plusieurs dans Shopify (voir renderVariants dans shared.js) */
 .variant-row {
