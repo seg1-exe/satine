@@ -727,20 +727,23 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
 
   /* ------------------------------------------------------------ panier */
 
-  /* prix conformes à la maquette : 35€ côté barrettes, 10€ côté poster */
+  /* Valeurs de DÉMONSTRATION : elles ne servent que hors Shopify (Render,
+     fichier local). Sur la boutique, titres, prix et stocks viennent de
+     theme.liquid — voir la section BOUTIQUE plus bas. Les garder à jour
+     évite juste d'afficher un prix faux sur le site de test. */
   var CATALOG = {
     barrettes: {
       name: 'Pack 3 barrettes',
-      price: 35,
+      price: 25,
       desc: 'Trois barrettes éclair « >< » : une blanche au tracé rose, une bleue, une noire. ' +
-        'Comme celle que je porte, mais pour TES cheveux.',
+        'Comme celle que je porte, mais pour TES cheveux. Expéditions à partir de la mi-octobre !!',
       visual: '<div class="product-visual has-img"><img src="' + ASSET('barretes.webp') + '" alt="Pack de 3 barrettes"></div>'
     },
     poster: {
       name: 'Poster du dernier clip',
       price: 10,
       desc: 'L’artwork du clip anomalisa en grand format, pour remplacer ce vieux poster que tu ' +
-        'n’assumes plus. Impression de qualité, mur non fourni.',
+        'n’assumes plus. Impression de qualité, mur non fourni. Expéditions à partir de la mi-octobre !!',
       visual: '<div class="product-visual has-img"><img src="' + ASSET('poster.webp') + '" alt="Poster anomalisa"></div>'
     }
   };
@@ -1024,8 +1027,19 @@ function ASSET(f) { return (window.__ASSET_BASE || 'assets/') + f; }
     });
   }
 
+  /* les pastilles de prix de la fenêtre merch : même source que la modale,
+     sinon la vitrine annoncerait un prix et le panier un autre */
+  function initPrices() {
+    document.querySelectorAll('[data-price-for]').forEach(function (el) {
+      var p = product(el.getAttribute('data-price-for'));
+      if (!p) return;
+      el.innerHTML = '<b>' + money(p.price * 100) + '</b>';
+    });
+  }
+
   function initCart() {
     renderCart();
+    initPrices();
     document.getElementById('cart-fab').addEventListener('click', function () {
       document.getElementById('cart-drawer').classList.toggle('open');
     });

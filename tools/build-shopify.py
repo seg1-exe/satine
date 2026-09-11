@@ -56,8 +56,8 @@ ASSET_RE = re.compile(r"assets/[A-Za-z0-9_\-./]+?\.[A-Za-z0-9]+")
 # Si un handle ne correspond à aucun produit, l'emplacement retombe sur les
 # valeurs de démonstration de shared.js au lieu de casser la page.
 SHOP_SLOTS = [
-    ('barrettes', 'pack-3-barrettes'),
-    ('poster', 'poster-anomalisa'),
+    ('barrettes', 'barrettes'),
+    ('poster', 'poster'),
 ]
 
 

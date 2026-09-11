@@ -102,8 +102,12 @@
       </div>
       <div class="hazard merch-bento">
         <div class="bento-board">
-          <span class="price-burst pb-tr"><b>10€</b></span>
-          <span class="price-burst pb-bl"><b>35€</b></span>
+          <!-- les prix affichés sont ceux de Shopify : data-price-for les fait
+               remplir par initPrices() dans shared.js. Les valeurs écrites ici
+               ne servent que de repli hors boutique (et si elles finissent par
+               dater, c'est visible tout de suite). -->
+          <span class="price-burst pb-tr" data-price-for="poster"><b>10€</b></span>
+          <span class="price-burst pb-bl" data-price-for="barrettes"><b>25€</b></span>
           <div class="bento-item bento-barrettes">
             <span class="item-tag">Barrettes</span>
             <img class="product-click" src="assets/img/products/barretes.webp" alt="Pack 3 barrettes" onclick="SatineModal.open('barrettes')">

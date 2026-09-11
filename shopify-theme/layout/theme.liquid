@@ -79,7 +79,7 @@
        chaîne venant du back-office, une apostrophe dans un titre suffirait
        à casser le script. */
     {%- assign slot_ids = 'barrettes,poster' | split: ',' -%}
-    {%- assign slot_handles = 'pack-3-barrettes,poster-anomalisa' | split: ',' -%}
+    {%- assign slot_handles = 'barrettes,poster' | split: ',' -%}
     window.SATINE_SHOP = { products: {
     {%- assign sep = '' -%}
     {%- for h in slot_handles -%}
